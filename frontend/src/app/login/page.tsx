@@ -1,33 +1,8 @@
-import { useId, useState } from 'react'
-import type {
-  ButtonHTMLAttributes,
-  ChangeEvent,
-  InputHTMLAttributes,
-  ReactNode,
-} from 'react'
+import { useState } from 'react'
+import Button from '../../components/Button/Button'
+import Checkbox from '../../components/Checkbox/Checkbox'
+import Input from '../../components/Input/Input'
 import styles from './login.module.css'
-
-type InputProps = {
-  label: string
-  type: 'text' | 'password'
-  placeholder: string
-  startIcon?: ReactNode
-  endIcon?: ReactNode
-  endIconLabel?: string
-  onEndIconClick?: () => void
-} & Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'placeholder'>
-
-type ButtonProps = {
-  variant: 'primary' | 'secondary'
-  icon?: ReactNode
-  children: ReactNode
-} & ButtonHTMLAttributes<HTMLButtonElement>
-
-type CheckboxProps = {
-  label: string
-  checked?: boolean
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => void
-}
 
 function MailIcon() {
   return (
@@ -187,74 +162,6 @@ function BrandIcon() {
   )
 }
 
-function Input({
-  label,
-  placeholder,
-  startIcon,
-  endIcon,
-  endIconLabel,
-  onEndIconClick,
-  type,
-  className,
-  ...inputProps
-}: InputProps) {
-  const id = useId()
-
-  return (
-    <label className={`${styles.field} ${className ?? ''}`} htmlFor={id}>
-      <span className={styles.fieldLabel}>{label}</span>
-      <span className={styles.inputShell}>
-        {startIcon ? <span className={styles.inputIcon}>{startIcon}</span> : null}
-        <input
-          id={id}
-          className={styles.input}
-          type={type}
-          placeholder={placeholder}
-          {...inputProps}
-        />
-        {endIcon ? (
-          onEndIconClick ? (
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={onEndIconClick}
-              aria-label={endIconLabel}
-            >
-              {endIcon}
-            </button>
-          ) : (
-            <span className={styles.inputIcon}>{endIcon}</span>
-          )
-        ) : null}
-      </span>
-    </label>
-  )
-}
-
-function Button({ variant, icon, className, children, ...buttonProps }: ButtonProps) {
-  return (
-    <button
-      className={`${styles.button} ${variant === 'primary' ? styles.primaryButton : styles.secondaryButton} ${className ?? ''}`}
-      {...buttonProps}
-    >
-      {icon ? <span className={styles.buttonIcon}>{icon}</span> : null}
-      <span>{children}</span>
-    </button>
-  )
-}
-
-function Checkbox({ label, checked, onChange }: CheckboxProps) {
-  const id = useId()
-
-  return (
-    <label className={styles.checkbox} htmlFor={id}>
-      <input id={id} className={styles.checkboxInput} type="checkbox" checked={checked} onChange={onChange} />
-      <span className={styles.checkboxBox} aria-hidden="true" />
-      <span className={styles.checkboxLabel}>{label}</span>
-    </label>
-  )
-}
-
 const features = [
   {
     title: 'Análises inteligentes',
@@ -289,8 +196,8 @@ function LoginPage() {
 
           <div className={styles.heroCopy}>
             <h1 className={styles.title}>
-              Evolua suas habilidades.
-              <span>
+              <span className={styles.titleLine}>Evolua suas habilidades.</span>
+              <span className={styles.titleLine}>
                 Acelere sua <strong>carreira</strong>.
               </span>
             </h1>
@@ -373,5 +280,4 @@ function LoginPage() {
   )
 }
 
-export { Button, Checkbox, Input }
 export default LoginPage
