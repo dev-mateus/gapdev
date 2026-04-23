@@ -1,0 +1,480 @@
+.page {
+  --page-pad-block: 1.7rem;
+  --page-pad-inline: 1.7rem;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: var(--page-pad-block) var(--page-pad-inline);
+  background: #02111b;
+}
+
+.shell {
+  position: relative;
+  display: grid;
+  min-height: calc(100vh - (var(--page-pad-block) * 2));
+  min-height: calc(100dvh - (var(--page-pad-block) * 2));
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2.7rem;
+  background: #02111b;
+  box-shadow:
+    0 34px 80px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+}
+
+.shell::after {
+  content: '';
+  position: absolute;
+  inset: 0.5rem;
+  border-radius: 2.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  pointer-events: none;
+}
+
+.infoPane,
+.formPane {
+  position: relative;
+  padding: 2rem;
+}
+
+.infoPane {
+  order: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.75rem;
+  background: #06324d;
+}
+
+.infoPane::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.03), transparent 28%);
+  pointer-events: none;
+}
+
+.formPane {
+  order: -1;
+  display: flex;
+  align-items: center;
+  background: #001827;
+}
+
+.formPane::before {
+  content: '';
+  position: absolute;
+  inset: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1.8rem;
+  pointer-events: none;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.brandMark {
+  display: inline-flex;
+  width: 3.4rem;
+  height: 3.4rem;
+}
+
+.brandMark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.brandName {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #dff7ff;
+  letter-spacing: -0.03em;
+}
+
+.heroCopy {
+  display: grid;
+  gap: 1rem;
+  max-width: 31rem;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 3.7rem);
+  line-height: 1.02;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: #f5fbff;
+}
+
+.title span {
+  display: block;
+}
+
+.title strong {
+  color: #48d0ff;
+  font-weight: 800;
+}
+
+.description {
+  max-width: 30rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: rgba(232, 246, 255, 0.72);
+}
+
+.featureList {
+  display: grid;
+  gap: 1.2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.featureItem {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.featureIcon {
+  display: inline-flex;
+  width: 3.2rem;
+  height: 3.2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(120, 213, 255, 0.28);
+  border-radius: 1rem;
+  background: #2b5f96;
+  color: #86e7ff;
+  box-shadow: 0 12px 30px rgba(3, 18, 32, 0.24);
+}
+
+.featureIcon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.featureTitle {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f5fbff;
+}
+
+.featureDescription {
+  margin: 0;
+  color: rgba(232, 246, 255, 0.72);
+  line-height: 1.5;
+}
+
+.formCard {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 30rem;
+  margin-inline: auto;
+}
+
+.formHeader {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 2rem;
+}
+
+.formTitle {
+  margin: 0;
+  font-size: clamp(1.8rem, 2.2vw, 2.3rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #f8fbff;
+}
+
+.formSubtitle {
+  margin: 0;
+  color: rgba(232, 246, 255, 0.72);
+}
+
+.form {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.fieldLabel {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(246, 250, 255, 0.9);
+}
+
+.inputShell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 3.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 1rem;
+  background: rgba(5, 21, 34, 0.82);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.inputShell:hover {
+  border-color: rgba(88, 224, 255, 0.38);
+  background: #072131;
+}
+
+.inputShell:focus-within {
+  border-color: rgba(88, 224, 255, 0.82);
+  box-shadow: 0 0 0 4px rgba(58, 192, 240, 0.14);
+  transform: translateY(-1px);
+}
+
+.inputIcon,
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.4rem;
+  height: 1.4rem;
+  color: rgba(180, 215, 231, 0.84);
+}
+
+.inputIcon svg,
+.iconButton svg {
+  width: 100%;
+  height: 100%;
+}
+
+.iconButton {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.iconButton:hover {
+  color: #75e7ff;
+}
+
+.input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #f8fbff;
+}
+
+.input::placeholder {
+  color: rgba(180, 215, 231, 0.62);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: 3.4rem;
+  padding: 0.85rem 1.25rem;
+  border: 0;
+  border-radius: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:focus-visible,
+.iconButton:focus-visible,
+.inlineLink:focus-visible,
+.footerText a:focus-visible {
+  outline: 2px solid rgba(88, 224, 255, 0.85);
+  outline-offset: 3px;
+}
+
+.primaryButton {
+  color: #f8fbff;
+  background: #1b7895;
+  box-shadow: 0 16px 36px rgba(15, 108, 145, 0.38);
+}
+
+.primaryButton:hover {
+  background: #206f89;
+  box-shadow: 0 18px 42px rgba(20, 126, 169, 0.32);
+}
+
+.secondaryButton {
+  color: #eff8ff;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: #001827;
+}
+
+.secondaryButton:hover {
+  border-color: rgba(88, 224, 255, 0.4);
+  background: #02253b;
+}
+
+.buttonIcon {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.buttonIcon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.formRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkboxInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkboxBox {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.48);
+  border-radius: 0.35rem;
+  background: rgba(5, 21, 34, 0.84);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.checkboxInput:checked + .checkboxBox {
+  border-color: #67deff;
+  background: #1b7895;
+  box-shadow: 0 0 0 4px rgba(88, 224, 255, 0.12);
+}
+
+.checkboxInput:checked + .checkboxBox::after {
+  content: '';
+  width: 0.32rem;
+  height: 0.62rem;
+  margin: 0.08rem auto 0;
+  border: solid #f8fbff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkboxLabel {
+  font-weight: 600;
+  color: rgba(242, 248, 255, 0.92);
+}
+
+.inlineLink,
+.footerText a {
+  color: #52d8ff;
+  font-weight: 600;
+  transition: color 160ms ease;
+}
+
+.inlineLink:hover,
+.footerText a:hover {
+  color: #9aeaff;
+}
+
+.submitButton {
+  margin-top: 0.2rem;
+}
+
+.googleButton {
+  margin-top: 0.1rem;
+}
+
+.divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  color: rgba(232, 246, 255, 0.58);
+  font-size: 0.92rem;
+}
+
+.divider span:first-child,
+.divider span:last-child {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.footerText {
+  margin: 0.5rem 0 0;
+  text-align: center;
+  color: rgba(232, 246, 255, 0.72);
+}
+
+@media (min-width: 768px) {
+  .page {
+    --page-pad-block: 2.2rem;
+    --page-pad-inline: 2.2rem;
+  }
+
+  .infoPane,
+  .formPane {
+    padding: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    --page-pad-block: 2.8rem;
+    --page-pad-inline: 3.4rem;
+  }
+
+  .shell {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .infoPane {
+    order: 0;
+    padding: 3.8rem 3.5rem;
+  }
+
+  .formPane {
+    order: 0;
+    padding: 3.8rem 3.5rem;
+  }
+}
