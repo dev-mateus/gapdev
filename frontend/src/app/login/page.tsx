@@ -26,7 +26,7 @@ function MailIcon() {
 
 function LockIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 290 24" aria-hidden="true" focusable="false">
       <path
         d="M7.5 10.25V8a4.5 4.5 0 1 1 9 0v2.25"
         fill="none"
