@@ -29,7 +29,7 @@
 }
 
 .infoPane {
-  order: 1;
+  order: -1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -70,7 +70,7 @@
 }
 
 .formPane {
-  order: -1;
+  order: 1;
   display: flex;
   align-items: center;
   background: #001827;
@@ -103,6 +103,10 @@
   letter-spacing: -0.03em;
 }
 
+.brandAccent {
+  color: #3ec1e0;
+}
+
 .heroCopy {
   display: grid;
   gap: 1rem;
@@ -124,11 +128,11 @@
 
 .titleLine {
   display: block;
-  white-space: nowrap;
+  white-space: normal;
 }
 
-.title strong {
-  color: #48d0ff;
+.titleAccent {
+  color: #3ec1e0;
   font-weight: 800;
 }
 
@@ -289,6 +293,10 @@
   .page {
     --page-pad-block: 3.8rem;
     --page-pad-inline: 5.4rem;
+  }
+
+  .titleLine {
+    white-space: nowrap;
   }
 
   .shell {
