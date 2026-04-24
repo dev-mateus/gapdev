@@ -3,14 +3,15 @@ import styles from './Button.module.css'
 
 type ButtonProps = {
   variant: 'primary' | 'secondary'
+  size?: 'small' | 'medium' | 'large'
   icon?: ReactNode
   children: ReactNode
 } & ButtonHTMLAttributes<HTMLButtonElement>
 
-function Button({ variant, icon, className, children, ...buttonProps }: ButtonProps) {
+function Button({ variant, size = 'medium', icon, className, children, ...buttonProps }: ButtonProps) {
   return (
     <button
-      className={`${styles.button} ${variant === 'primary' ? styles.primaryButton : styles.secondaryButton} ${className ?? ''}`}
+      className={`${styles.button} ${styles[`size${size[0].toUpperCase()}${size.slice(1)}`]} ${variant === 'primary' ? styles.primaryButton : styles.secondaryButton} ${className ?? ''}`}
       {...buttonProps}
     >
       {icon ? <span className={styles.buttonIcon}>{icon}</span> : null}
