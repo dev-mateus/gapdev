@@ -1,7 +1,7 @@
 # Design System - GapDev (Baseado na Tela de Login)
 
-Status: v0.1 (baseline)
-Escopo atual: pagina de login e componentes usados nela (Button, Input, Checkbox)
+Status: v0.2 (login + cadastro)
+Escopo atual: paginas de login/cadastro e componentes usados nelas (Button, Input, Checkbox)
 
 Este documento e vivo. Ele deve ser atualizado sempre que um novo padrao visual for criado, alterado ou removido.
 
@@ -32,9 +32,9 @@ Este documento e vivo. Ele deve ser atualizado sempre que um novo padrao visual 
 | color-bg-info-pane | #06324d | Painel de informacoes |
 | color-bg-form-pane | #001827 | Painel de formulario |
 | color-bg-feature-icon | #2b5f96 | Cartao do icone de feature |
-| color-bg-input | rgba(5, 21, 34, 0.82) | Campo de input |
+| color-bg-input | #051522 | Campo de input |
 | color-bg-input-hover | #072131 | Hover do input |
-| color-bg-checkbox | rgba(5, 21, 34, 0.84) | Fundo checkbox |
+| color-bg-checkbox | #051522 | Fundo checkbox |
 | color-bg-secondary-hover | #02253b | Hover botao secundario |
 
 ### 2.3 Texto
@@ -44,27 +44,27 @@ Este documento e vivo. Ele deve ser atualizado sempre que um novo padrao visual 
 | color-text-primary | #f8fbff | Texto principal e botoes |
 | color-text-heading-hero | #f5fbff | Titulo hero |
 | color-text-brand | #dff7ff | Nome da marca |
-| color-text-muted | rgba(232, 246, 255, 0.72) | Descricoes e subtitulos |
-| color-text-muted-soft | rgba(232, 246, 255, 0.58) | Texto do divisor |
+| color-text-muted | #e8f6ff | Descricoes e subtitulos |
+| color-text-muted-soft | #e8f6ff | Texto do divisor |
 | color-text-link | #52d8ff | Links inline |
 | color-text-link-hover | #9aeaff | Hover de links |
-| color-text-icon | rgba(180, 215, 231, 0.84) | Icones de input |
-| color-text-icon-placeholder | rgba(180, 215, 231, 0.62) | Placeholder |
+| color-text-icon | #b4d7e7 | Icones de input |
+| color-text-icon-placeholder | #b4d7e7 | Placeholder |
 
 ### 2.4 Bordas, foco e efeitos
 
 | Token sugerido | Valor | Uso atual |
 |---|---|---|
-| color-border-shell | rgba(255, 255, 255, 0.2) | Borda container shell |
-| color-border-shell-inner | rgba(255, 255, 255, 0.06) | Inset shell |
-| color-border-input | rgba(255, 255, 255, 0.16) | Input default |
-| color-border-input-hover | rgba(88, 224, 255, 0.38) | Input hover |
-| color-border-input-focus | rgba(88, 224, 255, 0.82) | Input focus |
-| color-ring-focus | rgba(88, 224, 255, 0.85) | Outline focus button/checkbox |
-| color-ring-focus-soft | rgba(58, 192, 240, 0.14) | Glow focus input |
-| color-border-secondary | rgba(255, 255, 255, 0.24) | Botao secundario |
-| color-border-secondary-hover | rgba(88, 224, 255, 0.4) | Hover botao secundario |
-| color-border-checkbox | rgba(255, 255, 255, 0.48) | Checkbox default |
+| color-border-shell | #ffffff | Borda container shell |
+| color-border-shell-inner | #ffffff | Inset shell |
+| color-border-input | #ffffff | Input default |
+| color-border-input-hover | #58e0ff | Input hover |
+| color-border-input-focus | #58e0ff | Input focus |
+| color-ring-focus | #58e0ff | Outline focus button/checkbox |
+| color-ring-focus-soft | #3ac0f0 | Glow focus input |
+| color-border-secondary | #ffffff | Botao secundario |
+| color-border-secondary-hover | #58e0ff | Hover botao secundario |
+| color-border-checkbox | #ffffff | Checkbox default |
 | color-border-checkbox-checked | #67deff | Checkbox checked |
 
 ## 3. Tipografia
@@ -125,13 +125,13 @@ Este documento e vivo. Ele deve ser atualizado sempre que um novo padrao visual 
 ## 5. Elevacao, sombras e blur
 
 - Shell:
-	- 0 34px 80px rgba(0, 0, 0, 0.35)
-	- inset 0 0 0 1px rgba(255, 255, 255, 0.06)
+	- 0 34px 80px #000000
+	- inset 0 0 0 1px #ffffff
 	- backdrop-filter: blur(18px)
 - Feature icon:
-	- 0 12px 30px rgba(3, 18, 32, 0.24)
+	- 0 12px 30px #031220
 - Focus input:
-	- 0 0 0 4px rgba(58, 192, 240, 0.14)
+	- 0 0 0 4px #3ac0f0
 
 ## 6. Iconografia
 
@@ -139,7 +139,7 @@ Este documento e vivo. Ele deve ser atualizado sempre que um novo padrao visual 
 - Tamanho tipico:
 	- Feature icon wrapper: 3.2rem, icone interno 1.5rem
 	- Input/botao icon wrapper: 1.25rem a 1.4rem
-- Cor padrao de icone em campo: rgba(180, 215, 231, 0.84)
+- Cor padrao de icone em campo: #b4d7e7
 - Cor hover de icone interativo: #75e7ff
 
 ## 7. Componentes (Baseline)
@@ -149,26 +149,26 @@ Este documento e vivo. Ele deve ser atualizado sempre que um novo padrao visual 
 - Altura minima: 3.4rem
 - Padding: 0.85rem 1.25rem
 - Peso: 700
-- Focus visible: outline 2px rgba(88, 224, 255, 0.85), offset 3px
+- Focus visible: outline 2px #58e0ff, offset 3px
 - Variantes:
 	- Primary: bg #1b7895, texto #f8fbff, hover #1e6981
-	- Secondary: bg #001827, border rgba(255, 255, 255, 0.24), hover bg #02253b
+	- Secondary: bg #001827, border #ffffff, hover bg #02253b
 
 ## 7.2 Input
 
 - Altura minima shell: 3.5rem
 - Padding shell: 0.85rem 1rem
-- Border default: rgba(255, 255, 255, 0.16)
-- Hover: border rgba(88, 224, 255, 0.38), bg #072131
-- Focus: border rgba(88, 224, 255, 0.82), glow 4px rgba(58, 192, 240, 0.14)
+- Border default: #ffffff
+- Hover: border #58e0ff, bg #072131
+- Focus: border #58e0ff, glow 4px #3ac0f0
 - Label: 0.95rem, 600
 
 ## 7.3 Checkbox
 
 - Box: 1.25rem x 1.25rem
-- Border default: rgba(255, 255, 255, 0.48)
+- Border default: #ffffff
 - Checked: border #67deff, bg #1b7895
-- Focus visible: outline 2px rgba(88, 224, 255, 0.85), offset 3px
+- Focus visible: outline 2px #58e0ff, offset 3px
 
 ## 8. Motion e Interacao
 

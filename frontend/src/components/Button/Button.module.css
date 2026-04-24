@@ -25,7 +25,7 @@
 }
 
 .button:focus-visible {
-  outline: 2px solid rgba(88, 224, 255, 0.85);
+  outline: 2px solid #58e0ff;
   outline-offset: 3px;
 }
 
@@ -40,12 +40,12 @@
 
 .secondaryButton {
   color: #eff8ff;
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid #ffffff;
   background: #001827;
 }
 
 .secondaryButton:hover {
-  border-color: rgba(88, 224, 255, 0.4);
+  border-color: #58e0ff;
   background: #02253b;
 }
 

@@ -1,9 +1,18 @@
 import { useState } from 'react'
-import { FaArrowTrendUp, FaBookOpen, FaChartLine, FaEnvelope, FaEye, FaEyeSlash, FaGoogle, FaLock } from 'react-icons/fa6'
+import {
+  FaArrowTrendUp,
+  FaBookOpen,
+  FaChartLine,
+  FaEnvelope,
+  FaEye,
+  FaEyeSlash,
+  FaGoogle,
+  FaLock,
+} from 'react-icons/fa6'
 import Button from '../../components/Button/Button'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import Input from '../../components/Input/Input'
-import styles from './login.module.css'
+import styles from './cadastro.module.css'
 
 const features = [
   {
@@ -23,8 +32,9 @@ const features = [
   },
 ] as const
 
-function LoginPage() {
+function CadastroPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   return (
     <main className={styles.page}>
@@ -42,13 +52,13 @@ function LoginPage() {
 
           <div className={styles.heroCopy}>
             <h1 className={styles.title}>
-              <span className={styles.titleLine}>Evolua suas habilidades.</span>
+              <span className={styles.titleLine}>Construa sua</span>
               <span className={styles.titleLine}>
-                Acelere sua <strong className={styles.titleAccent}>carreira</strong>.
+                <strong className={styles.titleAccent}>carreira</strong> com estratégia.
               </span>
             </h1>
             <p className={styles.description}>
-              Analisamos vagas do mercado e criamos um plano de estudos personalizados para você conquistar seus objetivos
+              Crie sua conta e receba um plano de estudos baseado no mercado real.
             </p>
           </div>
 
@@ -70,11 +80,13 @@ function LoginPage() {
         <section className={styles.formPane}>
           <div className={styles.formCard}>
             <header className={styles.formHeader}>
-              <h2 className={styles.formTitle}>Bem-vindo de volta!</h2>
-              <p className={styles.formSubtitle}>Faça login para continuar sua jornada</p>
+              <h2 className={styles.formTitle}>Crie sua conta</h2>
+              <p className={styles.formSubtitle}>Comece sua jornada agora</p>
             </header>
 
             <form className={styles.form}>
+              <Input label="Nome" type="text" placeholder="nome" autoComplete="name" />
+
               <Input
                 label="E-mail"
                 type="text"
@@ -86,23 +98,29 @@ function LoginPage() {
               <Input
                 label="Senha"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="********"
+                placeholder="**********"
                 startIcon={<FaLock />}
                 endIcon={showPassword ? <FaEyeSlash /> : <FaEye />}
                 endIconLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 onEndIconClick={() => setShowPassword((current) => !current)}
-                autoComplete="current-password"
+                autoComplete="new-password"
               />
 
-              <div className={styles.formRow}>
-                <Checkbox label="Lembrar de mim" />
-                <a className={styles.inlineLink} href="#forgot-password">
-                  Esqueci minha senha
-                </a>
-              </div>
+              <Input
+                label="Confirmar Senha"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="**********"
+                startIcon={<FaLock />}
+                endIcon={showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                endIconLabel={showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'}
+                onEndIconClick={() => setShowConfirmPassword((current) => !current)}
+                autoComplete="new-password"
+              />
+
+              <Checkbox label="Eu concordo com os termos" />
 
               <Button type="submit" variant="primary" className={styles.submitButton}>
-                Entrar
+                Criar conta
               </Button>
 
               <div className={styles.divider}>
@@ -116,7 +134,7 @@ function LoginPage() {
               </Button>
 
               <p className={styles.footerText}>
-                Ainda não tem uma conta? <a href="/cadastro">Cadastre-se</a>
+                Já tem uma conta? <a href="/login">Entrar</a>
               </p>
             </form>
           </div>
@@ -126,4 +144,4 @@ function LoginPage() {
   )
 }
 
-export default LoginPage
+export default CadastroPage

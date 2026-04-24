@@ -14,7 +14,7 @@ body,
 body {
   min-height: 100vh;
   color-scheme: dark;
-  background: radial-gradient(circle at center, #000 0 12%, #012e49 68% 100%);
+  background: radial-gradient(circle at center, #000000 0 12%, #012e49 68% 100%);
   background-attachment: fixed;
   color: #f8fbff;
   font-family:
