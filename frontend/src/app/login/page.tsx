@@ -5,6 +5,7 @@ import Checkbox from '../../components/Checkbox/Checkbox'
 import Input from '../../components/Input/Input'
 import styles from './login.module.css'
 
+
 const features = [
   {
     title: 'Análises inteligentes',
@@ -108,6 +109,8 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
                   Esqueci minha senha
                 </a>
               </div>
+ 
+              
 
               <Button type="submit" variant="primary" className={styles.submitButton}>
                 Entrar
@@ -135,3 +138,4 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
 }
 
 export default LoginPage
+
