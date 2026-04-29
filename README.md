@@ -50,7 +50,7 @@ Consulte [backend/app/core/config.py](backend/app/core/config.py) para a impleme
 3. Rodar a aplicação (desenvolvimento):
 
 ```powershell
-uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 API disponível em `http://localhost:8000` e documentação OpenAPI em `http://localhost:8000/docs`.
@@ -135,11 +135,12 @@ Se desejar, use `concurrently`, tmux ou scripts para orquestrar múltiplos proce
 
 ## Endpoints principais
 
-As rotas estão em [backend/app/api/routes](backend/app/api/routes). Exemplos:
+As rotas do backend ficam em [backend/app/api/routes](backend/app/api/routes).
 
-- `POST /analise` — endpoint de análise (veja [backend/app/api/routes/analise.py](backend/app/api/routes/analise.py))
-- `POST /vagas` — criação/listagem de vagas (veja [backend/app/api/routes/vaga.py](backend/app/api/routes/vaga.py))
+Como os endpoints disponíveis dependem dos módulos efetivamente implementados e registrados na aplicação, consulte:
 
+- os arquivos de rota realmente implementados em [backend/app/api/routes](backend/app/api/routes)
+- a documentação interativa do FastAPI em `http://localhost:8000/docs`, com o backend em execução
 
 ## Desenvolvimento e contribuição
 
