@@ -50,7 +50,7 @@ Consulte [backend/app/core/config.py](backend/app/core/config.py) para a impleme
 3. Rodar a aplicação (desenvolvimento):
 
 ```powershell
-uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 API disponível em `http://localhost:8000` e documentação OpenAPI em `http://localhost:8000/docs`.
