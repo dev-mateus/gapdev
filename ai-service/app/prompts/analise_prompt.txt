@@ -1,0 +1,1 @@
+Analise a vaga recebida e produza uma resposta objetiva, clara e estruturada.
