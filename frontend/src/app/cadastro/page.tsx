@@ -32,7 +32,11 @@ const features = [
   },
 ] as const
 
-function CadastroPage() {
+type CadastroPageProps = {
+  isBackendConnected: boolean
+}
+
+function CadastroPage({ isBackendConnected }: CadastroPageProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -81,7 +85,11 @@ function CadastroPage() {
           <div className={styles.formCard}>
             <header className={styles.formHeader}>
               <h2 className={styles.formTitle}>Crie sua conta</h2>
-              <p className={styles.formSubtitle}>Comece sua jornada agora</p>
+              <p className={styles.formSubtitle}>
+                Comece sua jornada agora
+                {' · '}
+                Backend: {isBackendConnected ? 'conectado' : 'desconectado'}
+              </p>
             </header>
 
             <form className={styles.form}>
