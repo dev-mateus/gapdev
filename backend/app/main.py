@@ -2,11 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.user import router as user_router
-from app.db.prisma_client import prisma
+from app.db.base import Base
+from app.db.session import engine
 
 app = FastAPI()
-
-app.state.prisma = prisma
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,16 +23,9 @@ app.include_router(user_router)
 
 @app.on_event("startup")
 async def on_startup() -> None:
-    """Connect the Prisma client on application startup."""
+    """Prepare SQLAlchemy metadata on application startup."""
 
-    await app.state.prisma.connect()
-
-
-@app.on_event("shutdown")
-async def on_shutdown() -> None:
-    """Disconnect the Prisma client on application shutdown."""
-
-    await app.state.prisma.disconnect()
+    Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")

@@ -1,29 +1,31 @@
 """User repository."""
 
-from prisma import Prisma
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
+from app.models.user import User
 from app.schemas.user import UserCreate
 
 
-async def get_user_by_email(db: Prisma, email: str):
+def get_user_by_email(db: Session, email: str) -> User | None:
 	"""Return a user by e-mail when found."""
 
-	return await db.user.find_unique(where={"email": email})
+	statement = select(User).where(User.email == email)
+	return db.scalars(statement).first()
 
 
-async def list_users(db: Prisma):
+def list_users(db: Session) -> list[User]:
 	"""Return all users."""
 
-	return await db.user.find_many(order={"name": "asc"})
+	statement = select(User).order_by(User.name.asc())
+	return list(db.scalars(statement).all())
 
 
-async def create_user(db: Prisma, payload: UserCreate):
+def create_user(db: Session, payload: UserCreate) -> User:
 	"""Persist a new user and return it."""
 
-	return await db.user.create(
-		data={
-			"name": payload.name,
-			"email": str(payload.email),
-			"password": payload.password,
-		},
-	)
+	user = User(name=payload.name, email=str(payload.email), password=payload.password)
+	db.add(user)
+	db.commit()
+	db.refresh(user)
+	return user

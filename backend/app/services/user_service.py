@@ -1,43 +1,38 @@
 """User service."""
 
 from fastapi import HTTPException, status
-from prisma import Prisma
+from sqlalchemy.orm import Session
 
 from app.repositories import user_repo
 from app.schemas.user import UserCreate, UserRead
 
 
 def _user_to_read(user: object) -> UserRead:
-	"""Convert a Prisma user record into the public response schema."""
+	"""Convert a SQLAlchemy user record into the public response schema."""
 
-	if isinstance(user, dict):
-		data = user
-	else:
-		data = {
-			"id": getattr(user, "id"),
-			"name": getattr(user, "name"),
-			"email": getattr(user, "email"),
-		}
-
-	return UserRead(id=str(data["id"]), name=str(data["name"]), email=str(data["email"]))
+	return UserRead(
+		id=str(getattr(user, "id")),
+		name=str(getattr(user, "name")),
+		email=str(getattr(user, "email")),
+	)
 
 
-async def list_users(db: Prisma) -> list[UserRead]:
+def list_users(db: Session) -> list[UserRead]:
 	"""List users."""
 
-	users = await user_repo.list_users(db)
+	users = user_repo.list_users(db)
 	return [_user_to_read(user) for user in users]
 
 
-async def create_user(db: Prisma, payload: UserCreate) -> UserRead:
+def create_user(db: Session, payload: UserCreate) -> UserRead:
 	"""Create a user if e-mail is not already in use."""
 
-	existing_user = await user_repo.get_user_by_email(db, str(payload.email))
+	existing_user = user_repo.get_user_by_email(db, str(payload.email))
 	if existing_user:
 		raise HTTPException(
 			status_code=status.HTTP_409_CONFLICT,
 			detail="E-mail ja cadastrado.",
 		)
 
-	created_user = await user_repo.create_user(db, payload)
+	created_user = user_repo.create_user(db, payload)
 	return _user_to_read(created_user)

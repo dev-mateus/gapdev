@@ -1,11 +1,13 @@
 """API dependencies."""
 
-from fastapi import Request
+from collections.abc import Generator
 
-from prisma import Prisma
+from sqlalchemy.orm import Session
+
+from app.db.session import get_db
 
 
-def get_prisma(request: Request) -> Prisma:
-	"""Provide the shared Prisma client."""
+def get_database() -> Generator[Session, None, None]:
+	"""Provide a SQLAlchemy session."""
 
-	return request.app.state.prisma
+	yield from get_db()
