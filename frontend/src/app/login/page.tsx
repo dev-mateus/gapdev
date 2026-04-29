@@ -5,6 +5,7 @@ import Checkbox from '../../components/Checkbox/Checkbox'
 import Input from '../../components/Input/Input'
 import styles from './login.module.css'
 
+
 const features = [
   {
     title: 'Análises inteligentes',
@@ -22,6 +23,8 @@ const features = [
     icon: FaArrowTrendUp,
   },
 ] as const
+
+
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -100,6 +103,8 @@ function LoginPage() {
                   Esqueci minha senha
                 </a>
               </div>
+ 
+              
 
               <Button type="submit" variant="primary" className={styles.submitButton}>
                 Entrar
@@ -127,3 +132,4 @@ function LoginPage() {
 }
 
 export default LoginPage
+
