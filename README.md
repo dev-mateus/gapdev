@@ -57,7 +57,7 @@ API disponível em `http://localhost:8000` e documentação OpenAPI em `http://l
 
 ### ai-service
 
-O `ai-service` é um micro-serviço Python separado que contém agentes, prompts e clientes LLM.
+O `ai-service` é um micro-serviço Python separado que contém agentes, prompts e clientes LLM. Ele utiliza **FastMCP** (não é uma aplicação ASGI/FastAPI por padrão).
 
 1. Entre na pasta e crie um ambiente:
 
@@ -72,13 +72,38 @@ pip install -r requirements.txt
 
 Crie `.env` com chaves específicas de provedores de LLM (por exemplo `OPENAI_API_KEY`), se necessário.
 
-3. Rodar:
+3. Executando o serviço (FastMCP)
+
+O `ai-service` não expõe atualmente um objeto ASGI `app` — por isso **não** use `uvicorn ai-service.app.main:app`. Além disso, o nome de pasta `ai-service` contém um hífen e não é um caminho de módulo Python válido.
+
+Opções para executar o serviço:
+
+- Execução via CLI do FastMCP (recomendado quando o módulo declara um `FastMCP` e chama `mcp.run()`):
 
 ```powershell
-uvicorn ai-service.app.main:app --reload --host 0.0.0.0 --port 8001
+# a partir da pasta ai-service
+python -m fastmcp app.main
+# ou, se o comando estiver disponível no PATH:
+fastmcp app.main
 ```
 
-O serviço de IA ficará disponível em `http://localhost:8001`.
+- Alternativa (importável por módulo): renomeie a pasta para `ai_service` e exponha um entrypoint. Exemplo de execução após renomear/ajustar:
+
+```powershell
+# se a pasta for renomeada para ai_service e o módulo exportar um FastMCP ou ASGI app
+python -m ai_service.app.main
+# ou, para ASGI (se implementar FastAPI/ASGI):
+uvicorn ai_service.app.main:app --reload --port 8001
+```
+
+Observações:
+
+- `ai-service/app/main.py` atualmente contém apenas uma docstring; para usar `python -m fastmcp app.main` o arquivo precisa declarar e executar um `FastMCP` (por exemplo `mcp = FastMCP(...); if __name__ == "__main__": mcp.run()`).
+- Se sua intenção for servir via HTTP com Uvicorn/FastAPI, implemente e exporte um objeto ASGI `app` em `app/main.py` (ou converta `ai-service` para `ai_service`).
+
+Se quiser, eu posso:
+- ajustar o código em `ai-service` para expor um `FastMCP` entrypoint funcional; ou
+- adicionar uma pequena aplicação FastAPI/ASGI em `ai-service` para permitir `uvicorn`.
 
 ### Frontend
 
