@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
+import CookieBanner from "./components/CookiesBanner/CookiesBanner";
 
 function getCurrentPath() {
   const path = window.location.pathname.replace(/\/+$/, '')
@@ -8,20 +9,29 @@ function getCurrentPath() {
 }
 
 function App() {
-  const [path, setPath] = useState(getCurrentPath())
+  const [path, setPath] = useState(getCurrentPath());
 
   useEffect(() => {
-    const handleNavigation = () => setPath(getCurrentPath())
+    const handleNavigation = () => setPath(getCurrentPath());
 
-    window.addEventListener('popstate', handleNavigation)
-    return () => window.removeEventListener('popstate', handleNavigation)
-  }, [])
+    window.addEventListener("popstate", handleNavigation);
+    return () => window.removeEventListener("popstate", handleNavigation);
+  }, []);
 
-  if (path === '/cadastro') {
-    return <CadastroPage />
+  let page;
+
+  if (path === "/cadastro") {
+    page = <CadastroPage />;
+  } else {
+    page = <LoginPage />;
   }
 
-  return <LoginPage />
+  return (
+    <div>
+      {page}
+      <CookieBanner />
+    </div>
+  );
 }
 
-export default App
+export default App;
