@@ -4,6 +4,8 @@ import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
 import Sidebar from './components/Sidebar/Sidebar'
 import './App.css'
+import CookieBanner from "./components/CookiesBanner/CookiesBanner";
+import { fetchBackendHealth } from './services/health'
 
 function getCurrentPath() {
   const path = window.location.pathname.replace(/\/+$/, '')
@@ -13,12 +15,50 @@ function getCurrentPath() {
 function App() {
   const [path, setPath] = useState(getCurrentPath())
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isBackendConnected, setIsBackendConnected] = useState(false)
 
   useEffect(() => {
-    const handleNavigation = () => setPath(getCurrentPath())
+    const handleNavigation = () => setPath(getCurrentPath());
 
-    window.addEventListener('popstate', handleNavigation)
-    return () => window.removeEventListener('popstate', handleNavigation)
+    window.addEventListener("popstate", handleNavigation);
+    return () => window.removeEventListener("popstate", handleNavigation);
+  }, []);
+
+  let page;
+
+  if (path === "/cadastro") {
+    page = <CadastroPage />;
+  } else {
+    page = <LoginPage />;
+  }
+
+  return (
+    <div>
+      {page}
+      <CookieBanner />
+    </div>
+  );
+  useEffect(() => {
+    let isMounted = true
+
+    const checkBackendConnection = async () => {
+      try {
+        const response = await fetchBackendHealth()
+        if (isMounted && response.status === 'ok') {
+          setIsBackendConnected(true)
+        }
+      } catch {
+        if (isMounted) {
+          setIsBackendConnected(false)
+        }
+      }
+    }
+
+    void checkBackendConnection()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   if (path === '/' || path === '/login') {
@@ -26,7 +66,7 @@ function App() {
   }
 
   if (path === '/cadastro') {
-    return <CadastroPage />
+    return <CadastroPage isBackendConnected={isBackendConnected} />
   }
 
   return (
@@ -55,3 +95,7 @@ function App() {
 
 export default App
 
+  return <LoginPage isBackendConnected={isBackendConnected} />
+}
+
+export default App;
