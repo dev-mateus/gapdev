@@ -1,0 +1,77 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  width: 100%;
+  border: 0;
+  border-radius: 1rem;
+  font-family:
+    Arimo, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.sizeSmall {
+  min-height: 2.8rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.92rem;
+}
+
+.sizeMedium {
+  min-height: 3.4rem;
+  padding: 0.85rem 1.25rem;
+  font-size: 1rem;
+}
+
+.sizeLarge {
+  min-height: 3.9rem;
+  padding: 1rem 1.35rem;
+  font-size: 1.05rem;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:focus-visible {
+  outline: 2px solid #58e0ff;
+  outline-offset: 3px;
+}
+
+.primaryButton {
+  color: #f8fbff;
+  background: #1b7895;
+}
+
+.primaryButton:hover {
+  background: #1e6981;
+}
+
+.secondaryButton {
+  color: #eff8ff;
+  border: 1px solid #ffffff;
+  background: #001827;
+}
+
+.secondaryButton:hover {
+  border-color: #58e0ff;
+  background: #02253b;
+}
+
+.buttonIcon {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.buttonIcon svg {
+  width: 100%;
+  height: 100%;
+}

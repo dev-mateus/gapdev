@@ -24,12 +24,39 @@ const features = [
   },
 ] as const
 
-type LoginPageProps = {
-  isBackendConnected?: boolean;
-};
 
-function LoginPage({ isBackendConnected }: LoginPageProps) {
+
+function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
+
+const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const newErrors: { email?: string; password?: string } = {}
+
+    if (!email.trim()) {
+      newErrors.email = 'Coloque seu e-mail'
+    } else if (!validateEmail(email)) {
+      newErrors.email = 'E-mail inválido. Use o formato: nome@email.com'
+    }
+
+    if (!password.trim()) {
+      newErrors.password = 'Coloque sua senha'
+    }
+
+    setErrors(newErrors)
+
+    if (Object.keys(newErrors).length === 0) {
+      console.log('Login submitted:', { email, password })
+    }
+  }
 
   return (
     <main className={styles.page}>
@@ -76,20 +103,19 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
           <div className={styles.formCard}>
             <header className={styles.formHeader}>
               <h2 className={styles.formTitle}>Bem-vindo de volta!</h2>
-              <p className={styles.formSubtitle}>
-                Faça login para continuar sua jornada
-                {' · '}
-                Backend: {isBackendConnected ? 'conectado' : 'desconectado'}
-              </p>
+              <p className={styles.formSubtitle}>Faça login para continuar sua jornada</p>
             </header>
 
-            <form className={styles.form}>
+<form className={styles.form} onSubmit={handleSubmit}>
               <Input
                 label="E-mail"
                 type="text"
                 placeholder="seu@gmail.com"
                 startIcon={<FaEnvelope />}
                 autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={errors.email}
               />
 
               <Input
@@ -101,6 +127,9 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
                 endIconLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 onEndIconClick={() => setShowPassword((current) => !current)}
                 autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={errors.password}
               />
 
               <div className={styles.formRow}>
