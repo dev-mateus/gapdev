@@ -35,6 +35,7 @@ const features = [
 
 type CadastroPageProps = {
   isBackendConnected?: boolean;
+  onNavigate: (path: string) => void;
 };
 
 type CreateUserResponse = {
@@ -43,7 +44,7 @@ type CreateUserResponse = {
   email: string
 }
 
-function CadastroPage({ isBackendConnected }: CadastroPageProps) {
+function CadastroPage({ isBackendConnected, onNavigate }: CadastroPageProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [name, setName] = useState('')
@@ -94,7 +95,7 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
       setFormMessage('Conta criada com sucesso. Redirecionando para o login...')
 
       window.setTimeout(() => {
-        window.location.href = '/login'
+        onNavigate('/login')
       }, 1200)
     } catch (error) {
       setFormMessageType('error')
@@ -230,7 +231,16 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
               </Button>
 
               <p className={styles.footerText}>
-                Já tem uma conta? <a href="/login">Entrar</a>
+                Já tem uma conta?{' '}
+                <a
+                  href="/login"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    onNavigate('/login')
+                  }}
+                >
+                  Entrar
+                </a>
               </p>
             </form>
           </div>

@@ -26,9 +26,10 @@ const features = [
 
 type LoginPageProps = {
   isBackendConnected?: boolean;
+  onNavigate: (path: string) => void;
 };
 
-function LoginPage({ isBackendConnected }: LoginPageProps) {
+function LoginPage({ isBackendConnected, onNavigate }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
@@ -127,7 +128,16 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
               </Button>
 
               <p className={styles.footerText}>
-                Ainda não tem uma conta? <a href="/cadastro">Cadastre-se</a>
+                Ainda não tem uma conta?{' '}
+                <a
+                  href="/cadastro"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    onNavigate('/cadastro')
+                  }}
+                >
+                  Cadastre-se
+                </a>
               </p>
             </form>
           </div>
