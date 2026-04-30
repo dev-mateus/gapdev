@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -23,9 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-=======
-backend/.env
---- a/file:///c%3A/Users/1065133/gapdev/backend/.env
-+++ b/file:///c%3A/Users/1065133/gapdev/backend/.env
-@@ -1,2 +1,2 @@
->>>>>>> 3e4435adb01815824b262e737aee06bda87ed94e

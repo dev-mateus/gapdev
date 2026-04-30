@@ -1,0 +1,59 @@
+.techCard {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-input);
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition:
+    border-color var(--transition-default),
+    background-color var(--transition-default),
+    transform var(--transition-default);
+}
+
+.techCard:hover {
+  border-color: var(--color-border-input-hover);
+  background: var(--color-bg-input-hover);
+  transform: translateY(-1px);
+}
+
+.techIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  color: var(--color-brand-accent);
+  font-size: 0.875rem;
+}
+
+.techName {
+  white-space: nowrap;
+}
+
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--color-text-icon);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: color var(--transition-default);
+}
+
+.closeBtn:hover {
+  color: var(--color-text-primary);
+}
+
+.closeBtn:focus-visible {
+  outline: 2px solid var(--color-ring-focus);
+  outline-offset: 2px;
+  border-radius: 50%;
+}

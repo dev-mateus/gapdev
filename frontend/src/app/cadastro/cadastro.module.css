@@ -1,0 +1,333 @@
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: var(--page-pad-block) var(--page-pad-inline);
+  background: transparent;
+}
+
+.shell {
+  position: relative;
+  display: grid;
+  min-height: calc(100vh - (var(--page-pad-block) * 2));
+  min-height: calc(100dvh - (var(--page-pad-block) * 2));
+  overflow: hidden;
+  border: 1px solid var(--color-border-shell);
+  border-radius: var(--radius-shell);
+  background: var(--color-bg-shell);
+  box-shadow: var(--shadow-shell);
+  backdrop-filter: blur(18px);
+}
+
+.infoPane,
+.formPane {
+  position: relative;
+  padding: 2rem;
+}
+
+/* ==========================
+   LEFT PANEL
+========================== */
+.infoPane {
+  order: -1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2rem;
+  isolation: isolate;
+  background: var(--color-bg-info-pane);
+}
+
+.infoPane::before,
+.infoPane::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.infoPane::before {
+  width: 34rem;
+  height: 34rem;
+  border: 0.125rem solid var(--color-brand-primary-hover);
+  outline: 0.125rem solid rgba(255, 255, 255, 0.05);
+  outline-offset: 4.75rem;
+}
+
+.infoPane::after {
+  width: 24.5rem;
+  height: 24.5rem;
+  border: 0.125rem solid var(--color-brand-primary);
+}
+
+.infoPane > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================
+   RIGHT PANEL
+========================== */
+.formPane {
+  order: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-form-pane);
+}
+
+/* ==========================
+   BRAND
+========================== */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.05rem;
+}
+
+.brandMark {
+  display: inline-flex;
+  width: 5rem;
+  height: 5rem;
+}
+
+.brandMark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.brandName {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--color-text-brand);
+  letter-spacing: -0.03em;
+}
+
+.brandAccent {
+  color: var(--color-brand-accent);
+}
+
+/* ==========================
+   HERO TEXT
+========================== */
+.heroCopy {
+  display: grid;
+  gap: 1rem;
+  max-width: 31rem;
+  text-align: left;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 3.7rem);
+  line-height: 1.02;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  letter-spacing: -0.05em;
+  color: var(--color-text-heading-hero);
+}
+
+.titleLine {
+  display: block;
+  white-space: normal;
+}
+
+.titleAccent {
+  color: var(--color-brand-accent);
+  font-weight: 800;
+}
+
+.description {
+  max-width: 30rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+}
+
+/* ==========================
+   FEATURES
+========================== */
+.featureList {
+  display: grid;
+  gap: 1.2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.featureItem {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.featureIcon {
+  display: inline-flex;
+  width: 3.2rem;
+  height: 3.2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-input-hover);
+  border-radius: var(--radius-control);
+  background: var(--color-bg-feature-icon);
+  color: var(--color-brand-accent);
+  box-shadow: var(--shadow-feature);
+}
+
+.featureIcon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.featureTitle {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--color-text-heading-hero);
+}
+
+.featureDescription {
+  margin: 0;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ==========================
+   FORM
+========================== */
+.formCard {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 30rem;
+  margin-inline: auto;
+}
+
+.formHeader {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.formTitle {
+  margin: 0;
+  font-size: clamp(1.8rem, 2.2vw, 2.3rem);
+  line-height: 1.05;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  letter-spacing: -0.04em;
+  color: var(--color-text-primary);
+}
+
+.formSubtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.submitButton {
+  margin-top: 0.25rem;
+}
+
+.formMessage {
+  margin: 0.100000rem 0 0;
+  padding: 0.900000rem 1.000000rem;
+  border-radius: 0.900000rem;
+  font-weight: 600;
+  line-height: 1.450000;
+}
+
+.formMessageError {
+  border: 0.062500rem solid #8f3e4c;
+  background: rgba(117, 31, 45, 0.35);
+  color: #ffd7de;
+}
+
+.formMessageSuccess {
+  border: 0.062500rem solid #2f7f72;
+  background: rgba(10, 82, 71, 0.35);
+  color: #d9fff7;
+}
+
+.googleButton {
+  margin-top: 0.25rem;
+}
+
+/* ==========================
+   DIVIDER
+========================== */
+.divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  color: var(--color-text-muted-soft);
+  font-size: 0.92rem;
+}
+
+.divider span:first-child,
+.divider span:last-child {
+  height: 1px;
+  background: var(--color-border-shell);
+}
+
+/* ==========================
+   FOOTER
+========================== */
+.footerText {
+  margin-top: 0.75rem;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.footerText a {
+  color: var(--color-text-link);
+  font-weight: 600;
+  transition: color var(--transition-default);
+}
+
+.footerText a:hover {
+  color: var(--color-text-link-hover);
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+@media (min-width: 768px) {
+  .infoPane,
+  .formPane {
+    padding: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .titleLine {
+    white-space: nowrap;
+  }
+
+  .shell {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .infoPane {
+    order: 0;
+    padding: 3.8rem 2.6rem 3.8rem 3rem;
+  }
+
+  .formPane {
+    order: 0;
+    padding: 3.8rem 3.5rem;
+  }
+}

@@ -1,0 +1,1 @@
+"""Vaga service."""

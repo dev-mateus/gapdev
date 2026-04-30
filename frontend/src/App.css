@@ -1,0 +1,37 @@
+.app-layout {
+  min-height: 100vh;
+  background-color: #061C2D;
+}
+
+.menu-button {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+
+  background-color: #1FA3C6;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menu-button:hover {
+  background-color: #178CA8;
+}
+
+.app-content {
+  padding: 32px;
+  color: #E6F1F7;
+  margin-left: 260px;
+  transition: margin-left 0.35s ease;
+}
