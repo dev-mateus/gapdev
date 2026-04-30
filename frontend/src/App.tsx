@@ -1,5 +1,6 @@
-import { type ReactElement, useEffect, useState } from 'react'
+import { type ReactElement, type ReactNode, useEffect, useState } from 'react'
 import { Menu } from 'lucide-react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
 import Sidebar from './components/Sidebar/Sidebar'
@@ -7,22 +8,36 @@ import './App.css'
 import CookieBanner from './components/CookiesBanner/CookiesBanner'
 import { fetchBackendHealth } from './services/health'
 
-function getCurrentPath() {
-  const path = window.location.pathname.replace(/\/+$/, '')
-  return path || '/'
+function PrivateRoute({ children }: { children: ReactNode }) {
+  const isLogged = localStorage.getItem('usuarioLogado')
+
+  if (!isLogged) {
+    return <Navigate to="/login" replace />
+  }
+
+  return children
+}
+
+function PrivateLayout({ children }: { children: ReactElement }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+
+  return (
+    <div className="app-layout">
+      {!isSidebarOpen && (
+        <button className="menu-button" onClick={() => setIsSidebarOpen(true)}>
+          <Menu size={24} />
+        </button>
+      )}
+
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+      <main className="app-content">{children}</main>
+    </div>
+  )
 }
 
 function App() {
-  const [path, setPath] = useState(getCurrentPath())
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isBackendConnected, setIsBackendConnected] = useState(false)
-
-  useEffect(() => {
-    const handleNavigation = () => setPath(getCurrentPath())
-
-    window.addEventListener('popstate', handleNavigation)
-    return () => window.removeEventListener('popstate', handleNavigation)
-  }, [])
 
   useEffect(() => {
     let isMounted = true
@@ -47,35 +62,95 @@ function App() {
     }
   }, [])
 
-  let page: ReactElement
-
-  if (path === '/' || path === '/login') {
-    page = <LoginPage isBackendConnected={isBackendConnected} />
-  } else if (path === '/cadastro') {
-    page = <CadastroPage isBackendConnected={isBackendConnected} />
-  } else {
-    page = (
-      <div className="app-layout">
-        {!isSidebarOpen && (
-          <button className="menu-button" onClick={() => setIsSidebarOpen(true)}>
-            <Menu size={24} />
-          </button>
-        )}
-
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-        <main className="app-content">
-          <h1>Você está em: {path}</h1>
-        </main>
-      </div>
-    )
-  }
-
   return (
-    <div>
-      {page}
+    <>
+      <Routes>
+        <Route
+          path="/"
+          element={<LoginPage isBackendConnected={isBackendConnected} />}
+        />
+
+        <Route
+          path="/login"
+          element={<LoginPage isBackendConnected={isBackendConnected} />}
+        />
+
+        <Route
+          path="/cadastro"
+          element={<CadastroPage isBackendConnected={isBackendConnected} />}
+        />
+
+        {/* 🔒 ROTAS PROTEGIDAS */}
+
+        <Route
+          path="/perfil"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <h1>Você está em: /perfil</h1>
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/vagas"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <h1>Você está em: /vagas</h1>
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/analise"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <h1>Você está em: /analise</h1>
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/plano-estudos"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <h1>Você está em: /plano-estudos</h1>
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/progresso"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <h1>Você está em: /progresso</h1>
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/historico-vagas"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <h1>Você está em: /historico-vagas</h1>
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+
       <CookieBanner />
-    </div>
+    </>
   )
 }
 
