@@ -1,16 +1,17 @@
-import { type ReactElement, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Menu } from 'lucide-react'
-import CadastroPage from './app/cadastro/page'
-import LoginPage from './app/login/page'
 import Sidebar from './components/Sidebar/Sidebar'
-import './App.css'
 import CookieBanner from './components/CookiesBanner/CookiesBanner'
+import { ROUTES } from './constants/routes'
 import { fetchBackendHealth } from './services/health'
+import './App.css'
 
 function getCurrentPath() {
   const path = window.location.pathname.replace(/\/+$/, '')
   return path || '/'
 }
+
+const PUBLIC_ROUTES = ['/', '/login', '/cadastro']
 
 function App() {
   const [path, setPath] = useState(getCurrentPath())
@@ -21,7 +22,10 @@ function App() {
     const handleNavigation = () => setPath(getCurrentPath())
 
     window.addEventListener('popstate', handleNavigation)
-    return () => window.removeEventListener('popstate', handleNavigation)
+
+    return () => {
+      window.removeEventListener('popstate', handleNavigation)
+    }
   }, [])
 
   useEffect(() => {
@@ -30,8 +34,9 @@ function App() {
     const checkBackendConnection = async () => {
       try {
         const response = await fetchBackendHealth()
-        if (isMounted && response.status === 'ok') {
-          setIsBackendConnected(true)
+
+        if (isMounted) {
+          setIsBackendConnected(response.status === 'ok')
         }
       } catch {
         if (isMounted) {
@@ -47,35 +52,49 @@ function App() {
     }
   }, [])
 
-  let page: ReactElement
+  const CurrentPage = ROUTES[path]
+  const isPublicRoute = PUBLIC_ROUTES.includes(path)
 
-  if (path === '/' || path === '/login') {
-    page = <LoginPage isBackendConnected={isBackendConnected} />
-  } else if (path === '/cadastro') {
-    page = <CadastroPage isBackendConnected={isBackendConnected} />
-  } else {
-    page = (
-      <div className="app-layout">
-        {!isSidebarOpen && (
-          <button className="menu-button" onClick={() => setIsSidebarOpen(true)}>
-            <Menu size={24} />
-          </button>
-        )}
-
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-        <main className="app-content">
-          <h1>Você está em: {path}</h1>
+  if (!CurrentPage) {
+    return (
+      <>
+        <main className="app-not-found">
+          <h1>Página não encontrada</h1>
         </main>
-      </div>
+        <CookieBanner />
+      </>
     )
   }
 
+  const page = isPublicRoute ? (
+    <CurrentPage isBackendConnected={isBackendConnected} />
+  ) : (
+    <div className="app-layout">
+      {!isSidebarOpen && (
+        <button
+          className="menu-button"
+          onClick={() => setIsSidebarOpen(true)}
+        >
+          <Menu size={24} />
+        </button>
+      )}
+
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      <main className="app-content">
+        <CurrentPage />
+      </main>
+    </div>
+  )
+
   return (
-    <div>
+    <>
       {page}
       <CookieBanner />
-    </div>
+    </>
   )
 }
 

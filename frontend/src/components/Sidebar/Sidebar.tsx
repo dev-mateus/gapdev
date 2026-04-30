@@ -10,8 +10,8 @@ import {
 import styles from './Sidebar.module.css'
 
 type SidebarProps = {
-  isOpen: boolean
-  onClose: () => void
+  isOpen?: boolean
+  onClose?: () => void
 }
 
 const menuItems = [
