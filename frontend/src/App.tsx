@@ -20,20 +20,6 @@ function App() {
     return () => window.removeEventListener("popstate", handleNavigation);
   }, []);
 
-  let page;
-
-  if (path === "/cadastro") {
-    page = <CadastroPage />;
-  } else {
-    page = <LoginPage />;
-  }
-
-  return (
-    <div>
-      {page}
-      <CookieBanner />
-    </div>
-  );
   useEffect(() => {
     let isMounted = true
 
@@ -58,10 +44,20 @@ function App() {
   }, [])
 
   if (path === '/cadastro') {
-    return <CadastroPage isBackendConnected={isBackendConnected} />
+    return (
+      <div>
+        <CadastroPage isBackendConnected={isBackendConnected} />
+        <CookieBanner />
+      </div>
+    )
   }
 
-  return <LoginPage isBackendConnected={isBackendConnected} />
+  return (
+    <div>
+      <LoginPage isBackendConnected={isBackendConnected} />
+      <CookieBanner />
+    </div>
+  )
 }
 
 export default App;
