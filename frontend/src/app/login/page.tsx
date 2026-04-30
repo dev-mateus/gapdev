@@ -4,6 +4,8 @@ import Button from '../../components/Button/Button'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import Input from '../../components/Input/Input'
 import styles from './login.module.css'
+import { useGoogleLogin } from '@react-oauth/google'
+import { useNavigate } from 'react-router-dom'
 
 
 const features = [
@@ -28,6 +30,25 @@ const features = [
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+
+
+  const navigate = useNavigate()
+
+const loginWithGoogle = useGoogleLogin({
+  onSuccess: (tokenResponse) => {
+    console.log('Login Google:', tokenResponse)
+
+    localStorage.setItem('usuarioLogado', 'true')
+    window.dispatchEvent(new Event('auth-changed'))
+
+    navigate('/perfil')
+  },
+  onError: () => {
+    console.log('Erro ao fazer login com Google')
+  },
+})
+
+
 
   return (
     <main className={styles.page}>
@@ -116,7 +137,13 @@ function LoginPage() {
                 <span />
               </div>
 
-              <Button type="button" variant="secondary" icon={<FaGoogle />} className={styles.googleButton}>
+              <Button 
+                type="button"
+                variant="secondary"
+                icon={<FaGoogle />}
+                className={styles.googleButton}
+                onClick={() => loginWithGoogle()}
+              >
                 Entrar com Google
               </Button>
 
