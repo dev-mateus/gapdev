@@ -5,17 +5,15 @@
   gap: 0.7rem;
   width: 100%;
   border: 0;
-  border-radius: 1rem;
-  font-family:
-    Arimo, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
+  border-radius: var(--radius-control);
+  font-family: var(--font-body);
   font-weight: 700;
   cursor: pointer;
   transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    border-color 160ms ease,
-    background-color 160ms ease;
+    transform var(--transition-default),
+    box-shadow var(--transition-default),
+    border-color var(--transition-default),
+    background-color var(--transition-default);
 }
 
 .sizeSmall {
@@ -41,28 +39,30 @@
 }
 
 .button:focus-visible {
-  outline: 2px solid #58e0ff;
+  outline: 2px solid var(--color-ring-focus);
   outline-offset: 3px;
 }
 
+/* PRIMARY */
 .primaryButton {
-  color: #f8fbff;
-  background: #1b7895;
+  color: var(--color-text-primary);
+  background: var(--color-brand-primary);
 }
 
 .primaryButton:hover {
-  background: #1e6981;
+  background: var(--color-brand-primary-hover);
 }
 
+/* SECONDARY */
 .secondaryButton {
-  color: #eff8ff;
-  border: 1px solid #ffffff;
-  background: #001827;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-secondary);
+  background: var(--color-bg-form-pane);
 }
 
 .secondaryButton:hover {
-  border-color: #58e0ff;
-  background: #02253b;
+  border-color: var(--color-border-secondary-hover);
+  background: var(--color-bg-secondary-hover);
 }
 
 .buttonIcon {

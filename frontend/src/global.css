@@ -1,39 +1,213 @@
 @import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&family=Inter:wght@700;800&display=swap');
 @import 'tailwindcss';
 
-body {
-  margin: 0;
-}
+@theme {
+  /* ==========================================
+     1. CORES DE MARCA
+  ========================================== */
+  --color-brand-accent: #3ec1e0;
+  --color-brand-primary: #1b7895;
+  --color-brand-primary-hover: #1e6981;
 
-html,
-body,
-#root {
-  min-height: 100%;
-}
+  /* ==========================================
+     2. FUNDOS E SUPERFÍCIES
+  ========================================== */
+  --color-bg-page-start: #000000;
+  --color-bg-page-end: #012e49;
+  --color-bg-shell: #02111b;
+  --color-bg-info-pane: #06324d;
+  --color-bg-form-pane: #001827;
+  --color-bg-feature-icon: #2b5f96;
+  --color-bg-input: #051522;
+  --color-bg-input-hover: #072131;
+  --color-bg-checkbox: #051522;
+  --color-bg-secondary-hover: #02253b;
 
-body {
-  min-height: 100vh;
-  color-scheme: dark;
-  background: radial-gradient(circle at center, #000000 0 12%, #012e49 68% 100%);
-  background-attachment: fixed;
-  color: #f8fbff;
-  font-family:
-    Arimo, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+  /* ==========================================
+     3. TEXTO
+  ========================================== */
+  --color-text-primary: #f8fbff;
+  --color-text-heading-hero: #f5fbff;
+  --color-text-brand: #dff7ff;
+  --color-text-muted: #e8f6ff;
+  --color-text-muted-soft: #e8f6ff;
+  --color-text-link: #52d8ff;
+  --color-text-link-hover: #9aeaff;
+  --color-text-icon: #b4d7e7;
+  --color-text-icon-placeholder: #b4d7e7;
+
+  /* ==========================================
+     4. BORDAS E FOCUS
+  ========================================== */
+  --color-border-shell: rgba(255, 255, 255, 0.18);
+  --color-border-shell-inner: rgba(255, 255, 255, 0.08);
+  --color-border-input: rgba(255, 255, 255, 0.22);
+  --color-border-input-hover: #58e0ff;
+  --color-border-input-focus: #58e0ff;
+  --color-ring-focus: #58e0ff;
+  --color-ring-focus-soft: #3ac0f0;
+  --color-border-secondary: rgba(255, 255, 255, 0.24);
+  --color-border-secondary-hover: #58e0ff;
+  --color-border-checkbox: rgba(255, 255, 255, 0.4);
+  --color-border-checkbox-checked: #67deff;
+
+  /* ==========================================
+     5. TIPOGRAFIA
+  ========================================== */
+  --font-body:
+    'Arimo',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
     sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+
+  --font-heading:
+    'Inter',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+
+  /* ==========================================
+     6. RAIOS
+  ========================================== */
+  --radius-shell: 1.7rem;
+  --radius-control: 1rem;
+  --radius-checkbox: 0.35rem;
+
+  /* ==========================================
+     7. SOMBRAS
+  ========================================== */
+  --shadow-shell:
+    0 34px 80px rgba(0, 0, 0, 1),
+    inset 0 0 0 1px var(--color-border-shell-inner);
+
+  --shadow-feature:
+    0 12px 30px rgba(3, 18, 32, 1);
+
+  --shadow-focus:
+    0 0 0 4px rgba(58, 192, 240, 0.22);
+
+  /* ==========================================
+     8. MOTION
+  ========================================== */
+  --transition-default: 160ms ease;
+
+  /* ==========================================
+     9. ESPAÇAMENTO
+  ========================================== */
+  --page-pad-block: 1.7rem;
+  --page-pad-inline: 1.7rem;
 }
 
-* {
+/* ==========================================
+   RESET GLOBAL
+========================================== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+html,
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
+body {
+  color-scheme: dark;
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background:
+    radial-gradient(
+      circle at center,
+      var(--color-bg-page-start) 0 12%,
+      var(--color-bg-page-end) 68% 100%
+    );
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ==========================================
+   TIPOGRAFIA GLOBAL
+========================================== */
+h1,
+h2,
+h3,
+h4,
+.brand-name {
+  font-family: var(--font-heading);
+}
+
+p {
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* ==========================================
+   LINKS
+========================================== */
+a {
+  color: var(--color-text-link);
+  text-decoration: none;
+  transition: color var(--transition-default);
+}
+
+a:hover {
+  color: var(--color-text-link-hover);
+}
+
+/* ==========================================
+   FORM ELEMENTS
+========================================== */
 button,
-input {
+input,
+textarea,
+select {
   font: inherit;
+  color: inherit;
+}
+
+/* ==========================================
+   GLASS SYSTEM
+========================================== */
+.glass {
+  background: var(--color-bg-shell);
+  border: 1px solid var(--color-border-shell);
+  border-radius: var(--radius-shell);
+  box-shadow: var(--shadow-shell);
+  backdrop-filter: blur(18px);
+}
+
+/* ==========================================
+   FOCUS ACCESSIBILITY
+========================================== */
+:focus-visible {
+  outline: 2px solid var(--color-ring-focus);
+  outline-offset: 3px;
+}
+
+/* ==========================================
+   RESPONSIVIDADE
+========================================== */
+@media (min-width: 768px) {
+  :root {
+    --page-pad-block: 2.2rem;
+    --page-pad-inline: 2.2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-pad-block: 3.8rem;
+    --page-pad-inline: 5.4rem;
+  }
 }
