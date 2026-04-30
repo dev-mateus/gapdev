@@ -46,6 +46,11 @@ const validateEmail = (email: string) => {
     return emailRegex.test(email)
   }
 
+  const validatePassword = (password: string) => {
+    //_PASSWORD_VALIDATION: Minimum 6 characters (6-8 recommended for security)
+    return password.length >= 6
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const newErrors: { nome?: string; email?: string; password?: string; confirmPassword?: string } = {}
@@ -60,8 +65,10 @@ const validateEmail = (email: string) => {
       newErrors.email = 'E-mail inválido. Use o formato: nome@email.com'
     }
 
-    if (!password.trim()) {
+if (!password.trim()) {
       newErrors.password = 'Coloque sua senha'
+    } else if (!validatePassword(password)) {
+      newErrors.password = 'A senha deve ter no mínimo 6 caracteres (máximo 8)'
     }
 
     if (!confirmPassword.trim()) {
