@@ -95,6 +95,7 @@ function CadastroPage() {
                 autoComplete="email"
               />
 
+
               <Input
                 label="Senha"
                 type={showPassword ? 'text' : 'password'}
@@ -143,5 +144,7 @@ function CadastroPage() {
     </main>
   )
 }
+  
 
 export default CadastroPage
+
