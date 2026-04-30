@@ -1,4 +1,37 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+=======
+=======
+>>>>>>> 3e4435adb01815824b262e737aee06bda87ed94e
 backend/.env
 --- a/file:///c%3A/Users/1065133/gapdev/backend/.env
 +++ b/file:///c%3A/Users/1065133/gapdev/backend/.env
 @@ -1,2 +1,2 @@
+<<<<<<< HEAD
+>>>>>>> 3e4435adb01815824b262e737aee06bda87ed94e
+=======
+>>>>>>> 3e4435adb01815824b262e737aee06bda87ed94e

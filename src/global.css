@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&family=Inter:wght@700;800&display=swap');
+@import 'tailwindcss';
+
+body {
+  margin: 0;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  color-scheme: dark;
+  background: radial-gradient(circle at center, #000000 0 12%, #012e49 68% 100%);
+  background-attachment: fixed;
+  color: #f8fbff;
+  font-family:
+    Arimo, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}

@@ -1,132 +1,114 @@
 .banner {
   position: fixed;
-  inset-inline: 0;
   bottom: 0;
+  left: 0;
+  right: 0;
+
+  background-color: #001827; /* fundo principal */
+  color: #f5fbff;
+
+  padding: 20px;
   z-index: 1000;
 
-  padding: 1.25rem;
-  background: var(--color-bg-form-pane);
-  color: var(--color-text-heading-hero);
-
-  border-top: 2px solid var(--color-border-shell);
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+  border-top: 3px solid #2f4d62;
 
   transform: translateY(100%);
   opacity: 0;
-  animation: slideUp 0.8s ease forwards;
+  animation: slideUp 1s ease forwards;
 }
-
-@keyframes slideUp {
+  /* animação */
+  @keyframes slideUp {
   to {
     transform: translateY(0);
     opacity: 1;
   }
 }
 
+
+
 .content {
-  max-width: 75rem;
-  margin-inline: auto;
+  max-width: 1200px;
+  margin: 0 auto;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1.25rem;
+
+  gap: 20px;
 }
 
 .content p {
-  flex: 1;
   margin: 0;
-  font-size: 0.875rem;
+  flex: 1;
+
+  font-size: 14px;
   line-height: 1.5;
-  color: var(--color-text-muted);
 }
 
 .content a {
-  color: var(--color-text-link);
-  font-weight: 700;
+  color: #52d8ff;
   text-decoration: underline;
-  transition: color var(--transition-default);
-}
-
-.content a:hover {
-  color: var(--color-text-link-hover);
+  font-weight: bold;
 }
 
 .buttons {
   display: flex;
-  gap: 1rem;
+  gap: 20px;
 }
 
 .accept,
 .decline {
-  min-width: 120px;
-  padding: 0.85rem 1.8rem;
-  border-radius: 1.25rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  font-family: var(--font-body);
+  padding: 10px 27px;
+  border: none;
+  border-radius: 6px;
+
   cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
 
-  transition:
-    transform var(--transition-default),
-    background-color var(--transition-default),
-    border-color var(--transition-default),
-    color var(--transition-default);
+  transition: 0.3s;
 }
 
-.accept:hover,
-.decline:hover {
-  transform: translateY(-1px);
-}
-
-.accept:focus-visible,
-.decline:focus-visible {
-  outline: 2px solid var(--color-ring-focus);
-  outline-offset: 3px;
-}
-
-/* botão azul */
+/* Botão aceitar */
 .accept {
-  background: var(--color-brand-primary);
-  color: var(--color-text-primary);
-  border: 2px solid var(--color-brand-primary);
+  background-color: #1b7895;
+  color: #f5fbff;
+  border-radius: 1rem;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
 }
 
 .accept:hover {
-  background: var(--color-brand-primary-hover);
-  border-color: var(--color-brand-primary-hover);
+  background-color: #1e6981;
+  transform: translateY(-1px);
 }
 
-/* botão transparente */
+/* Botão recusar */
 .decline {
-  background: transparent;
-  color: var(--color-text-primary);
-  border: 2px solid #ffffff;
+  background-color: #001827;
+  border-color: #ffffff;
+  border: 1px solid;
+  color: #f5fbff;
+  border-radius: 1rem;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
 }
 
 .decline:hover {
-  border-color: var(--color-border-secondary-hover);
-  color: var(--color-text-link-hover);
-  background: rgba(255, 255, 255, 0.03);
-}
-/* ==========================
-   SECONDARY BUTTON
-========================== */
-.decline {
-  border: 1px solid var(--color-border-secondary);
-  background: var(--color-bg-form-pane);
-  color: var(--color-text-primary);
+  background-color: #58e0ff;
+  border-color: #58e0ff;
+  background: #02253b;
+  transform: translateY(-1px);
 }
 
-.decline:hover {
-  border-color: var(--color-border-secondary-hover);
-  background: var(--color-bg-secondary-hover);
-}
-
-/* ==========================
-   RESPONSIVE
-========================== */
 @media (max-width: 768px) {
   .content {
     flex-direction: column;
@@ -135,11 +117,5 @@
 
   .buttons {
     justify-content: center;
-    width: 100%;
-  }
-
-  .accept,
-  .decline {
-    flex: 1;
   }
 }
