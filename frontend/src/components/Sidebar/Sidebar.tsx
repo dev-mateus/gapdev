@@ -8,7 +8,7 @@ import {
   ChevronLeft,
 } from 'lucide-react'
 
-import './Sidebar.css'
+import './Sidebar.module.css'
 
 type SidebarProps = {
   isOpen: boolean
