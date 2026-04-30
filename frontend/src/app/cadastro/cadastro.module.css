@@ -232,6 +232,26 @@
   margin-top: 0.200000rem;
 }
 
+.formMessage {
+  margin: 0.100000rem 0 0;
+  padding: 0.900000rem 1.000000rem;
+  border-radius: 0.900000rem;
+  font-weight: 600;
+  line-height: 1.450000;
+}
+
+.formMessageError {
+  border: 0.062500rem solid #8f3e4c;
+  background: rgba(117, 31, 45, 0.35);
+  color: #ffd7de;
+}
+
+.formMessageSuccess {
+  border: 0.062500rem solid #2f7f72;
+  background: rgba(10, 82, 71, 0.35);
+  color: #d9fff7;
+}
+
 .googleButton {
   margin-top: 0.100000rem;
 }
