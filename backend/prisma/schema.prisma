@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-py"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String      @id @default(uuid())
+  name     String
+  email    String      @unique
+  password String
+  skills   UserSkill[]
+
+  @@map("users")
+}
+
+model UserSkill {
+  id        String  @id @default(uuid())
+  userId    String
+  skillName String
+  level     Int     @default(1)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_skills")
+  @@index([userId])
+}

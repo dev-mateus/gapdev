@@ -1,6 +1,4 @@
 .page {
-  --page-pad-block: 1.7rem;
-  --page-pad-inline: 1.7rem;
   min-height: 100vh;
   min-height: 100dvh;
   padding: var(--page-pad-block) var(--page-pad-inline);
@@ -13,12 +11,10 @@
   min-height: calc(100vh - (var(--page-pad-block) * 2));
   min-height: calc(100dvh - (var(--page-pad-block) * 2));
   overflow: hidden;
-  border: 1px solid #2f4d62;
-  border-radius: 1.7rem;
-  background: #02111b;
-  box-shadow:
-    0 34px 80px #000000,
-    inset 0 0 0 1px #2f4d62;
+  border: 1px solid var(--color-border-shell);
+  border-radius: var(--radius-shell);
+  background: var(--color-bg-shell);
+  box-shadow: var(--shadow-shell);
   backdrop-filter: blur(18px);
 }
 
@@ -36,7 +32,7 @@
   justify-content: center;
   gap: 2rem;
   isolation: isolate;
-  background: #06324d;
+  background: var(--color-bg-info-pane);
 }
 
 .infoPane::before,
@@ -45,7 +41,6 @@
   position: absolute;
   top: 50%;
   left: 100%;
-  right: auto;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   pointer-events: none;
@@ -55,14 +50,14 @@
 .infoPane::before {
   width: 24.5rem;
   height: 24.5rem;
-  border: 0.125rem solid #2d6784;
+  border: 0.125rem solid var(--color-brand-primary);
 }
 
 .infoPane::after {
   width: 34rem;
   height: 34rem;
-  border: 0.125rem solid #1f4e67;
-  outline: 0.125rem solid #163f56;
+  border: 0.125rem solid var(--color-brand-primary-hover);
+  outline: 0.125rem solid rgba(255, 255, 255, 0.05);
   outline-offset: 4.75rem;
 }
 
@@ -75,9 +70,13 @@
   order: 1;
   display: flex;
   align-items: center;
-  background: #001827;
+  justify-content: center;
+  background: var(--color-bg-form-pane);
 }
 
+/* ==========================
+   BRAND
+========================== */
 .brand {
   display: inline-flex;
   align-items: center;
@@ -98,17 +97,18 @@
 .brandName {
   font-size: 2rem;
   font-weight: 700;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
-  color: #dff7ff;
+  font-family: var(--font-heading);
+  color: var(--color-text-brand);
   letter-spacing: -0.03em;
 }
 
 .brandAccent {
-  color: #3ec1e0;
+  color: var(--color-brand-accent);
 }
 
+/* ==========================
+   HERO
+========================== */
 .heroCopy {
   display: grid;
   gap: 1rem;
@@ -121,11 +121,9 @@
   font-size: clamp(2.2rem, 4vw, 3.7rem);
   line-height: 1.02;
   font-weight: 700;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
+  font-family: var(--font-heading);
   letter-spacing: -0.05em;
-  color: #f5fbff;
+  color: var(--color-text-heading-hero);
 }
 
 .titleLine {
@@ -134,7 +132,7 @@
 }
 
 .titleAccent {
-  color: #3ec1e0;
+  color: var(--color-brand-accent);
   font-weight: 800;
 }
 
@@ -142,15 +140,16 @@
   max-width: 30rem;
   font-size: 1rem;
   line-height: 1.65;
-  color: #b2d3e2;
+  color: var(--color-text-muted);
 }
 
+/* ==========================
+   FEATURES
+========================== */
 .featureList {
   display: grid;
   gap: 1.2rem;
   list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
 .featureItem {
@@ -166,11 +165,11 @@
   height: 3.2rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid #78d5ff;
-  border-radius: 1rem;
-  background: #2b5f96;
-  color: #86e7ff;
-  box-shadow: 0 12px 30px #031220;
+  border: 1px solid var(--color-border-input-hover);
+  border-radius: var(--radius-control);
+  background: var(--color-bg-feature-icon);
+  color: var(--color-brand-accent);
+  box-shadow: var(--shadow-feature);
 }
 
 .featureIcon svg {
@@ -182,18 +181,19 @@
   margin: 0 0 0.25rem;
   font-size: 1rem;
   font-weight: 700;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
-  color: #f5fbff;
+  font-family: var(--font-heading);
+  color: var(--color-text-heading-hero);
 }
 
 .featureDescription {
   margin: 0;
-  color: #b2d3e2;
+  color: var(--color-text-muted);
   line-height: 1.5;
 }
 
+/* ==========================
+   FORM
+========================== */
 .formCard {
   position: relative;
   z-index: 1;
@@ -204,8 +204,8 @@
 
 .formHeader {
   display: grid;
-  gap: 0.35rem;
-  margin-bottom: 2rem;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
 }
 
 .formTitle {
@@ -213,79 +213,84 @@
   font-size: clamp(1.8rem, 2.2vw, 2.3rem);
   line-height: 1.05;
   font-weight: 800;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
+  font-family: var(--font-heading);
   letter-spacing: -0.04em;
-  color: #f8fbff;
+  color: var(--color-text-primary);
 }
 
 .formSubtitle {
   margin: 0;
-  color: #9ebbc9;
+  color: var(--color-text-muted);
 }
 
 .form {
   display: grid;
-  gap: 1.1rem;
+  gap: 1.75rem;
 }
 
 .formRow {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.8rem;
-}
-
-.inlineLink,
-.footerText a {
-  color: #52d8ff;
-  font-weight: 600;
-  transition: color 160ms ease;
-}
-
-.inlineLink:hover,
-.footerText a:hover {
-  color: #9aeaff;
+  gap: 1rem;
+  margin-top: -0.4rem;
 }
 
 .submitButton {
-  margin-top: 0.2rem;
+  margin-top: 0.25rem;
 }
 
 .googleButton {
-  margin-top: 0.1rem;
+  margin-top: 0.25rem;
 }
 
-
+/* ==========================
+   DIVIDER
+========================== */
 .divider {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 1rem;
-  color: #8ba6b4;
+  margin: 0.5rem 0;
+  color: var(--color-text-muted-soft);
   font-size: 0.92rem;
 }
 
 .divider span:first-child,
 .divider span:last-child {
   height: 1px;
-  background: #3d5663;
+  background: var(--color-border-shell);
 }
 
+/* ==========================
+   LINKS
+========================== */
+.inlineLink,
+.footerText a {
+  color: var(--color-text-link);
+  font-weight: 600;
+  transition: color var(--transition-default);
+}
+
+.inlineLink:hover,
+.footerText a:hover {
+  color: var(--color-text-link-hover);
+}
+
+/* ==========================
+   FOOTER
+========================== */
 .footerText {
-  margin: 0.5rem 0 0;
+  margin-top: 0.75rem;
   text-align: center;
-  color: #9ebbc9;
+  color: var(--color-text-muted);
 }
 
+/* ==========================
+   RESPONSIVE
+========================== */
 @media (min-width: 768px) {
-  .page {
-    --page-pad-block: 2.2rem;
-    --page-pad-inline: 2.2rem;
-  }
-
   .infoPane,
   .formPane {
     padding: 2.5rem;
@@ -293,11 +298,6 @@
 }
 
 @media (min-width: 1024px) {
-  .page {
-    --page-pad-block: 3.8rem;
-    --page-pad-inline: 5.4rem;
-  }
-
   .titleLine {
     white-space: nowrap;
   }

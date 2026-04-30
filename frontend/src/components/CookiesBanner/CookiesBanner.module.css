@@ -1,0 +1,121 @@
+.banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background-color: #001827; /* fundo principal */
+  color: #f5fbff;
+
+  padding: 20px;
+  z-index: 1000;
+
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+  border-top: 3px solid #2f4d62;
+
+  transform: translateY(100%);
+  opacity: 0;
+  animation: slideUp 1s ease forwards;
+}
+  /* animação */
+  @keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 20px;
+}
+
+.content p {
+  margin: 0;
+  flex: 1;
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.content a {
+  color: #52d8ff;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.buttons {
+  display: flex;
+  gap: 20px;
+}
+
+.accept,
+.decline {
+  padding: 10px 27px;
+  border: none;
+  border-radius: 6px;
+
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+
+  transition: 0.3s;
+}
+
+/* Botão aceitar */
+.accept {
+  background-color: #1b7895;
+  color: #f5fbff;
+  border-radius: 1rem;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.accept:hover {
+  background-color: #1e6981;
+  transform: translateY(-1px);
+}
+
+/* Botão recusar */
+.decline {
+  background-color: #001827;
+  border-color: #ffffff;
+  border: 1px solid;
+  color: #f5fbff;
+  border-radius: 1rem;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.decline:hover {
+  background-color: #58e0ff;
+  border-color: #58e0ff;
+  background: #02253b;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .buttons {
+    justify-content: center;
+  }
+}

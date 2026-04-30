@@ -26,9 +26,11 @@ const features = [
   },
 ] as const
 
+type LoginPageProps = {
+  isBackendConnected?: boolean;
+};
 
-
-function LoginPage() {
+function LoginPage({ isBackendConnected }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false)
 
 
@@ -95,7 +97,11 @@ const loginWithGoogle = useGoogleLogin({
           <div className={styles.formCard}>
             <header className={styles.formHeader}>
               <h2 className={styles.formTitle}>Bem-vindo de volta!</h2>
-              <p className={styles.formSubtitle}>Faça login para continuar sua jornada</p>
+              <p className={styles.formSubtitle}>
+                Faça login para continuar sua jornada
+                {' · '}
+                Backend: {isBackendConnected ? 'conectado' : 'desconectado'}
+              </p>
             </header>
 
             <form className={styles.form}>
