@@ -178,6 +178,7 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
                 required
               />
 
+
               <Input
                 label="Senha"
                 type={showPassword ? 'text' : 'password'}
@@ -238,5 +239,7 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
     </main>
   )
 }
+  
 
 export default CadastroPage
+
