@@ -12,6 +12,11 @@ function getCurrentPath() {
   return path || '/'
 }
 
+function navigateTo(path: string) {
+  window.history.pushState({}, '', path)
+  window.dispatchEvent(new PopStateEvent('popstate'))
+}
+
 function App() {
   const [path, setPath] = useState(getCurrentPath())
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
@@ -50,9 +55,9 @@ function App() {
   let page: ReactElement
 
   if (path === '/' || path === '/login') {
-    page = <LoginPage isBackendConnected={isBackendConnected} />
+    page = <LoginPage isBackendConnected={isBackendConnected} onNavigate={navigateTo} />
   } else if (path === '/cadastro') {
-    page = <CadastroPage isBackendConnected={isBackendConnected} />
+    page = <CadastroPage isBackendConnected={isBackendConnected} onNavigate={navigateTo} />
   } else {
     page = (
       <div className="app-layout">
