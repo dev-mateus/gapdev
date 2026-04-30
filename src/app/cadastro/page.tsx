@@ -38,8 +38,9 @@ function CadastroPage() {
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [errors, setErrors] = useState<{ nome?: string; email?: string; password?: string; confirmPassword?: string }>({})
+const [confirmPassword, setConfirmPassword] = useState('')
+  const [agreeTerms, setAgreeTerms] = useState(false)
+  const [errors, setErrors] = useState<{ nome?: string; email?: string; password?: string; confirmPassword?: string; agreeTerms?: string }>({})
 
 const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -71,10 +72,14 @@ if (!password.trim()) {
       newErrors.password = 'A senha deve ter no mínimo 6 caracteres (máximo 8)'
     }
 
-    if (!confirmPassword.trim()) {
+if (!confirmPassword.trim()) {
       newErrors.confirmPassword = 'Confirme sua senha'
     } else if (password !== confirmPassword) {
       newErrors.confirmPassword = 'As senhas não conferem'
+    }
+
+    if (!agreeTerms) {
+      newErrors.agreeTerms = 'Você precisa concordar com os termos para criar uma conta'
     }
 
     setErrors(newErrors)
@@ -182,7 +187,12 @@ if (!password.trim()) {
                 error={errors.confirmPassword}
               />
 
-              <Checkbox label="Eu concordo com os termos" />
+<Checkbox 
+                label="Eu concordo com os termos" 
+                checked={agreeTerms}
+                onChange={(e) => setAgreeTerms(e.target.checked)}
+                error={errors.agreeTerms}
+              />
 
               <Button type="submit" variant="primary" className={styles.submitButton}>
                 Criar conta

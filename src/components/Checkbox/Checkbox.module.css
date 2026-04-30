@@ -1,3 +1,9 @@
+.checkboxWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .checkbox {
   display: inline-flex;
   align-items: center;
@@ -51,4 +57,10 @@
 .checkboxInput:focus-visible + .checkboxBox {
   outline: 2px solid #58e0ff;
   outline-offset: 3px;
+}
+
+.checkboxError {
+  font-size: 0.75rem;
+  color: #ff6b6b;
+  margin-left: 2rem;
 }
