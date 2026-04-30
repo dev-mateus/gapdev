@@ -34,8 +34,8 @@ const features = [
 ] as const
 
 type CadastroPageProps = {
-  isBackendConnected: boolean
-}
+  isBackendConnected?: boolean;
+};
 
 type CreateUserResponse = {
   id: string

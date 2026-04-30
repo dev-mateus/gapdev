@@ -25,8 +25,8 @@ const features = [
 ] as const
 
 type LoginPageProps = {
-  isBackendConnected: boolean
-}
+  isBackendConnected?: boolean;
+};
 
 function LoginPage({ isBackendConnected }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false)
