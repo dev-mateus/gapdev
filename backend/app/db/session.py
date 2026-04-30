@@ -15,9 +15,19 @@ def _normalize_database_url(raw_url: str) -> str:
 	parsed = urlsplit(raw_url)
 	if parsed.scheme.startswith("postgres"):
 		scheme = "postgresql+psycopg"
+		hostname = parsed.hostname.replace("-pooler", "") if parsed.hostname else parsed.hostname
+		auth = ""
+		if parsed.username:
+			auth = parsed.username
+			if parsed.password:
+				auth = f"{auth}:{parsed.password}"
+			auth = f"{auth}@"
+		host = hostname or ""
+		if parsed.port:
+			host = f"{host}:{parsed.port}"
 		query_items = parse_qsl(parsed.query, keep_blank_values=True)
 		query_items = [(key, value) for key, value in query_items if key.lower() != "channel_binding"]
-		return urlunsplit((scheme, parsed.netloc, parsed.path, urlencode(query_items), parsed.fragment))
+		return urlunsplit((scheme, f"{auth}{host}", parsed.path, urlencode(query_items), parsed.fragment))
 
 	return raw_url
 
@@ -25,10 +35,12 @@ def _normalize_database_url(raw_url: str) -> str:
 database_url = _normalize_database_url(settings.database_url)
 is_sqlite = database_url.startswith("sqlite")
 
+connect_args = {"check_same_thread": False} if is_sqlite else {"channel_binding": "disable"}
+
 engine = create_engine(
 	database_url,
 	pool_pre_ping=True,
-	connect_args={"check_same_thread": False} if is_sqlite else {},
+	connect_args=connect_args,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
