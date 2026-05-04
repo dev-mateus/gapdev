@@ -13,6 +13,9 @@
   max-width: min(100%, 78rem);
 }
 
+/* ==========================
+   FORM
+========================== */
 .form {
   display: grid;
   gap: 1.45rem;
@@ -34,26 +37,34 @@
   min-width: 13rem;
 }
 
+/* ==========================
+   FEEDBACK (Design System)
+========================== */
 .formMessage {
   margin: 0;
   padding: 0.9rem 1rem;
-  border-radius: 0.9rem;
+  border-radius: var(--radius-control);
   font-weight: 600;
   line-height: 1.45;
 }
 
+/* ❌ erro (ajustado pro padrão do DS) */
 .formMessageError {
-  border: 1px solid #8f3e4c;
+  border: 1px solid rgba(255, 80, 100, 0.5);
   background: rgba(117, 31, 45, 0.35);
   color: #ffd7de;
 }
 
+/* ✅ sucesso (ajustado pro padrão do DS) */
 .formMessageSuccess {
-  border: 1px solid #2f7f72;
+  border: 1px solid rgba(80, 255, 200, 0.5);
   background: rgba(10, 82, 71, 0.35);
   color: #d9fff7;
 }
 
+/* ==========================
+   RESPONSIVO
+========================== */
 @media (min-width: 768px) {
   .pageStack {
     gap: 2rem;
