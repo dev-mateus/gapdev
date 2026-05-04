@@ -6,7 +6,9 @@ import {
   ChartColumnIncreasing,
   History,
   ChevronLeft,
+  LogOut,
 } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import styles from './Sidebar.module.css'
 
 type SidebarProps = {
@@ -24,7 +26,13 @@ const menuItems = [
 ]
 
 function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const currentPath = window.location.pathname
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    localStorage.removeItem('usuarioLogado')
+    window.dispatchEvent(new Event('auth-changed'))
+    navigate('/login')
+  }
 
   return (
     <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
@@ -46,20 +54,28 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
       <nav className={styles.sidebarNav}>
         {menuItems.map((item) => {
           const Icon = item.icon
-          const isActive = currentPath === item.path
 
           return (
-            <a
+            <NavLink
               key={item.path}
-              href={item.path}
-              className={`${styles.sidebarItem} ${isActive ? styles.active : ''}`}
+              to={item.path}
+              className={({ isActive }) =>
+                `${styles.sidebarItem} ${isActive ? styles.active : ''}`
+              }
             >
               <Icon size={22} />
               <span>{item.label}</span>
-            </a>
+            </NavLink>
           )
         })}
       </nav>
+
+      <div className={styles.sidebarFooter}>
+        <button className={styles.logoutButton} onClick={handleLogout}>
+          <LogOut size={18} />
+          <span>Sair</span>
+        </button>
+      </div>
     </aside>
   )
 }

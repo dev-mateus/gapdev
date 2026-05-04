@@ -71,3 +71,29 @@
 .active {
   background-color: #1fa3c6;
 }
+
+
+.sidebarFooter {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 👈 centraliza horizontalmente */
+  gap: 5px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  width: 110px;
+  background: transparent;
+  color: #c7d3dd;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.logoutButton:hover {
+  background-color: #b83434;
+  color: white;
+}
