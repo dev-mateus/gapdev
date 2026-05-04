@@ -3,6 +3,7 @@ import { Menu } from 'lucide-react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
+import VagasPage from './app/vagas/page'
 import Sidebar from './components/Sidebar/Sidebar'
 import './App.css'
 import CookieBanner from './components/CookiesBanner/CookiesBanner'
@@ -61,6 +62,32 @@ function App() {
       isMounted = false
     }
   }, [])
+
+  let page: ReactElement
+
+  if (path === '/' || path === '/login') {
+    page = <LoginPage isBackendConnected={isBackendConnected} />
+  } else if (path === '/cadastro') {
+    page = <CadastroPage isBackendConnected={isBackendConnected} />
+  } else if (path === '/vagas') {
+    page = <VagasPage />
+  } else {
+    page = (
+      <div className="app-layout">
+        {!isSidebarOpen && (
+          <button className="menu-button" onClick={() => setIsSidebarOpen(true)}>
+            <Menu size={24} />
+          </button>
+        )}
+
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+        <main className="app-content">
+          <h1>Você está em: {path}</h1>
+        </main>
+      </div>
+    )
+  }
 
   return (
     <>
