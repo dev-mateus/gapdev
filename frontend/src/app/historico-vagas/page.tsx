@@ -33,6 +33,9 @@ const vagas = [
   },
 ]
 
+
+
+
 function navigateTo(path: string) {
   if (window.location.pathname === path) return
 
