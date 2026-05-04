@@ -13,6 +13,7 @@ import Button from '../../components/Button/Button'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import Input from '../../components/Input/Input'
 import { apiPost } from '../../services/api'
+import { validateEmail, validatePassword } from '../../utils/validators'
 import styles from './cadastro.module.css'
 
 const features = [
@@ -64,6 +65,19 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
     if (!trimmedName || !trimmedEmail || !password || !confirmPassword) {
       setFormMessageType('error')
       setFormMessage('Preencha nome, e-mail e senha.')
+      return
+    }
+
+    if (!validateEmail(trimmedEmail)) {
+      setFormMessageType('error')
+      setFormMessage('Por favor, insira um e-mail válido.')
+      return
+    }
+
+    const passwordValidation = validatePassword(password)
+    if (!passwordValidation.isValid) {
+      setFormMessageType('error')
+      setFormMessage(`Senha inválida. Requisitos: ${passwordValidation.errors.join(', ')}`)
       return
     }
 

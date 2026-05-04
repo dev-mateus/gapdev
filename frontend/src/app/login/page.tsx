@@ -3,6 +3,7 @@ import { FaArrowTrendUp, FaBookOpen, FaChartLine, FaEnvelope, FaEye, FaEyeSlash,
 import Button from '../../components/Button/Button'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import Input from '../../components/Input/Input'
+import { validateEmail, validatePassword } from '../../utils/validators'
 import styles from './login.module.css'
 import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
@@ -32,7 +33,10 @@ type LoginPageProps = {
 
 function LoginPage({ isBackendConnected }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false)
-
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [formMessage, setFormMessage] = useState('')
+  const [formMessageType, setFormMessageType] = useState<'error' | 'success' | ''>('')
 
   const navigate = useNavigate()
 
@@ -49,6 +53,39 @@ const loginWithGoogle = useGoogleLogin({
     console.log('Erro ao fazer login com Google')
   },
 })
+
+function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  e.preventDefault()
+
+  const trimmedEmail = email.trim()
+
+  if (!trimmedEmail || !password) {
+    setFormMessageType('error')
+    setFormMessage('Preencha e-mail e senha.')
+    return
+  }
+
+  if (!validateEmail(trimmedEmail)) {
+    setFormMessageType('error')
+    setFormMessage('Por favor, insira um e-mail válido.')
+    return
+  }
+
+  const passwordValidation = validatePassword(password)
+  if (!passwordValidation.isValid) {
+    setFormMessageType('error')
+    setFormMessage(`Senha inválida. Requisitos: ${passwordValidation.errors.join(', ')}`)
+    return
+  }
+
+  setFormMessageType('success')
+  setFormMessage('Dados validados com sucesso!')
+  
+  // Aqui você pode fazer a chamada da API de login
+  localStorage.setItem('usuarioLogado', 'true')
+  window.dispatchEvent(new Event('auth-changed'))
+  navigate('/perfil')
+}
 
 
 
@@ -104,13 +141,16 @@ const loginWithGoogle = useGoogleLogin({
               </p>
             </header>
 
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={handleSubmit}>
               <Input
                 label="E-mail"
                 type="text"
                 placeholder="seu@gmail.com"
                 startIcon={<FaEnvelope />}
                 autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
               />
 
               <Input
@@ -122,6 +162,9 @@ const loginWithGoogle = useGoogleLogin({
                 endIconLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 onEndIconClick={() => setShowPassword((current) => !current)}
                 autoComplete="current-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
               />
 
               <div className={styles.formRow}>
@@ -130,8 +173,12 @@ const loginWithGoogle = useGoogleLogin({
                   Esqueci minha senha
                 </a>
               </div>
- 
-              
+
+              {formMessage ? (
+                <p className={`${styles.formMessage} ${formMessageType === 'success' ? styles.formMessageSuccess : styles.formMessageError}`}>
+                  {formMessage}
+                </p>
+              ) : null}
 
               <Button type="submit" variant="primary" className={styles.submitButton}>
                 Entrar
