@@ -37,7 +37,7 @@ function PrivateLayout({ children }: { children: ReactElement }) {
   )
 }
 
-function App() {
+function App(): ReactElement {
   const [isBackendConnected, setIsBackendConnected] = useState(false)
 
   useEffect(() => {
@@ -63,7 +63,6 @@ function App() {
     }
   }, [])
 
- 
   return (
     <>
       <Routes>
@@ -100,7 +99,7 @@ function App() {
           element={
             <PrivateRoute>
               <PrivateLayout>
-                <h1>Você está em: /vagas</h1>
+                <VagasPage />
               </PrivateLayout>
             </PrivateRoute>
           }
