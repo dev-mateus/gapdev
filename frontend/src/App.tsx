@@ -63,32 +63,7 @@ function App() {
     }
   }, [])
 
-  let page: ReactElement
-
-  if (path === '/' || path === '/login') {
-    page = <LoginPage isBackendConnected={isBackendConnected} />
-  } else if (path === '/cadastro') {
-    page = <CadastroPage isBackendConnected={isBackendConnected} />
-  } else if (path === '/vagas') {
-    page = <VagasPage />
-  } else {
-    page = (
-      <div className="app-layout">
-        {!isSidebarOpen && (
-          <button className="menu-button" onClick={() => setIsSidebarOpen(true)}>
-            <Menu size={24} />
-          </button>
-        )}
-
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-        <main className="app-content">
-          <h1>Você está em: {path}</h1>
-        </main>
-      </div>
-    )
-  }
-
+ 
   return (
     <>
       <Routes>
