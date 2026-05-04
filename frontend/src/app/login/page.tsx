@@ -175,7 +175,12 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
               </div>
 
               {formMessage ? (
-                <p className={`${styles.formMessage} ${formMessageType === 'success' ? styles.formMessageSuccess : styles.formMessageError}`}>
+                <p
+                  className={`${styles.formMessage} ${formMessageType === 'success' ? styles.formMessageSuccess : styles.formMessageError}`}
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
                   {formMessage}
                 </p>
               ) : null}
