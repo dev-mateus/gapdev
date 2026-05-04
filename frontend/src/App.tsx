@@ -2,6 +2,7 @@ import { type ReactElement, useEffect, useState } from 'react'
 import { Menu } from 'lucide-react'
 import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
+import VagasPage from './app/vagas/page'
 import Sidebar from './components/Sidebar/Sidebar'
 import './App.css'
 import CookieBanner from './components/CookiesBanner/CookiesBanner'
@@ -53,6 +54,8 @@ function App() {
     page = <LoginPage isBackendConnected={isBackendConnected} />
   } else if (path === '/cadastro') {
     page = <CadastroPage isBackendConnected={isBackendConnected} />
+  } else if (path === '/vagas') {
+    page = <VagasPage />
   } else {
     page = (
       <div className="app-layout">
