@@ -9,8 +9,9 @@ import {
   ChevronLeft,
   LogOut,
 } from 'lucide-react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import styles from './Sidebar.module.css'
+import LogoutModal from '../logout/LogoutModal'
 
 type SidebarProps = {
   isCollapsed: boolean
@@ -27,22 +28,10 @@ const menuItems = [
 ]
 
 function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
-  const navigate = useNavigate()
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
 
   function handleLogoutClick() {
-    setShowLogoutConfirm(true)
-  }
-
-  function handleConfirmLogout() {
-    localStorage.removeItem('usuarioLogado')
-    window.dispatchEvent(new Event('auth-changed'))
-    setShowLogoutConfirm(false)
-    navigate('/login')
-  }
-
-  function handleCancelLogout() {
-    setShowLogoutConfirm(false)
+    setShowLogoutModal(true)
   }
 
   return (
@@ -91,23 +80,7 @@ function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
         </button>
       </div>
 
-      {showLogoutConfirm && (
-        <div className={styles.modalOverlay} onClick={handleCancelLogout}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2 className={styles.modalTitle}>Confirmar logout</h2>
-            <p className={styles.modalMessage}>Você tem certeza que deseja sair?</p>
-            
-            <div className={styles.modalActions}>
-              <button className={styles.buttonCancel} onClick={handleCancelLogout}>
-                Não
-              </button>
-              <button className={styles.buttonConfirm} onClick={handleConfirmLogout}>
-                Sim
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <LogoutModal isOpen={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
     </aside>
   )
 }
