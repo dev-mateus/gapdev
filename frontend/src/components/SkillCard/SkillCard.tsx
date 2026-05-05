@@ -7,20 +7,19 @@ import styles from './SkillCard.module.css'
 type SkillCardProps = {
   name: string
   icon?: ReactNode
-  known?: boolean
-  onToggle?: (known: boolean) => void
-  onClick?: () => void
+  selected: boolean
+  onToggle?: (selected: boolean) => void
 }
 
-export default function SkillCard({ name, icon, known = false, onToggle, onClick }: SkillCardProps) {
+export default function SkillCard({ name, icon, selected = false, onToggle, }: SkillCardProps) {
   const id = useId()
 
-  function handleChange(event: ChangeEvent<HTMLInputElement>) {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onToggle?.(event.target.checked)
   }
 
   return (
-    <label className={styles.card} htmlFor={id} onClick={onClick}>
+    <label className={styles.card} htmlFor={id}>
       <div className={styles.left}>
         {icon ? (
           <span className={styles.icon} aria-hidden>
@@ -38,9 +37,8 @@ export default function SkillCard({ name, icon, known = false, onToggle, onClick
           id={id}
           className={checkboxStyles.checkboxInput}
           type="checkbox"
-          checked={known}
+          checked={selected}
           onChange={handleChange}
-          onMouseDown={(e) => e.preventDefault()} /* prevent mouse focus which can cause the container to scroll */
         />
         <span className={checkboxStyles.checkboxBox} aria-hidden="true" />
       </div>
