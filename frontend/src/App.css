@@ -1,6 +1,6 @@
 .app-layout {
   min-height: 100vh;
-  background-color: #061C2D;
+  background-color: var(--color-bg-app-shell);
 }
 
 .app-content {

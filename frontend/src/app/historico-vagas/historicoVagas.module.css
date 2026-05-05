@@ -1,71 +1,40 @@
 .content {
   min-height: 100vh;
-  padding: 2.5rem 3rem;
-  
+  min-height: 100dvh;
+  padding-block: 1rem;
 }
 
-/* container alinhado à esquerda (igual print) */
-.container {
-  max-width: 72rem;
-  margin: 0;
+.pageStack {
+  display: grid;
+  gap: 1.6rem;
 }
 
-/* ==========================
-   HEADER
-========================== */
-.header {
-  margin-bottom: 1.5rem;
+.expandedContainer {
+  max-width: min(100%, 78rem);
 }
 
-.title {
-  margin: 0;
-  font-size: clamp(2rem, 3vw, 2.6rem);
-  font-family: var(--font-heading);
-  font-weight: 800;
-  color: var(--color-text-primary);
-}
-
-.subtitle {
-  margin-top: 0.5rem;
-  color: var(--color-text-muted);
-}
-
-/* ==========================
-   LISTA
-========================== */
 .list {
   display: grid;
-  gap: 1.5rem;
-  margin-top: 2rem;
+  gap: 1.45rem;
 }
 
-/* ==========================
-   CARD
-========================== */
 .card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 2rem;
-
-  padding: 1.4rem 1.6rem;
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1rem;
-
-  background: rgba(255, 255, 255, 0.02);
-
-  transition: all 0.2s ease;
+  gap: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border-shell);
+  border-radius: var(--radius-control);
+  background: rgba(1, 30, 47, 0.82);
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .card:hover {
-  border-color: rgba(62, 193, 224, 0.4);
+  border-color: var(--color-border-input-hover);
   transform: translateY(-2px);
 }
 
-/* ==========================
-   LEFT SIDE
-========================== */
 .left {
   display: grid;
   gap: 0.7rem;
@@ -95,7 +64,6 @@
 .tag {
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
-
   background: rgba(62, 193, 224, 0.15);
   color: #dff7ff;
 
@@ -103,24 +71,10 @@
   font-weight: 600;
 }
 
-/* ==========================
-   RIGHT SIDE
-========================== */
 .right {
   display: grid;
   justify-items: end;
   gap: 0.6rem;
-}
-
-.status {
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-
-  background: rgba(62, 193, 224, 0.15);
-  color: #c9f2ff;
-
-  font-size: 0.75rem;
-  font-weight: 600;
 }
 
 .match {
@@ -128,7 +82,7 @@
 }
 
 .matchValue {
-  color: #52d8ff;
+  color: var(--color-text-link);
   font-size: 1rem;
   font-weight: 700;
 }
@@ -138,9 +92,20 @@
   font-size: 0.75rem;
 }
 
-/* ==========================
-   RESPONSIVO
-========================== */
+@media (min-width: 768px) {
+  .pageStack {
+    gap: 2rem;
+  }
+
+  .list {
+    gap: 1.6rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+}
+
 @media (max-width: 900px) {
   .card {
     flex-direction: column;
@@ -149,5 +114,11 @@
 
   .right {
     justify-items: start;
+  }
+}
+
+@media (min-width: 1280px) {
+  .expandedContainer {
+    max-width: min(100%, 84rem);
   }
 }

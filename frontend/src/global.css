@@ -14,6 +14,7 @@
   ========================================== */
   --color-bg-page-start: #000000;
   --color-bg-page-end: #012e49;
+  --color-bg-app-shell: #061c2d;
   --color-bg-shell: #02111b;
   --color-bg-info-pane: #06324d;
   --color-bg-form-pane: #001827;
@@ -22,6 +23,9 @@
   --color-bg-input-hover: #072131;
   --color-bg-checkbox: #051522;
   --color-bg-secondary-hover: #02253b;
+  --color-surface-panel: rgba(1, 30, 47, 0.82);
+  --color-surface-panel-hover: rgba(1, 30, 47, 0.9);
+  --color-surface-switcher: rgba(1, 25, 39, 0.82);
 
   /* ==========================================
      3. TEXTO
@@ -102,6 +106,10 @@
   ========================================== */
   --page-pad-block: 1.7rem;
   --page-pad-inline: 1.7rem;
+  --page-container-max-width: 64rem;
+  --page-container-max-width-expanded: 84rem;
+  --page-header-title-size: clamp(1.9rem, 3.5vw, 2.4rem);
+  --page-header-description-width: 42rem;
 }
 
 /* ==========================================
@@ -134,6 +142,11 @@ body {
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ==========================================

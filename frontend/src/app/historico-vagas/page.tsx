@@ -1,8 +1,7 @@
-import { useState } from 'react'
-import { Menu } from 'lucide-react'
 import { FaCalendar } from 'react-icons/fa6'
 
 import PageContainer from '../../components/PageContainer/PageContainer'
+import PageHeader from '../../components/PageHeader/PageHeader'
 import TabSwitcher, { type TabSwitcherItem } from '../../components/TabSwitcher/TabSwitcher'
 
 import styles from './historicoVagas.module.css'
@@ -42,30 +41,19 @@ function navigateTo(path: string) {
 }
 
 function HistoricoPage() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-
   function handleTabChange(tab: TabSwitcherItem) {
     if (!tab.href) return
     navigateTo(tab.href)
   }
 
   return (
-    <div className="app-layout">
-      {!isSidebarOpen && (
-        <button className="menu-button" onClick={() => setIsSidebarOpen(true)}>
-          <Menu size={24} />
-        </button>
-      )}
-
-
-      <main className={`app-content ${styles.content}`}>
-        <PageContainer className={styles.container}>
-          <header className={styles.header}>
-            <h1 className={styles.title}>Histórico de Vagas</h1>
-            <p className={styles.subtitle}>
-              Todas as vagas que você analisou
-            </p>
-          </header>
+    <div className={styles.content}>
+      <PageContainer className={styles.expandedContainer}>
+        <div className={styles.pageStack}>
+          <PageHeader
+            title="Histórico de Vagas"
+            description="Todas as vagas que você analisou"
+          />
 
           <TabSwitcher
             tabs={tabs}
@@ -106,8 +94,8 @@ function HistoricoPage() {
               </article>
             ))}
           </div>
-        </PageContainer>
-      </main>
+        </div>
+      </PageContainer>
     </div>
   )
 }
