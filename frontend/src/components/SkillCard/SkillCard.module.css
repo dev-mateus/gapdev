@@ -1,0 +1,43 @@
+/* Minimal styles for SkillCard demo */
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  color: #61dafb;
+}
+
+.iconPlaceholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.02);
+}
+
+.name {
+  color: white;
+  font-size: 14px;
+}
+
+.checkboxWrap {
+  display: inline-flex;
+  align-items: center;
+}
