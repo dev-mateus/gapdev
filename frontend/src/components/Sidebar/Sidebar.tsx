@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   UserRoundCog,
   Newspaper,
@@ -27,11 +28,21 @@ const menuItems = [
 
 function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const navigate = useNavigate()
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
-  function handleLogout() {
+  function handleLogoutClick() {
+    setShowLogoutConfirm(true)
+  }
+
+  function handleConfirmLogout() {
     localStorage.removeItem('usuarioLogado')
     window.dispatchEvent(new Event('auth-changed'))
+    setShowLogoutConfirm(false)
     navigate('/login')
+  }
+
+  function handleCancelLogout() {
+    setShowLogoutConfirm(false)
   }
 
   return (
@@ -74,11 +85,29 @@ function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       </nav>
 
       <div className={styles.sidebarFooter}>
-        <button className={styles.logoutButton} onClick={handleLogout} title="Fazer logout">
+        <button className={styles.logoutButton} onClick={handleLogoutClick} title="Fazer logout">
           <LogOut size={18} />
           {!isCollapsed && <span>Sair</span>}
         </button>
       </div>
+
+      {showLogoutConfirm && (
+        <div className={styles.modalOverlay} onClick={handleCancelLogout}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>Confirmar logout</h2>
+            <p className={styles.modalMessage}>Você tem certeza que deseja sair?</p>
+            
+            <div className={styles.modalActions}>
+              <button className={styles.buttonCancel} onClick={handleCancelLogout}>
+                Não
+              </button>
+              <button className={styles.buttonConfirm} onClick={handleConfirmLogout}>
+                Sim
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   )
 }
