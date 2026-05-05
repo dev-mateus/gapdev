@@ -64,7 +64,7 @@ export function useAnalisarVagaForm() {
       setFormState(initialState)
     } catch (error) {
       setStatusType('error')
-      setStatusMessage(error instanceof Error ? error.message : 'Nao foi possivel enviar a vaga para analise.')
+      setStatusMessage(error instanceof Error ? error.message : 'Nao foi possivel salvar a vaga.')
     } finally {
       setIsSubmitting(false)
     }

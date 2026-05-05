@@ -31,11 +31,11 @@ model UserSkill {
 
 model Job {
   id          String   @id @default(uuid())
-  userId      String
-  companyName String
-  jobTitle    String
+  userId      String   @map("user_id")
+  companyName String   @map("company_name")
+  jobTitle    String   @map("job_title")
   description String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

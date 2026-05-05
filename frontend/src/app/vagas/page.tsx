@@ -40,14 +40,14 @@ function VagasPage() {
           <div className={styles.pageStack}>
             <PageHeader
               title="Vagas"
-              description="Adicione vagas de interesse e nossa IA analisara os requisitos tecnicos automaticamente."
+              description="Adicione vagas de interesse para salvar no seu historico."
             />
 
             <TabSwitcher tabs={tabs} activeTabId="analisar-vaga" onTabChange={handleTabChange} />
 
             <SectionCard
-              title="Analisar vaga"
-              description="Cole a descricao completa da vaga para analise automatica dos requisitos"
+              title="Salvar vaga"
+              description="Cole a descricao completa da vaga e salve no historico."
               icon={<ClipboardList size={20} />}
             >
               <form className={styles.form} onSubmit={handleSubmit}>
@@ -88,7 +88,7 @@ function VagasPage() {
 
                 <div className={styles.actions}>
                   <PrimaryButton type="submit" icon={<Plus />} className={styles.submitButton} disabled={isSubmitting}>
-                    {isSubmitting ? 'Gerando analise...' : 'Gerar analise'}
+                    {isSubmitting ? 'Salvando vaga...' : 'Salvar vaga'}
                   </PrimaryButton>
                 </div>
               </form>

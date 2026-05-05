@@ -1,12 +1,15 @@
+import { apiPost } from '../../../services/api'
 import type { AnalyzeJobRequest, AnalyzeJobResponse } from '../types/analisarVaga'
 
 export async function submitJobForAnalysis(payload: AnalyzeJobRequest): Promise<AnalyzeJobResponse> {
-  await new Promise((resolve) => {
-    window.setTimeout(resolve, 500)
+  await apiPost('/jobs', {
+    company_name: payload.company,
+    job_title: payload.title,
+    description: payload.description,
   })
 
   return {
-    status: 'queued',
-    message: `Análise da vaga \"${payload.title}\" enviada com sucesso.`,
+    status: 'saved',
+    message: `Vaga "${payload.title}" salva com sucesso.`,
   }
 }

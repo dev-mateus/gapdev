@@ -3,6 +3,7 @@
 from uuid import uuid4
 
 from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
 
 from app.db.base import Base
 
@@ -16,3 +17,4 @@ class User(Base):
 	name = Column(String(120), nullable=False)
 	email = Column(String(255), unique=True, nullable=False, index=True)
 	password = Column(String(255), nullable=False)
+	jobs = relationship("Job", back_populates="user", cascade="all, delete-orphan")
