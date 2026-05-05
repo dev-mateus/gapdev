@@ -1,0 +1,153 @@
+.content {
+  min-height: 100vh;
+  padding: 2.5rem 3rem;
+  
+}
+
+/* container alinhado à esquerda (igual print) */
+.container {
+  max-width: 72rem;
+  margin: 0;
+}
+
+/* ==========================
+   HEADER
+========================== */
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  color: var(--color-text-muted);
+}
+
+/* ==========================
+   LISTA
+========================== */
+.list {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* ==========================
+   CARD
+========================== */
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+
+  padding: 1.4rem 1.6rem;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+
+  background: rgba(255, 255, 255, 0.02);
+
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(62, 193, 224, 0.4);
+  transform: translateY(-2px);
+}
+
+/* ==========================
+   LEFT SIDE
+========================== */
+.left {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.jobTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+
+  background: rgba(62, 193, 224, 0.15);
+  color: #dff7ff;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ==========================
+   RIGHT SIDE
+========================== */
+.right {
+  display: grid;
+  justify-items: end;
+  gap: 0.6rem;
+}
+
+.status {
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+
+  background: rgba(62, 193, 224, 0.15);
+  color: #c9f2ff;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.match {
+  text-align: right;
+}
+
+.matchValue {
+  color: #52d8ff;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.matchLabel {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+/* ==========================
+   RESPONSIVO
+========================== */
+@media (max-width: 900px) {
+  .card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .right {
+    justify-items: start;
+  }
+}
