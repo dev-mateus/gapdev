@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   UserRoundCog,
   Newspaper,
@@ -8,8 +9,9 @@ import {
   ChevronLeft,
   LogOut,
 } from 'lucide-react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import styles from './Sidebar.module.css'
+import LogoutModal from '../logout/LogoutModal'
 
 type SidebarProps = {
   isCollapsed: boolean
@@ -26,12 +28,10 @@ const menuItems = [
 ]
 
 function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
-  const navigate = useNavigate()
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
 
-  function handleLogout() {
-    localStorage.removeItem('usuarioLogado')
-    window.dispatchEvent(new Event('auth-changed'))
-    navigate('/login')
+  function handleLogoutClick() {
+    setShowLogoutModal(true)
   }
 
   return (
@@ -74,11 +74,13 @@ function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       </nav>
 
       <div className={styles.sidebarFooter}>
-        <button className={styles.logoutButton} onClick={handleLogout} title="Fazer logout">
+        <button className={styles.logoutButton} onClick={handleLogoutClick} title="Fazer logout">
           <LogOut size={18} />
           {!isCollapsed && <span>Sair</span>}
         </button>
       </div>
+
+      <LogoutModal isOpen={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
     </aside>
   )
 }
