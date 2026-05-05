@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import { BriefcaseBusiness, ClipboardList, Menu, Plus } from 'lucide-react'
-import Sidebar from '../../components/Sidebar/Sidebar'
+import { BriefcaseBusiness, ClipboardList, Plus } from 'lucide-react'
 import PageContainer from '../../components/PageContainer/PageContainer'
 import PageHeader from '../../components/PageHeader/PageHeader'
 import SectionCard from '../../components/SectionCard/SectionCard'
@@ -26,7 +24,6 @@ function navigateTo(path: string) {
 }
 
 function VagasPage() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const { formState, isSubmitting, statusMessage, statusType, updateField, handleSubmit } = useAnalisarVagaForm()
 
   function handleTabChange(tab: TabSwitcherItem) {
@@ -38,16 +35,7 @@ function VagasPage() {
   }
 
   return (
-    <div className="app-layout">
-      {!isSidebarOpen && (
-        <button className="menu-button" onClick={() => setIsSidebarOpen(true)} aria-label="Abrir menu lateral">
-          <Menu size={24} />
-        </button>
-      )}
-
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-      <main className={`app-content ${styles.content}`}>
+    <div className={styles.content}>
         <PageContainer className={styles.expandedContainer}>
           <div className={styles.pageStack}>
             <PageHeader
@@ -107,7 +95,6 @@ function VagasPage() {
             </SectionCard>
           </div>
         </PageContainer>
-      </main>
     </div>
   )
 }

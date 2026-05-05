@@ -1,5 +1,4 @@
 import { type ReactElement, type ReactNode, useEffect, useState } from 'react'
-import { Menu } from 'lucide-react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
@@ -20,19 +19,13 @@ function PrivateRoute({ children }: { children: ReactNode }) {
 }
 
 function PrivateLayout({ children }: { children: ReactElement }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   return (
     <div className="app-layout">
-      {!isSidebarOpen && (
-        <button className="menu-button" onClick={() => setIsSidebarOpen(true)}>
-          <Menu size={24} />
-        </button>
-      )}
+      <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
 
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-      <main className="app-content">{children}</main>
+      <main className={`app-content ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>{children}</main>
     </div>
   )
 }
