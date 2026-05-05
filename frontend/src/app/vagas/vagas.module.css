@@ -1,0 +1,71 @@
+.content {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-block: 1rem;
+}
+
+.pageStack {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.expandedContainer {
+  max-width: min(100%, 78rem);
+}
+
+.form {
+  display: grid;
+  gap: 1.45rem;
+}
+
+.row {
+  display: grid;
+  gap: 1.1rem;
+  grid-template-columns: 1fr;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submitButton {
+  width: auto;
+  min-width: 13rem;
+}
+
+.formMessage {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border-radius: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.formMessageError {
+  border: 1px solid #8f3e4c;
+  background: rgba(117, 31, 45, 0.35);
+  color: #ffd7de;
+}
+
+.formMessageSuccess {
+  border: 1px solid #2f7f72;
+  background: rgba(10, 82, 71, 0.35);
+  color: #d9fff7;
+}
+
+@media (min-width: 768px) {
+  .pageStack {
+    gap: 2rem;
+  }
+
+  .row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .expandedContainer {
+    max-width: min(100%, 84rem);
+  }
+}
