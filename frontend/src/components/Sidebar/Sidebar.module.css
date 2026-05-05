@@ -1,31 +1,46 @@
 .sidebar {
-  width: 240px;
   height: 100vh;
   background-color: #0a2538;
   color: white;
-  padding: 16px;
   display: flex;
   flex-direction: column;
   position: fixed;
   left: 0;
   top: 0;
-  transition: transform 0.3s ease;
+  transition: width 0.3s ease, padding 0.3s ease;
+  z-index: 100;
 }
 
-.sidebarOpen {
-  transform: translateX(0);
+.expanded {
+  width: 240px;
+  padding: 16px;
 }
 
-.sidebarClosed {
-  transform: translateX(-100%);
+.collapsed {
+  width: 80px;
+  padding: 16px 12px;
 }
 
-.sidebarCloseButton {
+.sidebarToggleButton {
   background: none;
   border: none;
   color: white;
   cursor: pointer;
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.sidebarToggleButton:hover {
+  background-color: #12394d;
+}
+
+.chevronCollapsed {
+  transform: rotate(180deg);
 }
 
 .sidebarLogoArea {
@@ -56,12 +71,21 @@
 .sidebarItem {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 10px;
   border-radius: 8px;
   text-decoration: none;
   color: white;
   transition: background 0.2s;
+}
+
+.expanded .sidebarItem {
+  justify-content: flex-start;
+}
+
+.collapsed .sidebarItem {
+  justify-content: center;
 }
 
 .sidebarItem:hover {
@@ -78,21 +102,29 @@
   padding-top: 20px;
 }
 
-
 .logoutButton {
   display: flex;
   align-items: center;
-  justify-content: center; /* 👈 centraliza horizontalmente */
-  gap: 5px;
-  padding: 5px 10px;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
   border: none;
   border-radius: 8px;
-  width: 110px;
   background: transparent;
   color: #c7d3dd;
   cursor: pointer;
   transition: all 0.2s;
+  width: 100%;
 }
+
+.expanded .logoutButton {
+  justify-content: flex-start;
+}
+
+.collapsed .logoutButton {
+  justify-content: center;
+}
+
 .logoutButton:hover {
   background-color: #b83434;
   color: white;
