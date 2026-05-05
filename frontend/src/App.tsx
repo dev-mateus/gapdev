@@ -4,6 +4,7 @@ import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
 import VagasPage from './app/vagas/page'
 import Sidebar from './components/Sidebar/Sidebar'
+import HistoricoPage from './app/historico-vagas/page'
 import './App.css'
 import CookieBanner from './components/CookiesBanner/CookiesBanner'
 import { fetchBackendHealth } from './services/health'
@@ -136,7 +137,7 @@ function App(): ReactElement {
           element={
             <PrivateRoute>
               <PrivateLayout>
-                <h1>Você está em: /historico-vagas</h1>
+                <HistoricoPage/>
               </PrivateLayout>
             </PrivateRoute>
           }

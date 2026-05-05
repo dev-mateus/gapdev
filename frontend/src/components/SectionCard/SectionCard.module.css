@@ -3,7 +3,7 @@
   gap: 1.7rem;
   border: 1px solid var(--color-border-shell);
   border-radius: var(--radius-control);
-  background: rgba(1, 30, 47, 0.82);
+  background: var(--color-surface-panel);
   padding: 1.25rem;
 }
 

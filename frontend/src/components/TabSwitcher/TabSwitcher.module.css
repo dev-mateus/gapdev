@@ -4,7 +4,7 @@
   padding: 0.25rem;
   border: 1px solid var(--color-border-shell);
   border-radius: var(--radius-control);
-  background: rgba(1, 25, 39, 0.82);
+  background: var(--color-surface-switcher);
 }
 
 .tab {
