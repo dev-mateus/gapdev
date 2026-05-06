@@ -1,0 +1,282 @@
+.profileTabs {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: fit-content;
+
+  padding: 4px;
+
+  border-radius: 16px;
+  border: 1px solid #4b6678;
+
+  background: rgba(6, 24, 36, 0.9);
+}
+
+.tab,
+.activeTab {
+  min-width: 170px;
+  height: 52px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: transparent;
+  color: #d6e3ec;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.activeTab {
+  background: #1f6f96;
+  color: white;
+}
+
+.tab:hover {
+  background: rgba(31, 111, 150, 0.12);
+}
+
+.tab svg,
+.activeTab svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.content {
+  width: 100%;
+  min-height: 100vh;
+
+  color: #fff;
+}
+
+.expandedContainer {
+  max-width: 1280px;
+}
+
+.pageStack {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.formContent {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+
+  gap: 28px;
+
+  padding: 8px 0 32px;
+}
+
+.leftForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.topFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 24px;
+}
+
+.areaField {
+  max-width: 560px;
+}
+
+.passwordArea {
+  border-left: 1px solid #24465a;
+
+  padding-left: 28px;
+
+  display: flex;
+  align-items: stretch;
+}
+
+.passwordBox {
+  width: 100%;
+
+  border: 1px solid #345468;
+  border-radius: 12px;
+
+  padding: 24px;
+
+  background: rgba(7, 28, 43, 0.65);
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.passwordTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 4px;
+}
+
+.passwordIcon {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 12px;
+
+  background: #238fac;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.passwordTitle h3 {
+  margin: 0;
+
+  font-size: 20px;
+}
+
+.eyeButton {
+  background: transparent;
+  border: none;
+
+  color: #e6f1f7;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.eyeButton:hover {
+  opacity: 0.8;
+}
+
+.passwordButton {
+  width: 100%;
+
+  margin-top: 10px;
+}
+
+.footerActions {
+  border-top: 1px solid #24465a;
+
+  padding-top: 22px;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+.continueButton {
+  width: 190px;
+  height: 48px;
+}
+
+.profileCard {
+  border: 1px solid #345468;
+  border-radius: 12px;
+
+  background: rgba(7, 28, 43, 0.65);
+
+  overflow: hidden;
+}
+
+.profileTop {
+  padding: 36px 42px;
+
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.avatar {
+  width: 78px;
+  height: 78px;
+
+  border-radius: 50%;
+
+  background: #238fac;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profileInfo {
+  flex: 1;
+}
+
+.profileInfo h2 {
+  margin: 0 0 8px;
+
+  font-size: 20px;
+}
+
+.profileInfo p {
+  margin: 0 0 12px;
+}
+
+.email {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: #d6e3ec;
+}
+
+.profileBottom {
+  border-top: 1px solid #1c3c50;
+
+  padding: 32px 42px;
+
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+
+  gap: 80px;
+}
+
+.profileBottom h3 {
+  margin: 0 0 12px;
+
+  font-size: 18px;
+}
+
+.profileBottom p {
+  margin: 0;
+
+  line-height: 1.5;
+}
+
+@media (max-width: 1100px) {
+  .formContent {
+    grid-template-columns: 1fr;
+  }
+
+  .passwordArea {
+    border-left: none;
+
+    padding-left: 0;
+  }
+
+  .topFields {
+    grid-template-columns: 1fr;
+  }
+
+  .areaField {
+    max-width: 100%;
+  }
+}
