@@ -8,6 +8,19 @@
   padding: 10px 12px;
   border-radius: 8px;
   cursor: pointer;
+
+  /* evita highlight visual ao tocar em dispositivos móveis */
+  -webkit-tap-highlight-color: transparent;
+  /* melhora comportamento de toque/click e reduz scroll inesperado em alguns navegadores */
+  touch-action: manipulation;
+  /* reduz a chance de mudanças de layout forçarem scroll */
+  contain: layout;
+}
+
+/* foco visível acessível (se o elemento for focável) */
+.card:focus-visible {
+  outline: 2px solid rgba(97,219,251,0.6);
+  outline-offset: 2px;
 }
 
 .left {
@@ -40,4 +53,12 @@
 .checkboxWrap {
   display: inline-flex;
   align-items: center;
+}
+
+/* evita que o foco do input force um scroll em alguns navegadores e dispositivos */
+.checkboxWrap input {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  /* mantém comportamento de foco acessível sem deslocar o layout */
+  scroll-margin-top: 0;
 }

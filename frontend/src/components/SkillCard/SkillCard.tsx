@@ -7,7 +7,7 @@ import styles from './SkillCard.module.css'
 type SkillCardProps = {
   name: string
   icon?: ReactNode
-  selected: boolean
+  selected?: boolean
   onToggle?: (selected: boolean) => void
 }
 
@@ -39,6 +39,7 @@ export default function SkillCard({ name, icon, selected = false, onToggle, }: S
           type="checkbox"
           checked={selected}
           onChange={handleChange}
+          onMouseDown={(e) => e.preventDefault()} /* previne scroll ao clicar */
         />
         <span className={checkboxStyles.checkboxBox} aria-hidden="true" />
       </div>
