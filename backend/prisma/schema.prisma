@@ -13,6 +13,7 @@ model User {
   email    String      @unique
   password String
   skills   UserSkill[]
+  jobs     Job[]
 
   @@map("users")
 }
@@ -25,5 +26,19 @@ model UserSkill {
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_skills")
+  @@index([userId])
+}
+
+model Job {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  companyName String   @map("company_name")
+  jobTitle    String   @map("job_title")
+  description String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("jobs")
   @@index([userId])
 }

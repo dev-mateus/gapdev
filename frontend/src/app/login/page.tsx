@@ -41,13 +41,38 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
   const navigate = useNavigate()
 
 const loginWithGoogle = useGoogleLogin({
-  onSuccess: (tokenResponse) => {
-    console.log('Login Google:', tokenResponse)
+  onSuccess: async (tokenResponse) => {
+    try {
+      const accessToken = tokenResponse.access_token
 
-    localStorage.setItem('usuarioLogado', 'true')
-    window.dispatchEvent(new Event('auth-changed'))
+      if (!accessToken) {
+        throw new Error('Nao foi possivel recuperar o token do Google.')
+      }
 
-    navigate('/perfil')
+      const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Nao foi possivel obter seu e-mail do Google.')
+      }
+
+      const profile = (await response.json()) as { email?: string }
+
+      if (profile.email) {
+        localStorage.setItem('usuarioEmail', profile.email)
+      }
+
+      localStorage.setItem('usuarioLogado', 'true')
+      window.dispatchEvent(new Event('auth-changed'))
+
+      navigate('/perfil')
+    } catch (error) {
+      setFormMessageType('error')
+      setFormMessage(error instanceof Error ? error.message : 'Erro ao fazer login com Google.')
+    }
   },
   onError: () => {
     console.log('Erro ao fazer login com Google')
@@ -83,6 +108,7 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   
   // Aqui você pode fazer a chamada da API de login
   localStorage.setItem('usuarioLogado', 'true')
+  localStorage.setItem('usuarioEmail', trimmedEmail)
   window.dispatchEvent(new Event('auth-changed'))
   navigate('/perfil')
 }
