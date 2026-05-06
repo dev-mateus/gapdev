@@ -101,10 +101,25 @@ function HistoricoPage() {
 
                   <div className={styles.meta}>
                     <FaCalendar />
-                    <span>Criado em {new Intl.DateTimeFormat('pt-BR').format(new Date(job.created_at))}</span>
+                    <span>Analisado em {new Intl.DateTimeFormat('pt-BR').format(new Date(job.created_at))}</span>
+                  </div>
+                </div>
+
+                <div className={styles.right}>
+                  <div className={styles.match}>
+                    <div className={styles.matchValue}>
+                      {job.compatibilidade ?? '-'}
+                    </div>
+                    <div className={styles.matchLabel}>
+                      Compatibilidade
+                    </div>
                   </div>
 
-                  <p className={styles.description}>{job.description}</p>
+                  <div className={styles.tags}>
+                    {job.tecnologias?.map((tech) => (
+                      <span key={tech} className={styles.tag}>{tech}</span>
+                    ))}
+                  </div>
                 </div>
               </article>
             ))}

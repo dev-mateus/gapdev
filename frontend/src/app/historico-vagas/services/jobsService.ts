@@ -7,6 +7,8 @@ export type JobItem = {
   job_title: string
   description: string
   created_at: string
+  compatibilidade?: string
+  tecnologias?: string[]
 }
 
 export async function fetchJobs(): Promise<JobItem[]> {
