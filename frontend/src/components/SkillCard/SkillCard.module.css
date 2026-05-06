@@ -1,0 +1,64 @@
+/* Minimal styles for SkillCard demo */
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  /* evita highlight visual ao tocar em dispositivos móveis */
+  -webkit-tap-highlight-color: transparent;
+  /* melhora comportamento de toque/click e reduz scroll inesperado em alguns navegadores */
+  touch-action: manipulation;
+  /* reduz a chance de mudanças de layout forçarem scroll */
+  contain: layout;
+}
+
+/* foco visível acessível (se o elemento for focável) */
+.card:focus-visible {
+  outline: 2px solid rgba(97,219,251,0.6);
+  outline-offset: 2px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  color: #61dafb;
+}
+
+.iconPlaceholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.02);
+}
+
+.name {
+  color: white;
+  font-size: 14px;
+}
+
+.checkboxWrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* evita que o foco do input force um scroll em alguns navegadores e dispositivos */
+.checkboxWrap input {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  /* mantém comportamento de foco acessível sem deslocar o layout */
+  scroll-margin-top: 0;
+}
