@@ -48,3 +48,26 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
 
   return (await response.json()) as T
 }
+
+// ✅ Adicione estas funções (não reescreva o arquivo)
+
+// 1. Interceptador para adicionar Authorization header
+export function configurarInterceptadores() {
+  // Toda requisição adiciona: Authorization: Bearer {token}
+  // Se resposta for 401 e error.code === 'access_token_expired':
+  //   - Chama POST /auth/refresh
+  //   - Se sucesso: retenta requisição original
+  //   - Se falha: redireciona para /login
+}
+
+// 2. Função para renovar token
+export async function renovarAccessToken() {
+  // POST /auth/refresh (cookie é enviado automaticamente)
+  // Retorna: { accessToken, usuario }
+}
+
+// 3. Função para logout
+export async function fazerLogout() {
+  // POST /auth/logout
+  // Backend invalida Refresh Token
+}
