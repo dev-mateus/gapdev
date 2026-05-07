@@ -1,4 +1,4 @@
-import { type ReactElement, type ReactNode, useEffect, useState } from 'react'
+import { type ReactElement, type ReactNode, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
@@ -7,12 +7,20 @@ import Sidebar from './components/Sidebar/Sidebar'
 import HistoricoPage from './app/historico-vagas/page'
 import './App.css'
 import CookieBanner from './components/CookiesBanner/CookiesBanner'
-import { fetchBackendHealth } from './services/health'
+import { useAuth } from './context/AuthContext'
 
 function PrivateRoute({ children }: { children: ReactNode }) {
-  const isLogged = localStorage.getItem('usuarioLogado')
+  const { estaAutenticado, estaCarregando } = useAuth()
 
-  if (!isLogged) {
+  if (estaCarregando) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+        Verificando sessão...
+      </div>
+    )
+  }
+
+  if (!estaAutenticado) {
     return <Navigate to="/login" replace />
   }
 
@@ -25,55 +33,18 @@ function PrivateLayout({ children }: { children: ReactElement }) {
   return (
     <div className="app-layout">
       <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
-
       <main className={`app-content ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>{children}</main>
     </div>
   )
 }
 
 function App(): ReactElement {
-  const [isBackendConnected, setIsBackendConnected] = useState(false)
-
-  useEffect(() => {
-    let isMounted = true
-
-    const checkBackendConnection = async () => {
-      try {
-        const response = await fetchBackendHealth()
-        if (isMounted && response.status === 'ok') {
-          setIsBackendConnected(true)
-        }
-      } catch {
-        if (isMounted) {
-          setIsBackendConnected(false)
-        }
-      }
-    }
-
-    void checkBackendConnection()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
-
   return (
     <>
       <Routes>
-        <Route
-          path="/"
-          element={<LoginPage isBackendConnected={isBackendConnected} />}
-        />
-
-        <Route
-          path="/login"
-          element={<LoginPage isBackendConnected={isBackendConnected} />}
-        />
-
-        <Route
-          path="/cadastro"
-          element={<CadastroPage isBackendConnected={isBackendConnected} />}
-        />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/cadastro" element={<CadastroPage />} />
 
         {/* 🔒 ROTAS PROTEGIDAS */}
 
@@ -137,7 +108,7 @@ function App(): ReactElement {
           element={
             <PrivateRoute>
               <PrivateLayout>
-                <HistoricoPage/>
+                <HistoricoPage />
               </PrivateLayout>
             </PrivateRoute>
           }

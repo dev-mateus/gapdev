@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import styles from './LogoutModal.module.css'
 
 type LogoutModalProps = {
@@ -8,11 +9,10 @@ type LogoutModalProps = {
 
 function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
   const navigate = useNavigate()
+  const { fazerLogout } = useAuth()
 
-  function handleConfirmLogout() {
-    localStorage.removeItem('usuarioLogado')
-    localStorage.removeItem('usuarioEmail')
-    window.dispatchEvent(new Event('auth-changed'))
+  async function handleConfirmLogout() {
+    await fazerLogout()
     onClose()
     navigate('/login')
   }
@@ -31,7 +31,7 @@ function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
           <button className={styles.buttonCancel} onClick={onClose}>
             Não
           </button>
-          <button className={styles.buttonConfirm} onClick={handleConfirmLogout}>
+          <button className={styles.buttonConfirm} onClick={() => void handleConfirmLogout()}>
             Sim
           </button>
         </div>

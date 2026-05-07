@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.repositories import user_repo
 from app.schemas.user import UserCreate, UserRead
+from app.core.security import hash_password
 
 
 def _user_to_read(user: object) -> UserRead:
@@ -34,5 +35,6 @@ def create_user(db: Session, payload: UserCreate) -> UserRead:
 			detail="E-mail ja cadastrado.",
 		)
 
+	payload.password = hash_password(payload.password)
 	created_user = user_repo.create_user(db, payload)
 	return _user_to_read(created_user)

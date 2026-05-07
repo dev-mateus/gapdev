@@ -7,7 +7,7 @@ import { validateEmail, validatePassword } from '../../utils/validators'
 import styles from './login.module.css'
 import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
-
+import { useAuth } from '../../context/AuthContext'
 
 const features = [
   {
@@ -27,93 +27,93 @@ const features = [
   },
 ] as const
 
-type LoginPageProps = {
-  isBackendConnected?: boolean;
-};
-
-function LoginPage({ isBackendConnected }: LoginPageProps) {
+function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const [formMessage, setFormMessage] = useState('')
   const [formMessageType, setFormMessageType] = useState<'error' | 'success' | ''>('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const navigate = useNavigate()
+  const { fazerLogin } = useAuth()
 
-const loginWithGoogle = useGoogleLogin({
-  onSuccess: async (tokenResponse) => {
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const accessToken = tokenResponse.access_token
+
+        if (!accessToken) {
+          throw new Error('Não foi possível recuperar o token do Google.')
+        }
+
+        const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+
+        if (!response.ok) {
+          throw new Error('Não foi possível obter seu e-mail do Google.')
+        }
+
+        const profile = (await response.json()) as { email?: string }
+
+        if (profile.email) {
+          // TODO: quando o backend tiver rota de login com Google,
+          // chamar fazerLogin com as credenciais OAuth aqui.
+          // Por ora mantém o fluxo anterior.
+          await fazerLogin(profile.email, '', rememberMe)
+        }
+
+        navigate('/vagas')
+      } catch (error) {
+        setFormMessageType('error')
+        setFormMessage(error instanceof Error ? error.message : 'Erro ao fazer login com Google.')
+      }
+    },
+    onError: () => {
+      setFormMessageType('error')
+      setFormMessage('Erro ao fazer login com Google.')
+    },
+  })
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    const trimmedEmail = email.trim()
+
+    if (!trimmedEmail || !password) {
+      setFormMessageType('error')
+      setFormMessage('Preencha e-mail e senha.')
+      return
+    }
+
+    if (!validateEmail(trimmedEmail)) {
+      setFormMessageType('error')
+      setFormMessage('Por favor, insira um e-mail válido.')
+      return
+    }
+
+    const passwordValidation = validatePassword(password)
+    if (!passwordValidation.isValid) {
+      setFormMessageType('error')
+      setFormMessage(`Senha inválida. Requisitos: ${passwordValidation.errors.join(', ')}`)
+      return
+    }
+
+    setIsLoading(true)
+    setFormMessage('')
+
     try {
-      const accessToken = tokenResponse.access_token
-
-      if (!accessToken) {
-        throw new Error('Nao foi possivel recuperar o token do Google.')
-      }
-
-      const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Nao foi possivel obter seu e-mail do Google.')
-      }
-
-      const profile = (await response.json()) as { email?: string }
-
-      if (profile.email) {
-        localStorage.setItem('usuarioEmail', profile.email)
-      }
-
-      localStorage.setItem('usuarioLogado', 'true')
-      window.dispatchEvent(new Event('auth-changed'))
-
-      navigate('/perfil')
+      await fazerLogin(trimmedEmail, password, rememberMe)
+      navigate('/vagas')
     } catch (error) {
       setFormMessageType('error')
-      setFormMessage(error instanceof Error ? error.message : 'Erro ao fazer login com Google.')
+      setFormMessage(error instanceof Error ? error.message : 'Erro ao fazer login.')
+    } finally {
+      setIsLoading(false)
     }
-  },
-  onError: () => {
-    console.log('Erro ao fazer login com Google')
-  },
-})
-
-function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-  e.preventDefault()
-
-  const trimmedEmail = email.trim()
-
-  if (!trimmedEmail || !password) {
-    setFormMessageType('error')
-    setFormMessage('Preencha e-mail e senha.')
-    return
   }
-
-  if (!validateEmail(trimmedEmail)) {
-    setFormMessageType('error')
-    setFormMessage('Por favor, insira um e-mail válido.')
-    return
-  }
-
-  const passwordValidation = validatePassword(password)
-  if (!passwordValidation.isValid) {
-    setFormMessageType('error')
-    setFormMessage(`Senha inválida. Requisitos: ${passwordValidation.errors.join(', ')}`)
-    return
-  }
-
-  setFormMessageType('success')
-  setFormMessage('Dados validados com sucesso!')
-  
-  // Aqui você pode fazer a chamada da API de login
-  localStorage.setItem('usuarioLogado', 'true')
-  localStorage.setItem('usuarioEmail', trimmedEmail)
-  window.dispatchEvent(new Event('auth-changed'))
-  navigate('/perfil')
-}
-
-
 
   return (
     <main className={styles.page}>
@@ -160,11 +160,7 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
           <div className={styles.formCard}>
             <header className={styles.formHeader}>
               <h2 className={styles.formTitle}>Bem-vindo de volta!</h2>
-              <p className={styles.formSubtitle}>
-                Faça login para continuar sua jornada
-                {' · '}
-                Backend: {isBackendConnected ? 'conectado' : 'desconectado'}
-              </p>
+              <p className={styles.formSubtitle}>Faça login para continuar sua jornada</p>
             </header>
 
             <form className={styles.form} onSubmit={handleSubmit}>
@@ -194,7 +190,11 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
               />
 
               <div className={styles.formRow}>
-                <Checkbox label="Lembrar de mim" />
+                <Checkbox
+                  label="Lembrar de mim por 30 dias"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
                 <a className={styles.inlineLink} href="#forgot-password">
                   Esqueci minha senha
                 </a>
@@ -211,8 +211,8 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
                 </p>
               ) : null}
 
-              <Button type="submit" variant="primary" className={styles.submitButton}>
-                Entrar
+              <Button type="submit" variant="primary" className={styles.submitButton} disabled={isLoading}>
+                {isLoading ? 'Entrando...' : 'Entrar'}
               </Button>
 
               <div className={styles.divider}>
@@ -221,7 +221,7 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
                 <span />
               </div>
 
-              <Button 
+              <Button
                 type="button"
                 variant="secondary"
                 icon={<FaGoogle />}
@@ -243,4 +243,3 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 }
 
 export default LoginPage
-

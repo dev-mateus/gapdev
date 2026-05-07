@@ -7,6 +7,13 @@ from app.models.user import User
 from app.schemas.user import UserCreate
 
 
+def get_user_by_id(db: Session, user_id: str) -> User | None:
+	"""Return a user by primary key when found."""
+
+	statement = select(User).where(User.id == user_id)
+	return db.scalars(statement).first()
+
+
 def get_user_by_email(db: Session, email: str) -> User | None:
 	"""Return a user by e-mail when found."""
 

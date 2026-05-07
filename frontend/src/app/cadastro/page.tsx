@@ -229,7 +229,7 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
                 </p>
               ) : null}
 
-              <Button type="submit" variant="primary" className={styles.submitButton} disabled={isSubmitting || !isBackendConnected}>
+              <Button type="submit" variant="primary" className={styles.submitButton} disabled={isSubmitting }>
                 {isSubmitting ? 'Criando conta...' : 'Criar conta'}
               </Button>
 

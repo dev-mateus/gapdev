@@ -12,6 +12,9 @@ class Settings(BaseSettings):
 	"""Runtime settings loaded from environment variables."""
 
 	database_url: str = "sqlite:///./app.db"
+	secret_key: str = "TROQUE_ESTA_CHAVE_NO_ENV_ANTES_DE_USAR_EM_PRODUCAO"
+	algorithm: str = "HS256"
+	access_token_expire_minutes: int = 15
 
 	model_config = SettingsConfigDict(
 		env_file=str(BASE_DIR / ".env"),
