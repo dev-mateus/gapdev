@@ -47,6 +47,13 @@
   color: var(--color-text-primary);
 }
 
+.companyName {
+  margin: 0;
+  color: var(--color-text-link);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .meta {
   display: flex;
   align-items: center;
@@ -71,25 +78,9 @@
   font-weight: 600;
 }
 
-.right {
-  display: grid;
-  justify-items: end;
-  gap: 0.6rem;
-}
-
-.match {
-  text-align: right;
-}
-
-.matchValue {
-  color: var(--color-text-link);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.matchLabel {
+.emptyState {
+  margin: 0;
   color: var(--color-text-muted);
-  font-size: 0.75rem;
 }
 
 @media (min-width: 768px) {
@@ -115,6 +106,27 @@
   .right {
     justify-items: start;
   }
+}
+
+.right {
+  display: grid;
+  justify-items: end;
+  gap: 0.6rem;
+}
+
+.match {
+  text-align: right;
+}
+
+.matchValue {
+  color: var(--color-text-link);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.matchLabel {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
 }
 
 @media (min-width: 1280px) {

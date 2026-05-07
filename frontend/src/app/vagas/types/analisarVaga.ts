@@ -5,7 +5,7 @@ export type AnalyzeJobRequest = {
 }
 
 export type AnalyzeJobResponse = {
-  status: 'queued'
+  status: 'saved'
   message: string
 }
 

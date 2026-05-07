@@ -6,12 +6,28 @@ function buildUrl(path: string): string {
   return `${normalizedBase}/${normalizedPath}`
 }
 
-export async function apiGet<T>(path: string): Promise<T> {
+function buildHeaders(extraHeaders?: HeadersInit): Headers {
+  const headers = new Headers()
+
+  if (extraHeaders) {
+    new Headers(extraHeaders).forEach((value, key) => {
+      headers.set(key, value)
+    })
+  }
+
+  const userEmail = localStorage.getItem('usuarioEmail')?.trim()
+
+  if (userEmail) {
+    headers.set('X-User-Email', userEmail)
+  }
+
+  return headers
+}
+
+export async function apiGet<T>(path: string, headers?: HeadersInit): Promise<T> {
   const response = await fetch(buildUrl(path), {
     method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
+    headers: buildHeaders({ Accept: 'application/json', ...headers }),
   })
 
   if (!response.ok) {
@@ -21,13 +37,10 @@ export async function apiGet<T>(path: string): Promise<T> {
   return (await response.json()) as T
 }
 
-export async function apiPost<T>(path: string, body: unknown): Promise<T> {
+export async function apiPost<T>(path: string, body: unknown, headers?: HeadersInit): Promise<T> {
   const response = await fetch(buildUrl(path), {
     method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
+    headers: buildHeaders({ Accept: 'application/json', 'Content-Type': 'application/json', ...headers }),
     body: JSON.stringify(body),
   })
 
