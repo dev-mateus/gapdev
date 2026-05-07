@@ -11,8 +11,8 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 class Settings(BaseSettings):
 	"""Runtime settings loaded from environment variables."""
 
-	database_url: str = "sqlite:///./app.db"
-	secret_key: str = "TROQUE_ESTA_CHAVE_NO_ENV_ANTES_DE_USAR_EM_PRODUCAO"
+	database_url: str 
+	secret_key: str 
 	algorithm: str = "HS256"
 	access_token_expire_minutes: int = 15
 
