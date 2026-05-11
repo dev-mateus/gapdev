@@ -6,12 +6,13 @@ import styles from './SkillCard.module.css'
 
 type SkillCardProps = {
   name: string
+  description?: string
   icon?: ReactNode
   selected?: boolean
   onToggle?: (selected: boolean) => void
 }
 
-export default function SkillCard({ name, icon, selected = false, onToggle, }: SkillCardProps) {
+export default function SkillCard({ name, description, icon, selected = false, onToggle }: SkillCardProps) {
   const id = useId()
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -21,15 +22,14 @@ export default function SkillCard({ name, icon, selected = false, onToggle, }: S
   return (
     <label className={styles.card} htmlFor={id}>
       <div className={styles.left}>
-        {icon ? (
-          <span className={styles.icon} aria-hidden>
-            {icon}
-          </span>
-        ) : (
-          <span className={styles.iconPlaceholder} />
-        )}
+        <span className={styles.icon} aria-hidden>
+          {icon ?? <span className={styles.iconDot} />}
+        </span>
 
-        <span className={styles.name}>{name}</span>
+        <span className={styles.text}>
+          <span className={styles.name}>{name}</span>
+          {description ? <span className={styles.description}>{description}</span> : null}
+        </span>
       </div>
 
       <div className={styles.checkboxWrap}>

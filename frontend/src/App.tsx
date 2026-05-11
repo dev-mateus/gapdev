@@ -4,6 +4,7 @@ import Perfil from './app/Perfil/perfil'
 import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
 import VagasPage from './app/vagas/page'
+import CompatibilityPage from './app/compatibility/page'
 import Sidebar from './components/Sidebar/Sidebar'
 import HistoricoPage from './app/historico-vagas/page'
 import './App.css'
@@ -96,6 +97,17 @@ function App(): ReactElement {
             <PrivateRoute>
               <PrivateLayout>
                 <VagasPage />
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/compatibility"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <CompatibilityPage />
               </PrivateLayout>
             </PrivateRoute>
           }

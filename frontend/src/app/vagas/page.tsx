@@ -24,7 +24,14 @@ function navigateTo(path: string) {
 }
 
 function VagasPage() {
-  const { formState, isSubmitting, statusMessage, statusType, analysisResult, updateField, handleSubmit } = useAnalisarVagaForm()
+  function handleAnalysisSuccess(title: string, description: string) {
+    const params = new URLSearchParams()
+    params.set('title', title)
+    params.set('description', description)
+    navigateTo(`/compatibility?${params.toString()}`)
+  }
+
+  const { formState, isSubmitting, statusMessage, statusType, updateField, handleSubmit } = useAnalisarVagaForm(handleAnalysisSuccess)
 
   function handleTabChange(tab: TabSwitcherItem) {
     if (!tab.href) {
@@ -46,8 +53,8 @@ function VagasPage() {
             <TabSwitcher tabs={tabs} activeTabId="analisar-vaga" onTabChange={handleTabChange} />
 
             <SectionCard
-              title="Salvar vaga"
-              description="Cole a descricao completa da vaga e salve no historico."
+              title="Analisar vaga"
+              description="Cole a descricao completa da vaga e analise com a IA."
               icon={<ClipboardList size={20} />}
             >
               <form className={styles.form} onSubmit={handleSubmit}>
@@ -88,32 +95,9 @@ function VagasPage() {
 
                 <div className={styles.actions}>
                   <PrimaryButton type="submit" icon={<Plus />} className={styles.submitButton} disabled={isSubmitting}>
-                    {isSubmitting ? 'Salvando vaga...' : 'Salvar vaga'}
+                    {isSubmitting ? 'Analisando vaga...' : 'Analisar vaga'}
                   </PrimaryButton>
                 </div>
-
-                {analysisResult ? (
-                  <div className={styles.analysisPanel}>
-                    <h3 className={styles.analysisTitle}>Analise da IA</h3>
-                    <p className={styles.analysisSummary}>{analysisResult.summary}</p>
-
-                    {analysisResult.skills.length > 0 ? (
-                      <ul className={styles.skillsList}>
-                        {analysisResult.skills.map((skill, index) => (
-                          <li key={`${skill.name}-${index}`} className={styles.skillItem}>
-                            <div className={styles.skillName}>{skill.name}</div>
-                            <div className={styles.skillMeta}>
-                              {skill.required_level ? <span>Nivel: {skill.required_level}</span> : null}
-                              {skill.importance ? <span>Importancia: {skill.importance}</span> : null}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className={styles.analysisEmpty}>A IA nao retornou habilidades para esta descricao.</p>
-                    )}
-                  </div>
-                ) : null}
               </form>
             </SectionCard>
           </div>

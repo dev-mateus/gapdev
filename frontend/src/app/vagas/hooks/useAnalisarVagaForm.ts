@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import { analyzeJobDescription, submitJobForAnalysis } from '../services/analisarVagaService'
-import type { AnalyzeJobAiResponse, AnalyzeJobFormState } from '../types/analisarVaga'
+import { submitJobForAnalysis } from '../services/analisarVagaService'
+import type { AnalyzeJobFormState } from '../types/analisarVaga'
 
 const initialState: AnalyzeJobFormState = {
   title: '',
@@ -24,12 +24,11 @@ function getErrorMessage(state: AnalyzeJobFormState): string {
   return ''
 }
 
-export function useAnalisarVagaForm() {
+export function useAnalisarVagaForm(onSuccess?: (title: string, description: string) => void) {
   const [formState, setFormState] = useState<AnalyzeJobFormState>(initialState)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [statusMessage, setStatusMessage] = useState('')
   const [statusType, setStatusType] = useState<'error' | 'success' | ''>('')
-  const [analysisResult, setAnalysisResult] = useState<AnalyzeJobAiResponse | null>(null)
 
   function updateField<K extends keyof AnalyzeJobFormState>(field: K, value: AnalyzeJobFormState[K]) {
     setFormState((current) => ({
@@ -52,7 +51,6 @@ export function useAnalisarVagaForm() {
     setIsSubmitting(true)
     setStatusMessage('')
     setStatusType('')
-    setAnalysisResult(null)
 
     try {
       const response = await submitJobForAnalysis({
@@ -61,11 +59,10 @@ export function useAnalisarVagaForm() {
         description: formState.description.trim(),
       })
 
-      const analysis = await analyzeJobDescription(formState.description.trim())
-
       setStatusType('success')
-      setStatusMessage(`${response.message} Analise da IA concluida.`)
-      setAnalysisResult(analysis)
+      setStatusMessage(response.message)
+      
+      onSuccess?.(formState.title.trim(), formState.description.trim())
       setFormState(initialState)
     } catch (error) {
       setStatusType('error')
@@ -80,7 +77,6 @@ export function useAnalisarVagaForm() {
     isSubmitting,
     statusMessage,
     statusType,
-    analysisResult,
     updateField,
     handleSubmit,
   }
