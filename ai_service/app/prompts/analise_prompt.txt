@@ -1,0 +1,7 @@
+Return ONLY a VALID JSON object. Keep it compact and single-line.
+Structure: {"summary": string, "skills": [{"name": string, "required_level": string, "importance": string}]}
+Constraints: max 8 skills; required_level one of [basic, intermediate, advanced]; importance one of [low, medium, high].
+Do NOT include explanations, code examples, evidence, recommendation or extra text — ONLY the JSON object.
+
+Vaga:
+{description}

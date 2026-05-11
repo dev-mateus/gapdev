@@ -24,7 +24,7 @@ function navigateTo(path: string) {
 }
 
 function VagasPage() {
-  const { formState, isSubmitting, statusMessage, statusType, updateField, handleSubmit } = useAnalisarVagaForm()
+  const { formState, isSubmitting, statusMessage, statusType, analysisResult, updateField, handleSubmit } = useAnalisarVagaForm()
 
   function handleTabChange(tab: TabSwitcherItem) {
     if (!tab.href) {
@@ -91,6 +91,29 @@ function VagasPage() {
                     {isSubmitting ? 'Salvando vaga...' : 'Salvar vaga'}
                   </PrimaryButton>
                 </div>
+
+                {analysisResult ? (
+                  <div className={styles.analysisPanel}>
+                    <h3 className={styles.analysisTitle}>Analise da IA</h3>
+                    <p className={styles.analysisSummary}>{analysisResult.summary}</p>
+
+                    {analysisResult.skills.length > 0 ? (
+                      <ul className={styles.skillsList}>
+                        {analysisResult.skills.map((skill, index) => (
+                          <li key={`${skill.name}-${index}`} className={styles.skillItem}>
+                            <div className={styles.skillName}>{skill.name}</div>
+                            <div className={styles.skillMeta}>
+                              {skill.required_level ? <span>Nivel: {skill.required_level}</span> : null}
+                              {skill.importance ? <span>Importancia: {skill.importance}</span> : null}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className={styles.analysisEmpty}>A IA nao retornou habilidades para esta descricao.</p>
+                    )}
+                  </div>
+                ) : null}
               </form>
             </SectionCard>
           </div>

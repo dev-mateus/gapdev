@@ -1,5 +1,5 @@
 import { apiPost } from '../../../services/api'
-import type { AnalyzeJobRequest, AnalyzeJobResponse } from '../types/analisarVaga'
+import type { AnalyzeJobAiResponse, AnalyzeJobRequest, AnalyzeJobResponse } from '../types/analisarVaga'
 
 export async function submitJobForAnalysis(payload: AnalyzeJobRequest): Promise<AnalyzeJobResponse> {
   await apiPost('/jobs', {
@@ -12,4 +12,8 @@ export async function submitJobForAnalysis(payload: AnalyzeJobRequest): Promise<
     status: 'saved',
     message: `Vaga "${payload.title}" salva com sucesso.`,
   }
+}
+
+export async function analyzeJobDescription(description: string): Promise<AnalyzeJobAiResponse> {
+  return apiPost('/analise', { description })
 }
