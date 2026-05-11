@@ -1,5 +1,6 @@
 import { type ReactElement, type ReactNode, useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import Perfil from './app/Perfil/perfil'
 import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
 import VagasPage from './app/vagas/page'
@@ -82,11 +83,12 @@ function App(): ReactElement {
           element={
             <PrivateRoute>
               <PrivateLayout>
-                <h1>Você está em: /perfil</h1>
+                <Perfil />
               </PrivateLayout>
             </PrivateRoute>
           }
         />
+        
 
         <Route
           path="/vagas"
