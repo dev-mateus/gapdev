@@ -169,9 +169,10 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 
               <div className={styles.formRow}>
                 <Checkbox label="Lembrar de mim" />
-                <a className={styles.inlineLink} href="#forgot-password">
+                <a className={styles.inlineLink} href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password') }}>
                   Esqueci minha senha
                 </a>
+
               </div>
 
               {formMessage ? (

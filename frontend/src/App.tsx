@@ -5,6 +5,7 @@ import LoginPage from './app/login/page'
 import VagasPage from './app/vagas/page'
 import Sidebar from './components/Sidebar/Sidebar'
 import HistoricoPage from './app/historico-vagas/page'
+import ForgotPasswordPage from './app/forgot-password/page'
 import './App.css'
 import CookieBanner from './components/CookiesBanner/CookiesBanner'
 import { fetchBackendHealth } from './services/health'
@@ -75,7 +76,13 @@ function App(): ReactElement {
           element={<CadastroPage isBackendConnected={isBackendConnected} />}
         />
 
+        <Route
+          path="/forgot-password"
+          element={<ForgotPasswordPage />}
+        />
+
         {/* 🔒 ROTAS PROTEGIDAS */}
+
 
         <Route
           path="/perfil"
