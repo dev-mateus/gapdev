@@ -5,19 +5,20 @@ import SkillSelectableCard from '../../components/SkillSelectableCard/SkillSelec
 import SkillCategoryCard from '../../components/SkillCategoryCard/SkillCategoryCard'
 import CompatibilityCard from '../../components/CompatibilityCard/CompatibilityCard'
 import { fetchCompatibility } from './compatibilityService'
+import type { CompatibilityResponse } from './types'
 import { useCompatibility } from './useCompatibility'
 import styles from './compatibility.module.css'
 
 export default function CompatibilityPage() {
-  const [data, setData] = useState<any>(null)
+  const [data, setData] = useState<CompatibilityResponse | null>(null)
 
   useEffect(() => {
     let mounted = true
-    // read description and title from query params when present
     const params = new URLSearchParams(window.location.search)
-    const description = params.get('description') ?? undefined
-    const title = params.get('title') ?? undefined
     const jobId = params.get('jobId') ?? undefined
+    const analysisContext = getAnalysisContext(jobId)
+    const description = analysisContext?.description ?? params.get('description') ?? undefined
+    const title = analysisContext?.title ?? params.get('title') ?? undefined
 
     fetchCompatibility(description ?? undefined, title ?? undefined, jobId ?? undefined).then(res => {
       if (mounted) setData(res)
@@ -134,4 +135,23 @@ function inferSkillGroup(skill: string) {
   }
 
   return 'Competência'
+}
+
+function getAnalysisContext(jobId?: string): { title?: string; description?: string } | null {
+  if (!jobId) {
+    return null
+  }
+
+  const rawValue = window.sessionStorage.getItem(`analysis:${jobId}`)
+
+  if (!rawValue) {
+    return null
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue) as { title?: string; description?: string }
+    return parsed
+  } catch {
+    return null
+  }
 }

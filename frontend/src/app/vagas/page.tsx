@@ -25,9 +25,10 @@ function navigateTo(path: string) {
 
 function VagasPage() {
   function handleAnalysisSuccess(title: string, description: string, jobId: string) {
+    const analysisContext = JSON.stringify({ title, description })
+    window.sessionStorage.setItem(`analysis:${jobId}`, analysisContext)
+
     const params = new URLSearchParams()
-    params.set('title', title)
-    params.set('description', description)
     params.set('jobId', jobId)
     navigateTo(`/compatibility?${params.toString()}`)
   }
