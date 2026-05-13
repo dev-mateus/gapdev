@@ -1,7 +1,7 @@
 import { apiPost } from '../../../services/api'
 import type { AnalyzeJobAiResponse, AnalyzeJobRequest, AnalyzeJobResponse } from '../types/analisarVaga'
 
-export async function submitJobForAnalysis(payload: AnalyzeJobRequest): Promise<AnalyzeJobResponse & { jobId?: string }> {
+export async function submitJobForAnalysis(payload: AnalyzeJobRequest): Promise<AnalyzeJobResponse & { jobId: string }> {
   const response = await apiPost<{ id: string; company_name: string; job_title: string }>(
     '/jobs',
     {
