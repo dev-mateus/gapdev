@@ -6,7 +6,7 @@ import SkillCategoryCard from '../../components/SkillCategoryCard/SkillCategoryC
 import CompatibilityCard from '../../components/CompatibilityCard/CompatibilityCard'
 import { fetchCompatibility } from './compatibilityService'
 import { useCompatibility } from './useCompatibility'
-import styles from './page.module.css'
+import styles from './compatibility.module.css'
 
 export default function CompatibilityPage() {
   const [data, setData] = useState<any>(null)
