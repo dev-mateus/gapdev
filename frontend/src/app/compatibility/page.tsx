@@ -17,8 +17,9 @@ export default function CompatibilityPage() {
     const params = new URLSearchParams(window.location.search)
     const description = params.get('description') ?? undefined
     const title = params.get('title') ?? undefined
+    const jobId = params.get('jobId') ?? undefined
 
-    fetchCompatibility(description ?? undefined, title ?? undefined).then(res => {
+    fetchCompatibility(description ?? undefined, title ?? undefined, jobId ?? undefined).then(res => {
       if (mounted) setData(res)
     })
     return () => {

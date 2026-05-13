@@ -28,7 +28,7 @@ function mapAnaliseToCompatibility(data: any, title?: string): CompatibilityResp
   }
 }
 
-export async function fetchCompatibility(description?: string, title?: string): Promise<CompatibilityResponse> {
+export async function fetchCompatibility(description?: string, title?: string, jobId?: string): Promise<CompatibilityResponse> {
   if (!description) {
     // fallback to mock when no description provided
     await new Promise((r) => setTimeout(r, 150))
@@ -40,6 +40,11 @@ export async function fetchCompatibility(description?: string, title?: string): 
     }
   }
 
-  const data = await apiPost('/analise', { description })
+  const payload: { description: string; job_id?: string } = { description }
+  if (jobId) {
+    payload.job_id = jobId
+  }
+
+  const data = await apiPost('/analise', payload)
   return mapAnaliseToCompatibility(data, title)
 }

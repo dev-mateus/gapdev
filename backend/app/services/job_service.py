@@ -12,12 +12,17 @@ from app.schemas.job import JobCreate, JobRead
 def _job_to_read(job: object) -> JobRead:
 	"""Convert a SQLAlchemy job record into the public response schema."""
 
+	level = getattr(job, "level", "Junior")
+	# Handle enum or string
+	level_str = level.value if hasattr(level, "value") else str(level)
+
 	return JobRead(
 		id=str(getattr(job, "id")),
 		user_id=str(getattr(job, "user_id")),
 		company_name=str(getattr(job, "company_name")),
 		job_title=str(getattr(job, "job_title")),
 		description=str(getattr(job, "description")),
+		level=level_str,
 		created_at=getattr(job, "created_at"),
 	)
 

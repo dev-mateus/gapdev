@@ -24,7 +24,7 @@ function getErrorMessage(state: AnalyzeJobFormState): string {
   return ''
 }
 
-export function useAnalisarVagaForm(onSuccess?: (title: string, description: string) => void) {
+export function useAnalisarVagaForm(onSuccess?: (title: string, description: string, jobId: string) => void) {
   const [formState, setFormState] = useState<AnalyzeJobFormState>(initialState)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [statusMessage, setStatusMessage] = useState('')
@@ -62,7 +62,7 @@ export function useAnalisarVagaForm(onSuccess?: (title: string, description: str
       setStatusType('success')
       setStatusMessage(response.message)
       
-      onSuccess?.(formState.title.trim(), formState.description.trim())
+      onSuccess?.(formState.title.trim(), formState.description.trim(), response.jobId)
       setFormState(initialState)
     } catch (error) {
       setStatusType('error')
