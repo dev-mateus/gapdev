@@ -1,1 +1,0 @@
-"""Response schema definitions."""

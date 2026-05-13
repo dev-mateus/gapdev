@@ -18,26 +18,52 @@ model User {
   @@map("users")
 }
 
+enum SkillLevel {
+  Beginner
+  Basic
+  Intermediate
+  Advanced
+  Specialist
+}
+
+enum SkillPriority {
+  desirable
+  required
+}
+
+enum JobLevel {
+  Intern
+  Junior
+  MidLevel
+  Senior
+}
+
 model UserSkill {
-  id        String  @id @default(uuid())
+  id        String        @id @default(uuid())
   userId    String
+  jobId     String        @map("job_id")
   skillName String
-  level     Int     @default(1)
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level     SkillLevel    @default(Beginner)
+  priority  SkillPriority @default(desirable)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job       Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@map("user_skills")
   @@index([userId])
+  @@index([jobId])
 }
 
 model Job {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  companyName String   @map("company_name")
-  jobTitle    String   @map("job_title")
+  id          String      @id @default(uuid())
+  userId      String      @map("user_id")
+  companyName String      @map("company_name")
+  jobTitle    String      @map("job_title")
   description String
-  createdAt   DateTime @default(now()) @map("created_at")
+  level       JobLevel    @default(Junior)
+  createdAt   DateTime    @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills     UserSkill[]
 
   @@map("jobs")
   @@index([userId])

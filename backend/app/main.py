@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.job import router as job_router
 from app.api.routes.user import router as user_router
+from app.api.routes.analise import router as analise_router
+from app.api.routes.user_skill import router as user_skill_router
 from app.db.base import Base
 from app.db.session import engine
 
@@ -22,6 +24,8 @@ app.add_middleware(
 
 app.include_router(user_router)
 app.include_router(job_router)
+app.include_router(user_skill_router)
+app.include_router(analise_router)
 
 
 @app.on_event("startup")

@@ -1,11 +1,20 @@
 """Job model."""
 
+from enum import Enum
 from uuid import uuid4
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, Text, func
+from sqlalchemy import Column, DateTime, Enum as SQLEnum, ForeignKey, String, Text, func
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
+
+
+class JobLevel(str, Enum):
+	"""Job level enum."""
+	Intern = "Intern"
+	Junior = "Junior"
+	MidLevel = "MidLevel"
+	Senior = "Senior"
 
 
 class Job(Base):
@@ -18,6 +27,8 @@ class Job(Base):
 	company_name = Column(String(255), nullable=False)
 	job_title = Column(String(255), nullable=False)
 	description = Column(Text, nullable=False)
+	level = Column(SQLEnum(JobLevel), nullable=False, default=JobLevel.Junior)
 	created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 	user = relationship("User", back_populates="jobs")
+	skills = relationship("UserSkill", back_populates="job", cascade="all, delete-orphan")

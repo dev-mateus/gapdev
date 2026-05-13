@@ -1,0 +1,5 @@
+﻿fastmcp==3.2.4
+python-dotenv==1.0.1
+pydantic==2.13.4
+huggingface_hub==1.13.0
+

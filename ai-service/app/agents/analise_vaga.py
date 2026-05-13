@@ -1,1 +1,0 @@
-"""Agent for vaga analysis."""
