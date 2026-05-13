@@ -37,15 +37,18 @@ export default function CompatibilityPage() {
 
   if (!data) {
     return (
-      <PageContainer className={styles.pageContainer}>
-        <div className={styles.loadingState}>Carregando análise da vaga...</div>
-      </PageContainer>
+      <div className={styles.content}>
+        <PageContainer className={styles.expandedContainer}>
+          <div className={styles.loadingState}>Carregando análise da vaga...</div>
+        </PageContainer>
+      </div>
     )
   }
 
   return (
-    <PageContainer className={styles.pageContainer}>
-      <div className={styles.page}>
+    <div className={styles.content}>
+      <PageContainer className={styles.expandedContainer}>
+        <div className={styles.page}>
         <section className={styles.hero}>
           <div className={styles.heroHeading}>
             <h1 className={styles.title}>Marque o que você já conhece</h1>
@@ -108,8 +111,9 @@ export default function CompatibilityPage() {
             </SkillCategoryCard>
           </div>
         </section>
-      </div>
-    </PageContainer>
+        </div>
+      </PageContainer>
+    </div>
   )
 }
 

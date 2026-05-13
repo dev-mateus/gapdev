@@ -1,5 +1,11 @@
-.pageContainer {
-  width: 100%;
+.content {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-block: 1rem;
+}
+
+.expandedContainer {
+  max-width: min(100%, 84rem);
 }
 
 .page {
