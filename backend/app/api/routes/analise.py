@@ -28,15 +28,15 @@ PROMPT_PATH = Path(__file__).resolve().parents[4] / "ai_service" / "app" / "prom
 
 
 def _get_user_email(x_user_email: str | None = Header(default=None, alias="X-User-Email")) -> str:
-	"""Return the logged user's e-mail from the request headers."""
+    """Return the logged user's e-mail from the request headers."""
 
-	if not x_user_email:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Usuario nao autenticado.",
-		)
+    if not x_user_email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Usuario nao autenticado.",
+        )
 
-	return x_user_email.strip()
+    return x_user_email.strip()
 
 
 def _normalize_skill_name(name: str) -> str:
@@ -55,58 +55,61 @@ def _normalize_skill_name(name: str) -> str:
 
 
 def _map_skill_level(required_level: str | None) -> str:
-	"""Map AI required_level to database SkillLevel enum."""
+    """Map AI required_level to database SkillLevel enum."""
 
-	if not required_level:
-		return "Beginner"
+    if not required_level:
+        return "Beginner"
 
-	level_map = {
-		"basic": "Basic",
-		"intermediate": "Intermediate",
-		"advanced": "Advanced",
-	}
-	return level_map.get(required_level.lower(), "Beginner")
+    level_map = {
+        "basic": "Basic",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced",
+    }
+    return level_map.get(required_level.lower(), "Beginner")
 
 
 def _reverse_map_level(level) -> str:
-	"""Reverse map database SkillLevel back to required_level for response."""
+    """Reverse map database SkillLevel back to required_level for response."""
 
-	# Handle enum or string
-	level_str = level.value if hasattr(level, "value") else str(level)
-	
-	reverse_map = {
-		"Beginner": "basic",
-		"Basic": "basic",
-		"Intermediate": "intermediate",
-		"Advanced": "advanced",
-		"Specialist": "advanced",
-	}
-	return reverse_map.get(level_str, "basic")
+    # Handle enum or string
+    level_str = level.value if hasattr(level, "value") else str(level)
+
+    reverse_map = {
+        "Beginner": "basic",
+        "Basic": "basic",
+        "Intermediate": "intermediate",
+        "Advanced": "advanced",
+        "Specialist": "advanced",
+    }
+    return reverse_map.get(level_str, "basic")
 
 
 def _map_skill_priority(importance: str | None) -> str:
-	"""Map AI importance to database SkillPriority enum."""
+    """Map AI importance to database SkillPriority enum."""
 
-	if not importance:
-		return "desirable"
+    if not importance:
+        return "desirable"
 
-	priority_map = {
-		"low": "desirable",
-		"medium": "desirable",
-		"high": "required",
-	}
-	return priority_map.get(importance.lower(), "desirable")
+    imp = importance.strip().lower()
+    # Accept either low/medium/high or required/desirable from the model
+    priority_map = {
+        "low": "desirable",
+        "medium": "desirable",
+        "high": "required",
+        "required": "required",
+        "desirable": "desirable",
+    }
+    return priority_map.get(imp, "desirable")
 
 
 def _reverse_map_importance(priority) -> str:
-	"""Reverse map database SkillPriority back to importance for response."""
+    """Reverse map database SkillPriority back to importance for response."""
 
-	# Handle enum or string
-	priority_str = priority.value if hasattr(priority, "value") else str(priority)
-	
-	if priority_str == "required":
-		return "high"
-	return "medium"  # Default to medium for desirable
+    # Handle enum or string
+    priority_str = priority.value if hasattr(priority, "value") else str(priority)
+    if priority_str == "required":
+        return "required"
+    return "desirable"  # Default to desirable
 
 
 def _load_hf_token() -> str | None:
@@ -168,9 +171,9 @@ def _load_prompt_template() -> str:
 
 @router.post("", response_model=AnaliseResponse)
 def analisar_vaga_route(
-	payload: AnaliseRequest,
-	db: Session = Depends(get_database),
-	user_email: str = Depends(_get_user_email),
+    payload: AnaliseRequest,
+    db: Session = Depends(get_database),
+    user_email: str = Depends(_get_user_email),
 ) -> dict:
     """Analisa a descrição da vaga e retorna resumo estruturado de habilidades."""
 
@@ -206,7 +209,7 @@ def analisar_vaga_route(
         completion = client.chat.completions.create(
             model=MODEL,
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=512,
+            max_tokens=2048,
         )
 
         message = completion.choices[0].message

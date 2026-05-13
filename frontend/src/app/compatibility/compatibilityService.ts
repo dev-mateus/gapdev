@@ -17,8 +17,19 @@ function mapAnaliseToCompatibility(data: any, title?: string): CompatibilityResp
   // If backend returns an analysis with `skills` array, map by importance
   const skills: AnaliseSkill[] = Array.isArray(data?.skills) ? data.skills : []
 
-  const required = skills.filter(s => (s.importance ?? '').toLowerCase() === 'high').map(s => s.name)
-  const optional = skills.filter(s => (s.importance ?? '').toLowerCase() !== 'high').map(s => s.name)
+  const required = skills
+    .filter(s => {
+      const imp = (s.importance ?? '').toLowerCase()
+      return imp === 'high' || imp === 'required'
+    })
+    .map(s => s.name)
+
+  const optional = skills
+    .filter(s => {
+      const imp = (s.importance ?? '').toLowerCase()
+      return imp === 'desirable' || imp === 'low' || imp === 'medium' || imp === ''
+    })
+    .map(s => s.name)
 
   return {
     title: title ?? data?.title ?? 'Vaga analisada',

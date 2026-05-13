@@ -9,19 +9,65 @@ from app.schemas.user_skill import UserSkillCreate, UserSkillUpdate
 
 def create_user_skill(db: Session, user_id: str, payload: UserSkillCreate) -> UserSkill:
 	"""Persist a new user skill."""
-
-	# Map string level to enum
+	# Map string level to enum (default to Beginner)
+	level_name = payload.level or "Beginner"
 	try:
-		level = SkillLevel[payload.level]
+		level = SkillLevel[level_name]
 	except KeyError:
 		level = SkillLevel.Beginner
 
-	# Map string priority to enum
+	# Map string priority to enum (default to desirable)
+	priority_name = payload.priority or "desirable"
 	try:
-		priority = SkillPriority[payload.priority]
+		priority = SkillPriority[priority_name]
 	except KeyError:
 		priority = SkillPriority.desirable
 
+	# Try to find an existing skill for the same user/job/name to avoid duplicates
+	statement = select(UserSkill).where(
+		UserSkill.user_id == user_id,
+		UserSkill.job_id == payload.job_id,
+		UserSkill.skill_name == payload.skill_name,
+	)
+	existing = db.scalars(statement).first()
+
+	if existing:
+		# Promote level/priority if the new analysis suggests higher requirements
+		LEVEL_ORDER = ["Beginner", "Basic", "Intermediate", "Advanced", "Specialist"]
+		PRIORITY_ORDER = ["desirable", "required"]
+
+		try:
+			existing_level_idx = LEVEL_ORDER.index(existing.level.value if hasattr(existing.level, "value") else str(existing.level))
+		except ValueError:
+			existing_level_idx = 0
+
+		try:
+			new_level_idx = LEVEL_ORDER.index(level.value if hasattr(level, "value") else str(level))
+		except ValueError:
+			new_level_idx = 0
+
+		# choose the higher level
+		chosen_level = level if new_level_idx >= existing_level_idx else existing.level
+
+		try:
+			existing_priority_idx = PRIORITY_ORDER.index(existing.priority.value if hasattr(existing.priority, "value") else str(existing.priority))
+		except ValueError:
+			existing_priority_idx = 0
+
+		try:
+			new_priority_idx = PRIORITY_ORDER.index(priority.value if hasattr(priority, "value") else str(priority))
+		except ValueError:
+			new_priority_idx = 0
+
+		chosen_priority = priority if new_priority_idx >= existing_priority_idx else existing.priority
+
+		existing.level = chosen_level
+		existing.priority = chosen_priority
+		db.commit()
+		db.refresh(existing)
+		return existing
+
+	# Create new record when not existing
 	user_skill = UserSkill(
 		user_id=user_id,
 		job_id=payload.job_id,
