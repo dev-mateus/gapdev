@@ -3,7 +3,7 @@
 from enum import Enum
 from uuid import uuid4
 
-from sqlalchemy import Column, DateTime, Enum as SQLEnum, ForeignKey, String, Text, func
+from sqlalchemy import Column, DateTime, Enum as SQLEnum, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
@@ -28,6 +28,7 @@ class Job(Base):
 	job_title = Column(String(255), nullable=False)
 	description = Column(Text, nullable=False)
 	level = Column(SQLEnum(JobLevel), nullable=False, default=JobLevel.Junior)
+	compatibility = Column(Integer, nullable=False, default=0)
 	created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 	user = relationship("User", back_populates="jobs")

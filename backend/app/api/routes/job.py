@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_database
-from app.schemas.job import JobCreate, JobRead
-from app.services.job_service import create_job, list_jobs
+from app.schemas.job import JobCompatibilityUpdate, JobCreate, JobRead, JobWithSkillsRead
+from app.services.job_service import create_job, list_jobs, set_job_compatibility
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
@@ -33,11 +33,23 @@ def create_job_route(
 	return create_job(db, user_email, payload)
 
 
-@router.get("", response_model=list[JobRead])
+@router.get("", response_model=list[JobWithSkillsRead])
 def list_jobs_route(
 	db: Session = Depends(get_database),
 	user_email: str = Depends(_get_user_email),
-) -> list[JobRead]:
+) -> list[JobWithSkillsRead]:
 	"""List the current user's jobs."""
 
 	return list_jobs(db, user_email)
+
+
+@router.patch("/{job_id}/compatibility", response_model=JobRead)
+def update_job_compatibility_route(
+	job_id: str,
+	payload: JobCompatibilityUpdate,
+	db: Session = Depends(get_database),
+	user_email: str = Depends(_get_user_email),
+) -> JobRead:
+	"""Update compatibility for a specific job."""
+
+	return set_job_compatibility(db, user_email, job_id, payload.compatibility)
