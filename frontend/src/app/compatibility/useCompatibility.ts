@@ -9,7 +9,7 @@ const storageKey = (title: string) => `gnose:compat:${title}`
 export function useCompatibility(initial: CompatibilityResponse) {
   const { title, compatibility: initialCompatibility, requiredSkills, optionalSkills } = initial
 
-  const [baseCompatibility] = useState(() => Math.max(0, Math.min(100, initialCompatibility)))
+  const baseCompatibility = useMemo(() => Math.max(0, Math.min(100, initialCompatibility)), [initialCompatibility])
 
   const [selections, setSelections] = useState<SkillSelectionState>(() => {
     try {
@@ -24,6 +24,29 @@ export function useCompatibility(initial: CompatibilityResponse) {
       selectedOptional: Object.fromEntries(optionalSkills.map(s => [s, false])),
     }
   })
+
+  useEffect(() => {
+    let storedSelections: SkillSelectionState | null = null
+
+    try {
+      const raw = localStorage.getItem(storageKey(title))
+      if (raw) {
+        storedSelections = JSON.parse(raw) as SkillSelectionState
+      }
+    } catch (_) {
+      // ignore
+    }
+
+    setSelections((current) => {
+      const sourceRequired = storedSelections?.selectedRequired ?? current.selectedRequired
+      const sourceOptional = storedSelections?.selectedOptional ?? current.selectedOptional
+
+      return {
+        selectedRequired: Object.fromEntries(requiredSkills.map(s => [s, sourceRequired[s] ?? false])),
+        selectedOptional: Object.fromEntries(optionalSkills.map(s => [s, sourceOptional[s] ?? false])),
+      }
+    })
+  }, [title, requiredSkills, optionalSkills])
 
   useEffect(() => {
     try {

@@ -9,6 +9,13 @@ import type { CompatibilityResponse } from './types'
 import { useCompatibility } from './useCompatibility'
 import styles from './compatibility.module.css'
 
+const defaultData = {
+  title: 'Carregando...',
+  compatibility: 0,
+  requiredSkills: [],
+  optionalSkills: [],
+}
+
 export default function CompatibilityPage() {
   const [data, setData] = useState<CompatibilityResponse | null>(null)
 
@@ -27,13 +34,6 @@ export default function CompatibilityPage() {
       mounted = false
     }
   }, [])
-
-  const defaultData = {
-    title: 'Carregando...',
-    compatibility: 0,
-    requiredSkills: [],
-    optionalSkills: [],
-  }
 
   const compat = useCompatibility(data || defaultData)
 
