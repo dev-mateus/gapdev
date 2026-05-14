@@ -1,7 +1,7 @@
 """Job repository."""
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.job import Job, JobLevel
 from app.schemas.job import JobCreate, JobUpdate
@@ -17,12 +17,15 @@ def create_job(db: Session, user_id: str, payload: JobCreate) -> Job:
 	except KeyError:
 		job_level = JobLevel.Junior
 
+	compatibility = max(0, min(100, int(payload.compatibility or 0)))
+
 	job = Job(
 		user_id=user_id,
 		company_name=payload.company_name,
 		job_title=payload.job_title,
 		description=payload.description,
 		level=job_level,
+		compatibility=compatibility,
 	)
 	db.add(job)
 	db.commit()
@@ -38,10 +41,10 @@ def get_job_by_id(db: Session, job_id: str) -> Job | None:
 
 
 def list_jobs_by_user(db: Session, user_id: str) -> list[Job]:
-	"""Return jobs for a specific user ordered by newest first."""
+	"""Return jobs for a specific user ordered by newest first with skills eager loaded."""
 
-	statement = select(Job).where(Job.user_id == user_id).order_by(Job.created_at.desc())
-	return list(db.scalars(statement).all())
+	statement = select(Job).where(Job.user_id == user_id).options(joinedload(Job.skills)).order_by(Job.created_at.desc())
+	return list(db.scalars(statement).unique().all())
 
 
 def update_job(db: Session, job_id: str, payload: JobUpdate) -> Job | None:
@@ -62,7 +65,22 @@ def update_job(db: Session, job_id: str, payload: JobUpdate) -> Job | None:
 			job.level = JobLevel[payload.level.strip()]
 		except KeyError:
 			job.level = JobLevel.Junior
+	if payload.compatibility is not None:
+		job.compatibility = max(0, min(100, int(payload.compatibility)))
 
+	db.commit()
+	db.refresh(job)
+	return job
+
+
+def update_job_compatibility(db: Session, job_id: str, compatibility: int) -> Job | None:
+	"""Update only compatibility for an existing job."""
+
+	job = get_job_by_id(db, job_id)
+	if not job:
+		return None
+
+	job.compatibility = max(0, min(100, int(compatibility)))
 	db.commit()
 	db.refresh(job)
 	return job

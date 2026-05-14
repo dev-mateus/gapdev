@@ -21,7 +21,7 @@
 .card {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 1.5rem;
   padding: 1.25rem;
   border: 1px solid var(--color-border-shell);
@@ -38,6 +38,7 @@
 .left {
   display: grid;
   gap: 0.7rem;
+  flex: 1;
 }
 
 .jobTitle {
@@ -66,6 +67,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .tag {
