@@ -1,0 +1,385 @@
+.content {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-block: 1rem;
+}
+
+.expandedContainer {
+  max-width: min(100%, 84rem);
+}
+
+.page {
+  display: grid;
+  gap: 2rem;
+}
+
+.hero {
+  display: grid;
+  gap: 1rem;
+}
+
+.heroHeading {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 2.95rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--color-text-heading-hero);
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 50rem;
+  color: rgba(232, 246, 255, 0.82);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.loadingState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: rgba(232, 246, 255, 0.6);
+  font-size: 1.1rem;
+}
+
+/* Main Analysis Card */
+.analysisCard {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: 1.2rem;
+  background: linear-gradient(135deg, rgba(22, 95, 138, 0.4) 0%, rgba(3, 33, 52, 0.6) 100%);
+  border: 1px solid rgba(95, 214, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Job Header */
+.jobHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(95, 214, 255, 0.15);
+}
+
+.jobInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.briefcaseIcon {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.8rem;
+  background: rgba(37, 111, 159, 0.6);
+  border: 1px solid rgba(95, 214, 255, 0.3);
+  color: #7adfff;
+}
+
+.jobDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.jobTitle {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.company {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(232, 246, 255, 0.7);
+}
+
+/* Compatibility Section */
+.compatibilitySection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  padding: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .compatibilitySection {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.circularProgress {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto;
+}
+
+.progressCircle {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.progressBackground {
+  fill: none;
+  stroke: rgba(95, 214, 255, 0.1);
+  stroke-width: 8;
+}
+
+.progressFill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.5s ease;
+}
+
+.progressFill.fill-high {
+  stroke: #10b981;
+}
+
+.progressFill.fill-medium {
+  stroke: #f59e0b;
+}
+
+.progressFill.fill-low {
+  stroke: #ef4444;
+}
+
+.progressText {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.percentage {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.compatibilityInfo {
+  display: grid;
+  gap: 1rem;
+}
+
+.compatibilityBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: #f59e0b;
+  color: #000;
+  font-weight: 600;
+  font-size: 0.85rem;
+  width: fit-content;
+}
+
+.compatibilityDescription {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(232, 246, 255, 0.85);
+}
+
+.levelIndicators {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.levelItem {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.8rem;
+  border-radius: 0.8rem;
+  background: rgba(22, 95, 138, 0.3);
+  border: 1px solid rgba(95, 214, 255, 0.2);
+}
+
+.levelLabel {
+  font-size: 0.75rem;
+  color: rgba(232, 246, 255, 0.6);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.levelValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Skills Container */
+.skillsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .skillsContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skillCard {
+  border-radius: 1rem;
+  border: 1px solid rgba(95, 214, 255, 0.2);
+}
+
+.hasSkillCard {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+.hasSkillCard header {
+  border-bottom-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+.needSkillCard {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+.needSkillCard header {
+  border-bottom-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+.skillIcon {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.hasSkillCard .skillIcon {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.needSkillCard .skillIcon {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.skillsList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.skillItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem;
+  border-radius: 0.6rem;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
+}
+
+.skillItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.checkmarkIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: #10b981;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.xmarkIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: #ef4444;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.checkmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: #10b981;
+  color: white;
+  font-weight: bold;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+.xmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: #ef4444;
+  color: white;
+  font-weight: bold;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+/* Recommendation Card */
+.recommendationCard {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 111, 159, 0.1) 100%);
+  border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+.recommendationCard header {
+  border-bottom-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+.recommendationText {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(232, 246, 255, 0.9);
+}
+
+/* Action Buttons */
+.actionButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .actionButtons {
+    grid-template-columns: 1fr;
+  }
+}
+
+.actionButtons button {
+  min-height: 3rem;
+}

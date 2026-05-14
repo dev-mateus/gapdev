@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
-import { BadgeInfo, Sparkles } from 'lucide-react'
+import { BadgeInfo, Sparkles, Check } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import PageContainer from '../../components/PageContainer/PageContainer'
 import SkillSelectableCard from '../../components/SkillSelectableCard/SkillSelectableCard'
 import SkillCategoryCard from '../../components/SkillCategoryCard/SkillCategoryCard'
 import CompatibilityCard from '../../components/CompatibilityCard/CompatibilityCard'
+import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import { fetchCompatibility } from './compatibilityService'
 import type { CompatibilityResponse } from './types'
 import { useCompatibility } from './useCompatibility'
@@ -17,6 +19,7 @@ const defaultData = {
 }
 
 export default function CompatibilityPage() {
+  const navigate = useNavigate()
   const [data, setData] = useState<CompatibilityResponse | null>(null)
 
   useEffect(() => {
@@ -36,6 +39,27 @@ export default function CompatibilityPage() {
   }, [])
 
   const compat = useCompatibility(data || defaultData)
+
+  const handleConcluir = () => {
+    // Armazenar dados de análise em sessionStorage para passar para resultado-analise
+    
+    const analysisData = {
+      jobTitle: compat.title,
+      compatibility: compat.recalculatedCompatibility,
+      hasSkills: Object.keys(compat.selections.selectedRequired).filter(
+        (skill) => compat.selections.selectedRequired[skill]
+      ),
+      needSkills: Object.keys(compat.selections.selectedRequired).filter(
+        (skill) => !compat.selections.selectedRequired[skill]
+      ),
+    }
+    
+    // Salvar em sessionStorage
+    window.sessionStorage.setItem('analysisResult', JSON.stringify(analysisData))
+    
+    // Navegar para resultado-analise
+    navigate('/analise', { replace: true })
+  }
 
   if (!data) {
     return (
@@ -113,6 +137,12 @@ export default function CompatibilityPage() {
             </SkillCategoryCard>
           </div>
         </section>
+        </div>
+        
+        <div className={styles.actionContainer}>
+          <PrimaryButton onClick={handleConcluir} size="large" icon={<Check size={18} />}>
+            Concluir análise
+          </PrimaryButton>
         </div>
       </PageContainer>
     </div>
