@@ -1,8 +1,8 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
-import ResultadoAnalisePage from './page'
-import { apiPatch } from '../../services/api'
+import ResultadoAnalisePage from '../app/resultado-analise/page'
+import { apiPatch } from '../services/api'
 
 const navigateMock = vi.hoisted(() => vi.fn())
 
@@ -15,7 +15,7 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-vi.mock('../../services/api', () => ({
+vi.mock('../services/api', () => ({
   apiPatch: vi.fn(),
 }))
 
