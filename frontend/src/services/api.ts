@@ -61,3 +61,28 @@ export async function apiPost<T>(path: string, body: unknown, headers?: HeadersI
 
   return (await response.json()) as T
 }
+
+export async function apiPatch<T>(path: string, body: unknown, headers?: HeadersInit): Promise<T> {
+  const response = await fetch(buildUrl(path), {
+    method: 'PATCH',
+    headers: buildHeaders({ Accept: 'application/json', 'Content-Type': 'application/json', ...headers }),
+    body: JSON.stringify(body),
+  })
+
+  if (!response.ok) {
+    let message = `HTTP ${response.status}`
+
+    try {
+      const data = (await response.json()) as { detail?: string }
+      if (typeof data.detail === 'string' && data.detail.trim().length > 0) {
+        message = data.detail
+      }
+    } catch {
+      // Keep the generic HTTP status message when the body is not JSON.
+    }
+
+    throw new Error(message)
+  }
+
+  return (await response.json()) as T
+}
