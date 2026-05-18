@@ -1,7 +1,17 @@
 ﻿import { useEffect, useState } from 'react'
-import { Lightbulb, BookOpen, Save, Briefcase, Check, X } from 'lucide-react'
+import {
+  AlertCircle,
+  BriefcaseBusiness,
+  Building2,
+  CircleCheck,
+  CircleX,
+  Lightbulb,
+  Target,
+  TrendingUp,
+} from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import PageContainer from '../../components/PageContainer/PageContainer'
+import PageHeader from '../../components/PageHeader/PageHeader'
 import SectionCard from '../../components/SectionCard/SectionCard'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import Button from '../../components/Button/Button'
@@ -89,107 +99,115 @@ export default function ResultadoAnalisePage() {
   const compatibilityColor =
     data.compatibility >= 70 ? 'high' : data.compatibility >= 50 ? 'medium' : 'low'
 
+  const compatibilityDescription =
+    data.compatibility >= 70
+      ? 'Você possui forte aderência para essa posição e pode destacar suas habilidades mais relevantes.'
+      : data.compatibility >= 50
+        ? 'Você possui uma boa base, mas ainda precisa desenvolver algumas habilidades importantes para essa posição.'
+        : 'Esta vaga pede habilidades que ainda precisam de atenção antes da candidatura.'
+
+  const progressRadius = 54
+  const progressLength = 2 * Math.PI * progressRadius
+  const progressValue = Math.max(0, Math.min(100, Math.round(data.compatibility)))
+
   return (
     <div className={styles.content}>
       <PageContainer className={styles.expandedContainer}>
-        <div className={styles.page}>
-          {/* Header */}
-          <section className={styles.hero}>
-            <div className={styles.heroHeading}>
-              <h1 className={styles.title}>Resultado da Análise</h1>
-              <p className={styles.subtitle}>
-                Confira o resultado da análise da vaga com base no seu perfil técnico.
-              </p>
-            </div>
-          </section>
+        <div className={styles.pageStack}>
+          <PageHeader
+            title="Resultado da Análise"
+            description="Confira o resultado da análise da vaga com base no seu perfil técnico."
+          />
 
-          {/* Main Analysis Card */}
           <section className={styles.analysisCard}>
-            {/* Job Header */}
             <div className={styles.jobHeader}>
               <div className={styles.jobInfo}>
                 <div className={styles.briefcaseIcon}>
-                  <Briefcase size={24} />
+                  <BriefcaseBusiness size={26} />
                 </div>
                 <div className={styles.jobDetails}>
                   <h2 className={styles.jobTitle}>{data.jobTitle}</h2>
-                  <p className={styles.company}>{data.company}</p>
+                  <p className={styles.company}>
+                    <Building2 size={16} />
+                    <span>{data.company}</span>
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Compatibility Section */}
             <div className={styles.compatibilitySection}>
-              <div className={styles.circularProgress}>
-                <svg viewBox="0 0 120 120" className={styles.progressCircle}>
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="54"
-                    className={`${styles.progressBackground}`}
-                  />
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="54"
-                    className={`${styles.progressFill} ${styles[`fill-${compatibilityColor}`]}`}
-                    style={{
-                      strokeDasharray: `${(data.compatibility / 100) * 2 * Math.PI * 54} ${2 * Math.PI * 54}`,
-                    }}
-                  />
-                </svg>
-                <div className={styles.progressText}>
-                  <span className={styles.percentage}>{data.compatibility}%</span>
+              <div className={styles.compatibilitySummary}>
+                <div className={styles.circularProgress} aria-label={`Compatibilidade de ${progressValue}%`}>
+                  <svg viewBox="0 0 120 120" className={styles.progressCircle} aria-hidden="true">
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r={progressRadius}
+                      className={styles.progressBackground}
+                    />
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r={progressRadius}
+                      className={`${styles.progressFill} ${styles[`fill-${compatibilityColor}`]}`}
+                      style={{
+                        strokeDasharray: `${(progressValue / 100) * progressLength} ${progressLength}`,
+                      }}
+                    />
+                  </svg>
+                  <div className={styles.progressText}>
+                    <span className={styles.percentage}>{progressValue}%</span>
+                  </div>
+                </div>
+
+                <div className={styles.compatibilityInfo}>
+                  <span className={styles.compatibilityTitle}>Compatibilidade com a vaga</span>
+                  <span className={`${styles.compatibilityBadge} ${styles[`badge-${compatibilityColor}`]}`}>
+                    {compatibilityLevel}
+                  </span>
+                  <p className={styles.compatibilityDescription}>{compatibilityDescription}</p>
                 </div>
               </div>
 
-              <div className={styles.compatibilityInfo}>
-                <div className={styles.compatibilityBadge}>{compatibilityLevel}</div>
-                <p className={styles.compatibilityDescription}>
-                  Você possui uma boa base, mas ainda precisa desenvolver algumas habilidades importantes para essa posição.
-                </p>
-
-                <div className={styles.levelIndicators}>
-                  <div className={styles.levelItem}>
-                    <span className={styles.levelLabel}>Seu nível atual</span>
-                    <span className={styles.levelValue}>{data.userLevel}</span>
-                  </div>
-                  <div className={styles.levelItem}>
-                    <span className={styles.levelLabel}>Nível da vaga</span>
-                    <span className={styles.levelValue}>{data.jobLevel}</span>
-                  </div>
+              <div className={styles.levelIndicators}>
+                <div className={styles.levelItem}>
+                  <Target size={32} className={styles.levelIcon} />
+                  <span className={styles.levelLabel}>Seu nível atual</span>
+                  <span className={styles.levelValue}>{data.userLevel}</span>
+                </div>
+                <div className={styles.levelItem}>
+                  <TrendingUp size={32} className={styles.levelIcon} />
+                  <span className={styles.levelLabel}>Nível da vaga</span>
+                  <span className={styles.levelValue}>{data.jobLevel}</span>
                 </div>
               </div>
             </div>
 
-            {/* Skills Section */}
             <div className={styles.skillsContainer}>
-              {/* Has Skills */}
               <SectionCard
                 title="Habilidades que você possui"
-                icon={<Check size={20} />}
+                icon={<CircleCheck size={22} />}
                 className={`${styles.skillCard} ${styles.hasSkillCard}`}
               >
                 <div className={styles.skillsList}>
                   {data.hasSkills.map((skill) => (
                     <div key={skill} className={styles.skillItem}>
-                      <Check size={16} className={styles.checkmarkIcon} />
+                      <CircleCheck size={18} className={styles.checkmarkIcon} />
                       {skill}
                     </div>
                   ))}
                 </div>
               </SectionCard>
 
-              {/* Need Skills */}
               <SectionCard
                 title="Habilidades que você precisa desenvolver"
-                icon={<X size={20} />}
+                icon={<AlertCircle size={22} />}
                 className={`${styles.skillCard} ${styles.needSkillCard}`}
               >
                 <div className={styles.skillsList}>
                   {data.needSkills.map((skill) => (
                     <div key={skill} className={styles.skillItem}>
-                      <X size={16} className={styles.xmarkIcon} />
+                      <CircleX size={18} className={styles.xmarkIcon} />
                       {skill}
                     </div>
                   ))}
@@ -197,7 +215,6 @@ export default function ResultadoAnalisePage() {
               </SectionCard>
             </div>
 
-            {/* Recommendation Card */}
             <SectionCard
               title="Recomendação"
               icon={<Lightbulb size={20} />}
@@ -212,15 +229,11 @@ export default function ResultadoAnalisePage() {
             <Button
               onClick={handleSaveJob}
               variant="secondary"
-              size="large"
-              icon={<Save size={18} />}
             >
               Salvar Vaga
             </Button>
             <PrimaryButton
               onClick={handleGeneratePlan}
-              size="large"
-              icon={<BookOpen size={18} />}
             >
               Gerar plano de estudo
             </PrimaryButton>
