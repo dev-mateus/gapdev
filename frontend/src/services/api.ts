@@ -15,13 +15,28 @@ function buildHeaders(extraHeaders?: HeadersInit): Headers {
     })
   }
 
-  const userEmail = localStorage.getItem('usuarioEmail')?.trim()
+  const token = localStorage.getItem('access_token')?.trim()
 
-  if (userEmail) {
-    headers.set('X-User-Email', userEmail)
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
   }
 
   return headers
+}
+
+function handleUnauthorized(path: string): void {
+  if (path === '/auth/login') {
+    return
+  }
+
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('usuarioLogado')
+  localStorage.removeItem('usuarioEmail')
+  window.dispatchEvent(new Event('auth-changed'))
+
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login'
+  }
 }
 
 export async function apiGet<T>(path: string, headers?: HeadersInit): Promise<T> {
@@ -31,6 +46,10 @@ export async function apiGet<T>(path: string, headers?: HeadersInit): Promise<T>
   })
 
   if (!response.ok) {
+    if (response.status === 401) {
+      handleUnauthorized(path)
+    }
+
     throw new Error(`HTTP ${response.status}`)
   }
 
@@ -45,6 +64,10 @@ export async function apiPost<T>(path: string, body: unknown, headers?: HeadersI
   })
 
   if (!response.ok) {
+    if (response.status === 401) {
+      handleUnauthorized(path)
+    }
+
     let message = `HTTP ${response.status}`
 
     try {
