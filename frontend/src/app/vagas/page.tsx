@@ -25,7 +25,8 @@ function navigateTo(path: string) {
 
 function VagasPage() {
   function handleAnalysisSuccess(title: string, description: string, jobId: string) {
-    const analysisContext = JSON.stringify({ title, description })
+    const company = formState.company.trim()
+    const analysisContext = JSON.stringify({ title, company, description })
     window.sessionStorage.setItem(`analysis:${jobId}`, analysisContext)
 
     const params = new URLSearchParams()

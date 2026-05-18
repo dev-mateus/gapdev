@@ -15,30 +15,15 @@ import PageHeader from '../../components/PageHeader/PageHeader'
 import SectionCard from '../../components/SectionCard/SectionCard'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import Button from '../../components/Button/Button'
+import { apiPatch } from '../../services/api'
 import styles from './resultado-analise.module.css'
 import type { AnalysisResult } from './types'
-
-// Mock data - será substituído por dados reais
-const mockData: AnalysisResult = {
-  jobTitle: 'Desenvolvedor Backend Pleno',
-  company: 'Google',
-  compatibility: 50,
-  userLevel: 'Intermediário',
-  jobLevel: 'Pleno',
-  hasSkills: ['JavaScript', 'Node.js', 'Git', 'APIs REST', 'SQL'],
-  needSkills: ['Docker', 'AWS', 'Testes Automatizados', 'CI/DC', 'GraphQL'],
-  recommendation: 'Você está no caminho certo. Foque nas habilidades mais importantes que faltam para aumentar suas chances de seleção. Recomendamos começar por Docker e AWS.',
-}
 
 function getStoredAnalysisData(): AnalysisResult | null {
   try {
     const stored = window.sessionStorage.getItem('analysisResult')
     if (stored) {
-      const parsed = JSON.parse(stored) as Partial<AnalysisResult>
-      return {
-        ...mockData,
-        ...parsed,
-      }
+      return JSON.parse(stored) as AnalysisResult
     }
   } catch (e) {
     console.error('Failed to parse analysis data:', e)
@@ -50,15 +35,16 @@ export default function ResultadoAnalisePage() {
   const navigate = useNavigate()
   const [data, setData] = useState<AnalysisResult | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   useEffect(() => {
     let mounted = true
 
-    // Tentar carregar dados do sessionStorage, senão usar mock
     const timer = setTimeout(() => {
       if (mounted) {
         const storedData = getStoredAnalysisData()
-        setData(storedData || mockData)
+        setData(storedData)
         setIsLoading(false)
       }
     }, 500)
@@ -69,9 +55,25 @@ export default function ResultadoAnalisePage() {
     }
   }, [])
 
-  const handleSaveJob = () => {
-    // Implementar salvar vaga
-    console.log('Salvar vaga:', data)
+  const handleSaveJob = async () => {
+    if (!data?.jobId) {
+      setSaveError('Não foi possível localizar a vaga para salvar.')
+      return
+    }
+
+    setIsSaving(true)
+    setSaveError('')
+
+    try {
+      await apiPatch(`/jobs/${data.jobId}/compatibility`, {
+        compatibility: Math.max(0, Math.min(100, Math.round(data.compatibility))),
+      })
+      navigate('/historico-vagas', { replace: true })
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Não foi possível salvar a vaga.')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleGeneratePlan = () => {
@@ -79,11 +81,21 @@ export default function ResultadoAnalisePage() {
     navigate('/plano-estudos')
   }
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
       <div className={styles.content}>
         <PageContainer className={styles.expandedContainer}>
           <div className={styles.loadingState}>Carregando análise...</div>
+        </PageContainer>
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div className={styles.content}>
+        <PageContainer className={styles.expandedContainer}>
+          <div className={styles.loadingState}>Nenhuma análise encontrada. Volte e conclua a análise da vaga.</div>
         </PageContainer>
       </div>
     )
@@ -229,8 +241,9 @@ export default function ResultadoAnalisePage() {
             <Button
               onClick={handleSaveJob}
               variant="secondary"
+              disabled={isSaving}
             >
-              Salvar Vaga
+              {isSaving ? 'Salvando...' : 'Salvar Vaga'}
             </Button>
             <PrimaryButton
               onClick={handleGeneratePlan}
@@ -238,6 +251,7 @@ export default function ResultadoAnalisePage() {
               Gerar plano de estudo
             </PrimaryButton>
           </div>
+          {saveError ? <p className={styles.saveError}>{saveError}</p> : null}
         </div>
       </PageContainer>
     </div>

@@ -1,4 +1,5 @@
 export type AnalysisResult = {
+  jobId?: string
   jobTitle: string
   company: string
   compatibility: number

@@ -10,4 +10,8 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom'],
   },
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+  },
 })

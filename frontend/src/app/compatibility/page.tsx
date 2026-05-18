@@ -21,16 +21,19 @@ const defaultData = {
 export default function CompatibilityPage() {
   const navigate = useNavigate()
   const [data, setData] = useState<CompatibilityResponse | null>(null)
+  const [jobId, setJobId] = useState<string | undefined>()
 
   useEffect(() => {
     let mounted = true
     const params = new URLSearchParams(window.location.search)
-    const jobId = params.get('jobId') ?? undefined
-    const analysisContext = getAnalysisContext(jobId)
+    const currentJobId = params.get('jobId') ?? undefined
+    setJobId(currentJobId)
+
+    const analysisContext = getAnalysisContext(currentJobId)
     const description = analysisContext?.description ?? params.get('description') ?? undefined
     const title = analysisContext?.title ?? params.get('title') ?? undefined
 
-    fetchCompatibility(description ?? undefined, title ?? undefined, jobId ?? undefined).then(res => {
+    fetchCompatibility(description ?? undefined, title ?? undefined, currentJobId ?? undefined).then(res => {
       if (mounted) setData(res)
     })
     return () => {
@@ -41,23 +44,28 @@ export default function CompatibilityPage() {
   const compat = useCompatibility(data || defaultData)
 
   const handleConcluir = () => {
-    // Armazenar dados de análise em sessionStorage para passar para resultado-analise
-    
+    const analysisContext = getAnalysisContext(jobId)
+
     const analysisData = {
+      jobId,
       jobTitle: compat.title,
+      company: analysisContext?.company ?? '',
       compatibility: compat.recalculatedCompatibility,
-      hasSkills: Object.keys(compat.selections.selectedRequired).filter(
-        (skill) => compat.selections.selectedRequired[skill]
-      ),
-      needSkills: Object.keys(compat.selections.selectedRequired).filter(
-        (skill) => !compat.selections.selectedRequired[skill]
-      ),
+      userLevel: getUserLevelLabel(compat.recalculatedCompatibility),
+      jobLevel: getJobLevelLabel(compat.title),
+      hasSkills: [
+        ...getSelectedSkills(compat.selections.selectedRequired),
+        ...getSelectedSkills(compat.selections.selectedOptional),
+      ],
+      needSkills: [
+        ...getSelectedSkills(compat.selections.selectedRequired, false),
+        ...getSelectedSkills(compat.selections.selectedOptional, false),
+      ],
+      recommendation: buildRecommendation(compat.selections.selectedRequired, compat.selections.selectedOptional),
     }
-    
-    // Salvar em sessionStorage
+
     window.sessionStorage.setItem('analysisResult', JSON.stringify(analysisData))
-    
-    // Navegar para resultado-analise
+
     navigate('/analise', { replace: true })
   }
 
@@ -167,7 +175,7 @@ function inferSkillGroup(skill: string) {
   return 'Competência'
 }
 
-function getAnalysisContext(jobId?: string): { title?: string; description?: string } | null {
+function getAnalysisContext(jobId?: string): { title?: string; company?: string; description?: string } | null {
   if (!jobId) {
     return null
   }
@@ -179,9 +187,48 @@ function getAnalysisContext(jobId?: string): { title?: string; description?: str
   }
 
   try {
-    const parsed = JSON.parse(rawValue) as { title?: string; description?: string }
+    const parsed = JSON.parse(rawValue) as { title?: string; company?: string; description?: string }
     return parsed
   } catch {
     return null
   }
+}
+
+function getSelectedSkills(selectionMap: Record<string, boolean>, selected = true): string[] {
+  return Object.keys(selectionMap).filter((skill) => selectionMap[skill] === selected)
+}
+
+function getUserLevelLabel(compatibility: number): string {
+  if (compatibility >= 80) return 'Avançado'
+  if (compatibility >= 55) return 'Intermediário'
+  return 'Júnior'
+}
+
+function getJobLevelLabel(title?: string): string {
+  const normalized = (title ?? '').toLowerCase()
+
+  if (normalized.includes('senior') || normalized.includes('sênior')) return 'Sênior'
+  if (normalized.includes('pleno')) return 'Pleno'
+  if (normalized.includes('junior') || normalized.includes('júnior')) return 'Júnior'
+
+  return 'Não informado'
+}
+
+function buildRecommendation(
+  selectedRequired: Record<string, boolean>,
+  selectedOptional: Record<string, boolean>
+): string {
+  const missingRequired = Object.keys(selectedRequired).filter((skill) => !selectedRequired[skill])
+  const highlighted = missingRequired.slice(0, 2)
+
+  if (highlighted.length > 0) {
+    return `Você está no caminho certo. Foque primeiro em ${highlighted.join(' e ')} para aumentar suas chances de seleção.`
+  }
+
+  const optionalCount = Object.values(selectedOptional).filter(Boolean).length
+  if (optionalCount > 0) {
+    return 'Você já cobre os principais requisitos. Agora vale reforçar os diferenciais da vaga para subir sua compatibilidade.'
+  }
+
+  return 'Você marcou as habilidades conhecidas. Revise os requisitos obrigatórios para avançar sua compatibilidade.'
 }
