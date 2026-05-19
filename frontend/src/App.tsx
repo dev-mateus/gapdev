@@ -5,6 +5,7 @@ import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
 import VagasPage from './app/vagas/page'
 import CompatibilityPage from './app/compatibility/page'
+import ResultadoAnalisePage from './app/resultado-analise/page'
 import Sidebar from './components/Sidebar/Sidebar'
 import HistoricoPage from './app/historico-vagas/page'
 import './App.css'
@@ -118,7 +119,18 @@ function App(): ReactElement {
           element={
             <PrivateRoute>
               <PrivateLayout>
-                <h1>Você está em: /analise</h1>
+                <ResultadoAnalisePage />
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/resultado-analise"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <ResultadoAnalisePage />
               </PrivateLayout>
             </PrivateRoute>
           }

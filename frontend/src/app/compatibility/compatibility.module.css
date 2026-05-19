@@ -112,6 +112,19 @@
   font-size: 1rem;
 }
 
+.actionContainer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(95, 214, 255, 0.15);
+}
+
+.actionContainer button {
+  min-width: 12rem;
+}
+
 @media (min-width: 980px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
