@@ -10,12 +10,8 @@ from app.schemas.job import JobCreate, JobUpdate
 def create_job(db: Session, user_id: str, payload: JobCreate) -> Job:
 	"""Persist a new job for the given user."""
 
-	# Map string level to enum
-	level_value = payload.level.strip() if payload.level else "Junior"
-	try:
-		job_level = JobLevel[level_value]
-	except KeyError:
-		job_level = JobLevel.Junior
+	# payload.level já chega validado pelo Pydantic
+	job_level = payload.level if payload.level is not None else JobLevel.Junior
 
 	compatibility = max(0, min(100, int(payload.compatibility or 0)))
 
@@ -43,7 +39,13 @@ def get_job_by_id(db: Session, job_id: str) -> Job | None:
 def list_jobs_by_user(db: Session, user_id: str) -> list[Job]:
 	"""Return jobs for a specific user ordered by newest first with skills eager loaded."""
 
-	statement = select(Job).where(Job.user_id == user_id).options(joinedload(Job.skills)).order_by(Job.created_at.desc())
+	statement = (
+		select(Job)
+		.where(Job.user_id == user_id)
+		.options(joinedload(Job.skills))
+		.order_by(Job.created_at.desc())
+	)
+
 	return list(db.scalars(statement).unique().all())
 
 
@@ -61,10 +63,8 @@ def update_job(db: Session, job_id: str, payload: JobUpdate) -> Job | None:
 	if payload.description is not None:
 		job.description = payload.description
 	if payload.level is not None:
-		try:
-			job.level = JobLevel[payload.level.strip()]
-		except KeyError:
-			job.level = JobLevel.Junior
+		job.level = payload.level
+
 	if payload.compatibility is not None:
 		job.compatibility = max(0, min(100, int(payload.compatibility)))
 
