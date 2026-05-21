@@ -49,33 +49,45 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
 const loginWithGoogle = useGoogleLogin({
   onSuccess: async (tokenResponse) => {
     try {
-      const accessToken = tokenResponse.access_token
+      const googleAccessToken = tokenResponse.access_token
 
-      if (!accessToken) {
+      if (!googleAccessToken) {
         throw new Error('Nao foi possivel recuperar o token do Google.')
       }
 
-      const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+      const data = await apiPost<LoginResponse>('/auth/google', {
+        google_token: googleAccessToken,
       })
 
-      if (!response.ok) {
-        throw new Error('Nao foi possivel obter seu e-mail do Google.')
-      }
+      localStorage.setItem('access_token', data.access_token)
+      localStorage.setItem('usuarioLogado', 'true')
 
-      await response.json()
-      throw new Error('Login com Google ainda nao esta integrado ao JWT.')
+      localStorage.removeItem('usuarioEmail')
+
+      window.dispatchEvent(new Event('auth-changed'))
+
+      setFormMessageType('success')
+      setFormMessage('Login realizado com sucesso.')
+
+      navigate('/perfil')
+
     } catch (error) {
       setFormMessageType('error')
-      setFormMessage(error instanceof Error ? error.message : 'Erro ao fazer login com Google.')
+
+      setFormMessage(
+        error instanceof Error
+          ? error.message
+          : 'Erro ao fazer login com Google.'
+      )
     }
   },
+
   onError: () => {
-    console.log('Erro ao fazer login com Google')
+    setFormMessageType('error')
+    setFormMessage('Erro ao autenticar com Google.')
   },
 })
+
 
 async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault()
@@ -233,7 +245,7 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
                 className={styles.googleButton}
                 onClick={() => loginWithGoogle()}
               >
-                Entrar com Google
+                Entrar com Google(em manutencao)
               </Button>
 
               <p className={styles.footerText}>
