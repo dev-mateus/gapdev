@@ -1,6 +1,8 @@
 """Job schemas."""
 
 from datetime import datetime
+from app.schemas.user_skill import UserSkillRead
+
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -40,7 +42,18 @@ class JobUpdate(BaseModel):
     compatibility: Optional[int] = None
 
 
-class JobCompatibilityUpdate(BaseModel):
+class JobCompatibilityUpdate(BaseModel): 
     """Payload to update compatibility for a job."""
 
     compatibility: int = Field(ge=0, le=100)
+
+class JobWithSkillsRead(JobRead):
+    """Job response payload with skills."""
+
+    skills: List[UserSkillRead] = []
+
+    model_config = {
+        "from_attributes": True,
+        "use_enum_values": True,
+    }
+    
