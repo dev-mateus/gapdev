@@ -181,46 +181,6 @@ def _normalize_analysis(parsed: dict) -> dict:
     return parsed
 
 
-def _attach_catalog_ids(db: Session, parsed: dict) -> dict:
-    """Resolve each analyzed skill to a catalog entry and attach its id."""
-
-    if not isinstance(parsed, dict):
-        return parsed
-
-    job_skills = parsed.get("job_skills")
-    if not isinstance(job_skills, list):
-        return parsed
-
-    enriched_job_skills = []
-    for skill in job_skills:
-        if not isinstance(skill, dict):
-            enriched_job_skills.append(skill)
-            continue
-
-        skill = dict(skill)
-        raw_name = skill.get("raw_name") or skill.get("name") or ""
-        catalog_skill = _resolve_catalog_skill(db, skill.get("skill_id"), raw_name if isinstance(raw_name, str) else None)
-        skill["skill_id"] = str(catalog_skill.id)
-        skill["skill_name"] = catalog_skill.canonical_name
-        if not skill.get("raw_name"):
-            skill["raw_name"] = catalog_skill.canonical_name
-        enriched_job_skills.append(skill)
-
-    parsed = dict(parsed)
-    parsed["job_skills"] = enriched_job_skills
-    parsed["skills"] = [
-        {
-            "skill_id": skill.get("skill_id"),
-            "name": skill.get("skill_name") or skill.get("raw_name", ""),
-            "required_level": skill.get("required_level"),
-            "importance": skill.get("priority"),
-        }
-        for skill in enriched_job_skills
-        if isinstance(skill, dict)
-    ]
-    return parsed
-
-
 def _load_prompt_template() -> str:
     return PROMPT_PATH.read_text(encoding="utf-8")
 
@@ -279,7 +239,7 @@ def analisar_vaga_route(
         message = completion.choices[0].message
         text = message.content if getattr(message, "content", None) is not None else str(message)
 
-        parsed = _attach_catalog_ids(db, _normalize_analysis(_parse_model_response(text)))
+        parsed = _normalize_analysis(_parse_model_response(text))
     except HTTPException:
         raise
     except Exception as exc:

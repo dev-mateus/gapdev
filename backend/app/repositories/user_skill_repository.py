@@ -7,15 +7,8 @@ from app.models.job_skill import JobSkill
 from app.models.user_skill import SkillLevel, UserSkill
 from app.schemas.user_skill import UserSkillCreate, UserSkillUpdate
 
-
 def create_user_skill(db: Session, user_id: str, skill_id: str, payload: UserSkillCreate) -> UserSkill:
 	"""Persist a new user skill."""
-	# Map string level to enum (default to Beginner)
-	level_name = payload.level or "Beginner"
-	try:
-		level = SkillLevel[level_name]
-	except KeyError:
-		level = SkillLevel.Beginner
 
 	# Try to find an existing skill for the same user/catalog skill to avoid duplicates
 	statement = select(UserSkill).where(
@@ -23,6 +16,12 @@ def create_user_skill(db: Session, user_id: str, skill_id: str, payload: UserSki
 		UserSkill.skill_id == skill_id,
 	)
 	existing = db.scalars(statement).first()
+
+	level_name = payload.level or "Beginner"
+	try:
+		level = SkillLevel[level_name]
+	except KeyError:
+		level = SkillLevel.Beginner
 
 	if existing:
 		# Promote level if the new payload suggests a higher competency.
@@ -46,7 +45,7 @@ def create_user_skill(db: Session, user_id: str, skill_id: str, payload: UserSki
 		db.refresh(existing)
 		return existing
 
-	# Create new record when not existing
+	# Create new record
 	user_skill = UserSkill(
 		user_id=user_id,
 		skill_id=skill_id,

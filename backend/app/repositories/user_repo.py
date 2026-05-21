@@ -14,6 +14,13 @@ def get_user_by_email(db: Session, email: str) -> User | None:
 	return db.scalars(statement).first()
 
 
+def get_user_by_id(db: Session, user_id: str) -> User | None:
+	"""Return a user by id when found."""
+
+	statement = select(User).where(User.id == user_id)
+	return db.scalars(statement).first()
+
+
 def list_users(db: Session) -> list[User]:
 	"""Return all users."""
 

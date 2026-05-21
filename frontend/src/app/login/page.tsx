@@ -7,6 +7,7 @@ import { validateEmail, validatePassword } from '../../utils/validators'
 import styles from './login.module.css'
 import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
+import { apiPost } from '../../services/api'
 
 
 const features = [
@@ -31,6 +32,11 @@ type LoginPageProps = {
   isBackendConnected?: boolean;
 };
 
+type LoginResponse = {
+  access_token: string
+  token_type: string
+}
+
 function LoginPage({ isBackendConnected }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
@@ -43,43 +49,47 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
 const loginWithGoogle = useGoogleLogin({
   onSuccess: async (tokenResponse) => {
     try {
-      const accessToken = tokenResponse.access_token
+      const googleAccessToken = tokenResponse.access_token
 
-      if (!accessToken) {
+      if (!googleAccessToken) {
         throw new Error('Nao foi possivel recuperar o token do Google.')
       }
 
-      const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+      const data = await apiPost<LoginResponse>('/auth/google', {
+        google_token: googleAccessToken,
       })
 
-      if (!response.ok) {
-        throw new Error('Nao foi possivel obter seu e-mail do Google.')
-      }
-
-      const profile = (await response.json()) as { email?: string }
-
-      if (profile.email) {
-        localStorage.setItem('usuarioEmail', profile.email)
-      }
-
+      localStorage.setItem('access_token', data.access_token)
       localStorage.setItem('usuarioLogado', 'true')
+
+      localStorage.removeItem('usuarioEmail')
+
       window.dispatchEvent(new Event('auth-changed'))
 
+      setFormMessageType('success')
+      setFormMessage('Login realizado com sucesso.')
+
       navigate('/perfil')
+
     } catch (error) {
       setFormMessageType('error')
-      setFormMessage(error instanceof Error ? error.message : 'Erro ao fazer login com Google.')
+
+      setFormMessage(
+        error instanceof Error
+          ? error.message
+          : 'Erro ao fazer login com Google.'
+      )
     }
   },
+
   onError: () => {
-    console.log('Erro ao fazer login com Google')
+    setFormMessageType('error')
+    setFormMessage('Erro ao autenticar com Google.')
   },
 })
 
-function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+
+async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault()
 
   const trimmedEmail = email.trim()
@@ -103,14 +113,21 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     return
   }
 
-  setFormMessageType('success')
-  setFormMessage('Dados validados com sucesso!')
-  
-  // Aqui você pode fazer a chamada da API de login
-  localStorage.setItem('usuarioLogado', 'true')
-  localStorage.setItem('usuarioEmail', trimmedEmail)
-  window.dispatchEvent(new Event('auth-changed'))
-  navigate('/perfil')
+  try {
+    const data = await apiPost<LoginResponse>('/auth/login', {
+      email: trimmedEmail,
+      password,
+    })
+
+    localStorage.setItem('access_token', data.access_token)
+    localStorage.setItem('usuarioLogado', 'true')
+    localStorage.removeItem('usuarioEmail')
+    window.dispatchEvent(new Event('auth-changed'))
+    navigate('/perfil')
+  } catch (error) {
+    setFormMessageType('error')
+    setFormMessage(error instanceof Error ? error.message : 'Erro ao fazer login.')
+  }
 }
 
 
@@ -228,7 +245,7 @@ function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
                 className={styles.googleButton}
                 onClick={() => loginWithGoogle()}
               >
-                Entrar com Google
+                Entrar com Google(em manutencao)
               </Button>
 
               <p className={styles.footerText}>
