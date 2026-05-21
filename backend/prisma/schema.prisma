@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User {
-  id       String      @id @default(uuid())
-  name     String
-  email    String      @unique
-  password String
-  skills   UserSkill[]
-  jobs     Job[]
+  id         String      @id @default(uuid())
+  name       String
+  email      String      @unique
+  password   String
+  skills     UserSkill[]
+  jobs       Job[]
+  studyPlans StudyPlan[]
 
   @@map("users")
 }
@@ -31,6 +32,12 @@ enum SkillPriority {
   required
 }
 
+enum SkillSource {
+  self_assessed
+  imported
+  inferred
+}
+
 enum JobLevel {
   Intern
   Junior
@@ -38,34 +45,133 @@ enum JobLevel {
   Senior
 }
 
+enum StudyPlanStatus {
+  draft
+  active
+  completed
+  archived
+}
+
+enum StudyPlanItemStatus {
+  pending
+  in_progress
+  completed
+  skipped
+}
+
+model Skill {
+  id            String          @id @default(uuid())
+  canonicalName String          @map("canonical_name")
+  slug          String          @unique
+  category      String?
+  description   String?
+  active        Boolean         @default(true)
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @default(now()) @updatedAt @map("updated_at")
+  aliases       SkillAlias[]
+  userSkills    UserSkill[]
+  jobSkills     JobSkill[]
+  studyItems    StudyPlanItem[]
+
+  @@map("skills")
+  @@index([category])
+}
+
+model SkillAlias {
+  id              String @id @default(uuid())
+  skillId         String @map("skill_id")
+  alias           String
+  normalizedAlias String @unique @map("normalized_alias")
+  skill           Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@map("skill_aliases")
+  @@index([skillId])
+}
+
 model UserSkill {
-  id        String        @id @default(uuid())
-  userId    String
-  jobId     String        @map("job_id")
-  skillName String
-  level     SkillLevel    @default(Beginner)
-  priority  SkillPriority @default(desirable)
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job       Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  id              String      @id @default(uuid())
+  userId          String      @map("user_id")
+  skillId         String      @map("skill_id")
+  level           SkillLevel  @default(Beginner)
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @default(now()) @updatedAt @map("updated_at")
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill           Skill       @relation(fields: [skillId], references: [id], onDelete: Restrict)
 
   @@map("user_skills")
   @@index([userId])
-  @@index([jobId])
+  @@index([skillId])
+  @@unique([userId, skillId])
 }
 
 model Job {
-  id          String      @id @default(uuid())
-  userId      String      @map("user_id")
-  companyName String      @map("company_name")
-  jobTitle    String      @map("job_title")
-  description String
-  level       JobLevel    @default(Junior)
-  compatibility Int       @default(0)
-  createdAt   DateTime    @default(now()) @map("created_at")
-
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  skills     UserSkill[]
+  id            String      @id @default(uuid())
+  userId        String      @map("user_id")
+  companyName   String      @map("company_name")
+  jobTitle      String      @map("job_title")
+  description   String
+  level         JobLevel    @default(Junior)
+  compatibility Int         @default(0)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at")
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills        JobSkill[]
+  studyPlans    StudyPlan[]
 
   @@map("jobs")
   @@index([userId])
+}
+
+model JobSkill {
+  id             String        @id @default(uuid())
+  jobId          String        @map("job_id")
+  skillId        String        @map("skill_id")
+  rawName        String?       @map("raw_name")
+  requiredLevel  SkillLevel    @default(Basic) @map("required_level")
+  priority       SkillPriority @default(desirable)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  job            Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skill          Skill         @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@map("job_skills")
+  @@index([jobId])
+  @@index([skillId])
+  @@unique([jobId, skillId])
+}
+
+model StudyPlan {
+  id        String              @id @default(uuid())
+  userId    String              @map("user_id")
+  jobId     String              @map("job_id")
+  status    StudyPlanStatus     @default(draft)
+  createdAt DateTime            @default(now()) @map("created_at")
+  updatedAt DateTime            @default(now()) @updatedAt @map("updated_at")
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job       Job                 @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  items     StudyPlanItem[]
+
+  @@map("study_plans")
+  @@index([userId])
+  @@index([jobId])
+  @@unique([userId, jobId])
+}
+
+model StudyPlanItem {
+  id            String              @id @default(uuid())
+  studyPlanId   String              @map("study_plan_id")
+  skillId       String              @map("skill_id")
+  currentLevel  SkillLevel?         @map("current_level")
+  targetLevel   SkillLevel          @map("target_level")
+  priority      SkillPriority       @default(desirable)
+  reason        String?
+  status        StudyPlanItemStatus @default(pending)
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @default(now()) @updatedAt @map("updated_at")
+  studyPlan     StudyPlan           @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
+  skill         Skill               @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@map("study_plan_items")
+  @@index([studyPlanId])
+  @@index([skillId])
+  @@unique([studyPlanId, skillId])
 }

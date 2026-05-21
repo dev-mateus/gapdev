@@ -33,3 +33,4 @@ class Job(Base):
 
 	user = relationship("User", back_populates="jobs")
 	skills = relationship("UserSkill", back_populates="job", cascade="all, delete-orphan")
+	job_skills = relationship("JobSkill", back_populates="job", cascade="all, delete-orphan")

@@ -38,7 +38,7 @@ def _job_to_read_with_skills(job: object) -> JobWithSkillsRead:
 
 	# Extract skills names from the job's skills relationship
 	skills = getattr(job, "skills", [])
-	skill_names = [skill.skill_name for skill in skills] if skills else []
+	skill_names = [getattr(skill.skill, "canonical_name", getattr(skill, "raw_name", "")) for skill in skills] if skills else []
 
 	return JobWithSkillsRead(
 		id=str(getattr(job, "id")),

@@ -1,7 +1,7 @@
 import type { CompatibilityResponse } from './types'
 import { apiPost } from '../../services/api'
 
-type AnaliseSkill = { name: string; importance?: string }
+type AnaliseSkill = { name?: string; raw_name?: string; importance?: string; priority?: string }
 
 function mapAnaliseToCompatibility(data: any, title?: string): CompatibilityResponse {
   // If the backend already returns compatibility-shaped response, use directly
@@ -14,22 +14,28 @@ function mapAnaliseToCompatibility(data: any, title?: string): CompatibilityResp
     }
   }
 
-  // If backend returns an analysis with `skills` array, map by importance
-  const skills: AnaliseSkill[] = Array.isArray(data?.skills) ? data.skills : []
+  // If backend returns an analysis with `job_skills` array, map by priority.
+  const skills: AnaliseSkill[] = Array.isArray(data?.job_skills)
+    ? data.job_skills
+    : Array.isArray(data?.skills)
+      ? data.skills
+      : []
 
   const required = skills
     .filter(s => {
-      const imp = (s.importance ?? '').toLowerCase()
+      const imp = (s.priority ?? s.importance ?? '').toLowerCase()
       return imp === 'high' || imp === 'required'
     })
-    .map(s => s.name)
+    .map(s => s.raw_name ?? s.name ?? '')
+    .filter(Boolean)
 
   const optional = skills
     .filter(s => {
-      const imp = (s.importance ?? '').toLowerCase()
+      const imp = (s.priority ?? s.importance ?? '').toLowerCase()
       return imp === 'desirable' || imp === 'low' || imp === 'medium' || imp === ''
     })
-    .map(s => s.name)
+    .map(s => s.raw_name ?? s.name ?? '')
+    .filter(Boolean)
 
   return {
     title: title ?? data?.title ?? 'Vaga analisada',

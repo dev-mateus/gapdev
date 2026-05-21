@@ -10,6 +10,7 @@ export type AnalyzeJobResponse = {
 }
 
 export type AnalyzeSkill = {
+  raw_name?: string
   name: string
   required_level?: string | null
   importance?: string | null
@@ -19,6 +20,7 @@ export type AnalyzeSkill = {
 
 export type AnalyzeJobAiResponse = {
   summary: string
+  job_skills?: AnalyzeSkill[]
   skills: AnalyzeSkill[]
 }
 

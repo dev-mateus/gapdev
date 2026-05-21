@@ -8,10 +8,9 @@ from pydantic import BaseModel
 class UserSkillCreate(BaseModel):
     """Payload to create a user skill."""
 
-    job_id: str
-    skill_name: str
-    level: str
-    priority: str
+    skill_id: Optional[str] = None
+    skill_name: Optional[str] = None
+    level: str = "Beginner"
 
 
 class UserSkillRead(UserSkillCreate):
@@ -19,6 +18,8 @@ class UserSkillRead(UserSkillCreate):
 
     id: str
     user_id: str
+    skill_id: str
+    skill_name: str
 
     model_config = {"from_attributes": True}
 
@@ -26,6 +27,4 @@ class UserSkillRead(UserSkillCreate):
 class UserSkillUpdate(BaseModel):
     """Payload to update a user skill."""
 
-    skill_name: Optional[str] = None
     level: Optional[str] = None
-    priority: Optional[str] = None
