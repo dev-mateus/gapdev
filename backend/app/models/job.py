@@ -32,5 +32,4 @@ class Job(Base):
 	created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 	user = relationship("User", back_populates="jobs")
-	skills = relationship("UserSkill", back_populates="job", cascade="all, delete-orphan")
 	job_skills = relationship("JobSkill", back_populates="job", cascade="all, delete-orphan")

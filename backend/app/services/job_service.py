@@ -36,9 +36,9 @@ def _job_to_read_with_skills(job: object) -> JobWithSkillsRead:
 	# Handle enum or string
 	level_str = level.value if hasattr(level, "value") else str(level)
 
-	# Extract skills names from the job's skills relationship
-	skills = getattr(job, "skills", [])
-	skill_names = [getattr(skill.skill, "canonical_name", getattr(skill, "raw_name", "")) for skill in skills] if skills else []
+	# Extract skills names from the job's job_skills relationship
+	job_skills = getattr(job, "job_skills", [])
+	skill_names = [getattr(job_skill.skill, "canonical_name", getattr(job_skill, "raw_name", "")) for job_skill in job_skills] if job_skills else []
 
 	return JobWithSkillsRead(
 		id=str(getattr(job, "id")),
