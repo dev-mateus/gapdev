@@ -12,6 +12,7 @@ function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
   function handleConfirmLogout() {
     localStorage.removeItem('usuarioLogado')
     localStorage.removeItem('usuarioEmail')
+    localStorage.removeItem('access_token')
     window.dispatchEvent(new Event('auth-changed'))
     onClose()
     navigate('/login')

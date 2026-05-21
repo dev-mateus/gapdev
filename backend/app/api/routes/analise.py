@@ -1,12 +1,13 @@
 """Analise routes for job descriptions."""
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pathlib import Path
 import os
 import json
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_database
+from app.api.deps import get_current_user, get_database
+from app.models.user import User
 from app.schemas.analise import AnaliseRequest, AnaliseResponse
 from app.services.user_skill_service import create_skill
 from app.repositories.user_skill_repository import list_skills_by_job
@@ -25,18 +26,6 @@ router = APIRouter(prefix="/analise", tags=["analise"])
 
 MODEL = "mistralai/Mistral-7B-Instruct-v0.2:featherless-ai"
 PROMPT_PATH = Path(__file__).resolve().parents[4] / "ai_service" / "app" / "prompts" / "analise_prompt.txt"
-
-
-def _get_user_email(x_user_email: str | None = Header(default=None, alias="X-User-Email")) -> str:
-    """Return the logged user's e-mail from the request headers."""
-
-    if not x_user_email:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuario nao autenticado.",
-        )
-
-    return x_user_email.strip()
 
 
 def _normalize_skill_name(name: str) -> str:
@@ -173,7 +162,7 @@ def _load_prompt_template() -> str:
 def analisar_vaga_route(
     payload: AnaliseRequest,
     db: Session = Depends(get_database),
-    user_email: str = Depends(_get_user_email),
+    current_user: User = Depends(get_current_user),
 ) -> dict:
     """Analisa a descrição da vaga e retorna resumo estruturado de habilidades."""
 
@@ -232,7 +221,7 @@ def analisar_vaga_route(
                     level=_map_skill_level(skill.get("required_level")),
                     priority=_map_skill_priority(skill.get("importance")),
                 )
-                create_skill(db, user_email, skill_create)
+                create_skill(db, str(current_user.email), skill_create)
             except Exception as e:
                 # Log error but continue saving other skills
                 print(f"Error saving skill: {e}")
