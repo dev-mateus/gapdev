@@ -77,6 +77,12 @@
   align-items: center;
 }
 
+.sync {
+  margin-left: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(232, 246, 255, 0.85);
+}
+
 /* evita que o foco do input force um scroll em alguns navegadores e dispositivos */
 .checkboxWrap input {
   -webkit-tap-highlight-color: transparent;

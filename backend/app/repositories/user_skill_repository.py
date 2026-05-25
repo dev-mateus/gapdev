@@ -4,7 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.job_skill import JobSkill
-from app.models.user_skill import SkillLevel, UserSkill
+from app.models.user_skill import UserSkill
+from app.models.enums import SkillLevel
 from app.schemas.user_skill import UserSkillCreate, UserSkillUpdate
 
 def create_user_skill(db: Session, user_id: str, skill_id: str, payload: UserSkillCreate) -> UserSkill:

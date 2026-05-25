@@ -3,23 +3,38 @@ import { apiPost } from '../../services/api'
 
 type AnaliseSkill = { name?: string; raw_name?: string; importance?: string; priority?: string }
 
-function mapAnaliseToCompatibility(data: any, title?: string): CompatibilityResponse {
+function mapAnaliseToCompatibility(data: unknown, title?: string): CompatibilityResponse {
+  const d = (data ?? {}) as Record<string, unknown>
+
   // If the backend already returns compatibility-shaped response, use directly
-  if (data && typeof data.title === 'string' && typeof data.compatibility === 'number') {
+  if (typeof d.title === 'string' && typeof d.compatibility === 'number') {
+    const required = Array.isArray(d.requiredSkills) ? (d.requiredSkills as string[]) : []
+    const optional = Array.isArray(d.optionalSkills) ? (d.optionalSkills as string[]) : []
+
     return {
-      title: data.title,
-      compatibility: Math.max(0, Math.min(100, Math.round(data.compatibility))),
-      requiredSkills: Array.isArray(data.requiredSkills) ? data.requiredSkills : [],
-      optionalSkills: Array.isArray(data.optionalSkills) ? data.optionalSkills : [],
+      title: d.title,
+      compatibility: Math.max(0, Math.min(100, Math.round(d.compatibility))),
+      requiredSkills: required,
+      optionalSkills: optional,
     }
   }
 
   // If backend returns an analysis with `job_skills` array, map by priority.
-  const skills: AnaliseSkill[] = Array.isArray(data?.job_skills)
-    ? data.job_skills
-    : Array.isArray(data?.skills)
-      ? data.skills
+  const rawSkills = Array.isArray(d.job_skills)
+    ? (d.job_skills as unknown[])
+    : Array.isArray(d.skills)
+      ? (d.skills as unknown[])
       : []
+
+  const skills: AnaliseSkill[] = rawSkills.map((it) => {
+    const r = (it ?? {}) as Record<string, unknown>
+    return {
+      name: typeof r.name === 'string' ? r.name : undefined,
+      raw_name: typeof r.raw_name === 'string' ? r.raw_name : undefined,
+      importance: typeof r.importance === 'string' ? r.importance : undefined,
+      priority: typeof r.priority === 'string' ? r.priority : undefined,
+    }
+  })
 
   const required = skills
     .filter(s => {
@@ -38,8 +53,8 @@ function mapAnaliseToCompatibility(data: any, title?: string): CompatibilityResp
     .filter(Boolean)
 
   return {
-    title: title ?? data?.title ?? 'Vaga analisada',
-    compatibility: typeof data?.compatibility === 'number' ? Math.max(0, Math.min(100, Math.round(data.compatibility))) : 0,
+    title: title ?? (typeof d.title === 'string' ? d.title : 'Vaga analisada'),
+    compatibility: typeof d.compatibility === 'number' ? Math.max(0, Math.min(100, Math.round(d.compatibility))) : 0,
     requiredSkills: required,
     optionalSkills: optional,
   }
@@ -62,6 +77,6 @@ export async function fetchCompatibility(description?: string, title?: string, j
     payload.job_id = jobId
   }
 
-  const data = await apiPost('/analise', payload)
+  const data = await apiPost<unknown>('/analise', payload)
   return mapAnaliseToCompatibility(data, title)
 }
