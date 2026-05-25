@@ -5,6 +5,8 @@ import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
 import VagasPage from './app/vagas/page'
 import PlanoEstudosPage from './app/plano-estudos/page'
+import CompatibilityPage from './app/compatibility/page'
+import ResultadoAnalisePage from './app/resultado-analise/page'
 import Sidebar from './components/Sidebar/Sidebar'
 import HistoricoPage from './app/historico-vagas/page'
 import ProgressoPage from './app/progresso/page'
@@ -114,6 +116,33 @@ function App(): ReactElement {
             <PrivateRoute>
               <PrivateLayout>
                 <PlanoEstudosPage />
+          path="/compatibility"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <CompatibilityPage />
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/analise"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <ResultadoAnalisePage />
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/resultado-analise"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <ResultadoAnalisePage />
               </PrivateLayout>
             </PrivateRoute>
           }

@@ -1,0 +1,30 @@
+"""User Skill schemas."""
+
+from typing import Optional
+
+from pydantic import BaseModel
+
+
+class UserSkillCreate(BaseModel):
+    """Payload to create a user skill."""
+
+    skill_id: Optional[str] = None
+    skill_name: Optional[str] = None
+    level: str = "Beginner"
+
+
+class UserSkillRead(UserSkillCreate):
+    """User skill response payload."""
+
+    id: str
+    user_id: str
+    skill_id: str
+    skill_name: str
+
+    model_config = {"from_attributes": True}
+
+
+class UserSkillUpdate(BaseModel):
+    """Payload to update a user skill."""
+
+    level: Optional[str] = None
