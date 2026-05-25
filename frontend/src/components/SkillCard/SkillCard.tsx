@@ -10,9 +10,11 @@ type SkillCardProps = {
   icon?: ReactNode
   selected?: boolean
   onToggle?: (selected: boolean) => void
+  syncing?: boolean
+  disabled?: boolean
 }
 
-export default function SkillCard({ name, description, icon, selected = false, onToggle }: SkillCardProps) {
+export default function SkillCard({ name, description, icon, selected = false, onToggle, syncing = false, disabled = false }: SkillCardProps) {
   const id = useId()
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -40,8 +42,10 @@ export default function SkillCard({ name, description, icon, selected = false, o
           checked={selected}
           onChange={handleChange}
           onMouseDown={(e) => e.preventDefault()} /* previne scroll ao clicar */
+          disabled={disabled || syncing}
         />
         <span className={checkboxStyles.checkboxBox} aria-hidden="true" />
+        {syncing ? <span className={styles.sync} aria-hidden>⏳</span> : null}
       </div>
     </label>
   )

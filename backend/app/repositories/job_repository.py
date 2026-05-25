@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.job import Job, JobLevel
+from app.models.job_skill import JobSkill
 from app.schemas.job import JobCreate, JobUpdate
 
 
@@ -42,7 +43,7 @@ def list_jobs_by_user(db: Session, user_id: str) -> list[Job]:
 	statement = (
 		select(Job)
 		.where(Job.user_id == user_id)
-		.options(joinedload(Job.skills))
+		.options(joinedload(Job.job_skills).joinedload(JobSkill.skill))
 		.order_by(Job.created_at.desc())
 	)
 

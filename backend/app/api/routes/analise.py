@@ -1,17 +1,15 @@
 """Analise routes for job descriptions."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from pathlib import Path
 import os
 import json
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_database
-from app.models.user import User
+from app.api.deps import get_database
 from app.schemas.analise import AnaliseRequest, AnaliseResponse
-from app.services.user_skill_service import create_skill
-from app.repositories.user_skill_repository import list_skills_by_job
-from app.schemas.user_skill import UserSkillCreate
+from app.schemas.job_skill import JobSkillCreate
+from app.services.job_skill_service import create_job_skill, list_job_skills_for_job, _resolve_catalog_skill
 
 try:
     from dotenv import load_dotenv
@@ -26,6 +24,18 @@ router = APIRouter(prefix="/analise", tags=["analise"])
 
 MODEL = "mistralai/Mistral-7B-Instruct-v0.2:featherless-ai"
 PROMPT_PATH = Path(__file__).resolve().parents[4] / "ai_service" / "app" / "prompts" / "analise_prompt.txt"
+
+
+def _get_user_email(x_user_email: str | None = Header(default=None, alias="X-User-Email")) -> str:
+    """Return the logged user's e-mail from the request headers."""
+
+    if not x_user_email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Usuario nao autenticado.",
+        )
+
+    return x_user_email.strip()
 
 
 def _normalize_skill_name(name: str) -> str:
@@ -138,18 +148,35 @@ def _normalize_analysis(parsed: dict) -> dict:
     if not isinstance(parsed, dict):
         return parsed
 
-    skills = parsed.get("skills")
-    if isinstance(skills, list):
-        normalized_skills = []
-        for skill in skills:
-            if isinstance(skill, dict) and isinstance(skill.get("name"), str):
+    job_skills = parsed.get("job_skills")
+    if not isinstance(job_skills, list):
+        job_skills = parsed.get("skills")
+
+    if isinstance(job_skills, list):
+        normalized_job_skills = []
+        for skill in job_skills:
+            if isinstance(skill, dict):
                 skill = dict(skill)
-                skill["name"] = _normalize_skill_name(skill["name"])
-                normalized_skills.append(skill)
+                raw_name = skill.get("raw_name") or skill.get("name")
+                if isinstance(raw_name, str):
+                    skill["raw_name"] = _normalize_skill_name(raw_name)
+                if "priority" not in skill and "importance" in skill:
+                    skill["priority"] = skill.get("importance")
+                normalized_job_skills.append(skill)
             else:
-                normalized_skills.append(skill)
+                normalized_job_skills.append(skill)
+
         parsed = dict(parsed)
-        parsed["skills"] = normalized_skills
+        parsed["job_skills"] = normalized_job_skills
+        parsed["skills"] = [
+            {
+                "name": skill.get("raw_name", ""),
+                "required_level": skill.get("required_level"),
+                "importance": skill.get("priority"),
+            }
+            for skill in normalized_job_skills
+            if isinstance(skill, dict)
+        ]
 
     return parsed
 
@@ -162,21 +189,29 @@ def _load_prompt_template() -> str:
 def analisar_vaga_route(
     payload: AnaliseRequest,
     db: Session = Depends(get_database),
-    current_user: User = Depends(get_current_user),
+    user_email: str = Depends(_get_user_email),
 ) -> dict:
     """Analisa a descrição da vaga e retorna resumo estruturado de habilidades."""
 
     # Check if this job has already been analyzed (only if job_id provided)
     if payload.job_id:
-        existing_skills = list_skills_by_job(db, payload.job_id)
+        existing_skills = list_job_skills_for_job(db, user_email, payload.job_id)
         if existing_skills:
             # Return already analyzed skills
             return {
                 "summary": "Análise já realizada anteriormente",
+                "job_skills": [
+                    {
+                        "raw_name": skill.raw_name or skill.skill.canonical_name,
+                        "required_level": _reverse_map_level(skill.required_level),
+                        "priority": _reverse_map_importance(skill.priority),
+                    }
+                    for skill in existing_skills
+                ],
                 "skills": [
                     {
-                        "name": skill.skill_name,
-                        "required_level": _reverse_map_level(skill.level),
+                        "name": skill.raw_name or skill.skill.canonical_name,
+                        "required_level": _reverse_map_level(skill.required_level),
                         "importance": _reverse_map_importance(skill.priority),
                     }
                     for skill in existing_skills
@@ -209,19 +244,20 @@ def analisar_vaga_route(
         raise
     except Exception as exc:
         # Fallback: return the raw text in summary
-        parsed = {"summary": str(exc), "skills": []}
+        parsed = {"summary": str(exc), "job_skills": [], "skills": []}
 
     # Save skills to database only if job_id is provided
-    if payload.job_id and parsed.get("skills"):
-        for skill in parsed["skills"]:
+    if payload.job_id and parsed.get("job_skills"):
+        for skill in parsed["job_skills"]:
             try:
-                skill_create = UserSkillCreate(
+                skill_create = JobSkillCreate(
                     job_id=payload.job_id,
-                    skill_name=skill.get("name", ""),
-                    level=_map_skill_level(skill.get("required_level")),
-                    priority=_map_skill_priority(skill.get("importance")),
+                    skill_id=skill.get("skill_id"),
+                    raw_name=skill.get("raw_name", skill.get("skill_name", skill.get("name", ""))),
+                    required_level=_map_skill_level(skill.get("required_level")),
+                    priority=_map_skill_priority(skill.get("priority", skill.get("importance"))),
                 )
-                create_skill(db, str(current_user.email), skill_create)
+                create_job_skill(db, user_email, skill_create)
             except Exception as e:
                 # Log error but continue saving other skills
                 print(f"Error saving skill: {e}")

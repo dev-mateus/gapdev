@@ -169,3 +169,28 @@ export async function apiPatch<T>(
 
   return (await response.json()) as T
 }
+
+export async function apiDelete(
+  path: string,
+  headers?: HeadersInit
+): Promise<void> {
+  const response = await fetch(buildUrl(path), {
+    method: 'DELETE',
+    headers: buildHeaders({
+      Accept: 'application/json',
+      ...headers,
+    }),
+  })
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      handleUnauthorized(path)
+    }
+
+    const message = await extractErrorMessage(response)
+
+    throw new Error(message)
+  }
+
+  return
+}

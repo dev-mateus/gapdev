@@ -124,6 +124,7 @@ export default function CompatibilityPage() {
                   description={inferSkillGroup(skill)}
                   selected={compat.selections.selectedRequired[skill]}
                   onToggle={(value) => compat.toggleRequired(skill, value)}
+                  syncing={Boolean(compat.syncing?.[skill])}
                 />
               ))}
             </SkillCategoryCard>
@@ -140,6 +141,7 @@ export default function CompatibilityPage() {
                   description={inferSkillGroup(skill)}
                   selected={compat.selections.selectedOptional[skill]}
                   onToggle={(value) => compat.toggleOptional(skill, value)}
+                  syncing={Boolean(compat.syncing?.[skill])}
                 />
               ))}
             </SkillCategoryCard>
