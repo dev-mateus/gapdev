@@ -39,7 +39,7 @@ function HistoricoPage() {
         }
       } catch (error) {
         if (isMounted) {
-          const message = error instanceof Error ? error.message : 'Nao foi possivel carregar o historico.'
+          const message = error instanceof Error ? error.message : 'Não foi possível carregar o histórico.'
 
           if (message.includes('404')) {
             setJobs([])

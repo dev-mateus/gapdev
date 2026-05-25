@@ -94,10 +94,12 @@ function Perfil() {
     <div className={styles.content}>
       <PageContainer className={styles.expandedContainer}>
         <div className={styles.pageStack}>
+
           <PageHeader
             title="Perfil do usuário"
             description="Configure seu perfil técnico para receber recomendações personalizadas de estudo."
           />
+
 
           <div className={styles.profileTabs}>
             <button

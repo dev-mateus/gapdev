@@ -46,7 +46,7 @@ const loginWithGoogle = useGoogleLogin({
       const accessToken = tokenResponse.access_token
 
       if (!accessToken) {
-        throw new Error('Nao foi possivel recuperar o token do Google.')
+        throw new Error('Não foi possível recuperar o token do Google.')
       }
 
       const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
@@ -56,7 +56,7 @@ const loginWithGoogle = useGoogleLogin({
       })
 
       if (!response.ok) {
-        throw new Error('Nao foi possivel obter seu e-mail do Google.')
+        throw new Error('Não foi possível obter seu e-mail do Google.')
       }
 
       const profile = (await response.json()) as { email?: string }

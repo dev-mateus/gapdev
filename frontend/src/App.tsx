@@ -4,11 +4,17 @@ import Perfil from './app/Perfil/perfil'
 import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
 import VagasPage from './app/vagas/page'
+import PlanoEstudosPage from './app/plano-estudos/page'
 import Sidebar from './components/Sidebar/Sidebar'
 import HistoricoPage from './app/historico-vagas/page'
+import ProgressoPage from './app/progresso/page'
+import { StudyPlanProvider } from './contexts/StudyPlanContext'
+
 import './App.css'
+
 import CookieBanner from './components/CookiesBanner/CookiesBanner'
 import { fetchBackendHealth } from './services/health'
+
 
 function PrivateRoute({ children }: { children: ReactNode }) {
   const isLogged = localStorage.getItem('usuarioLogado')
@@ -59,9 +65,10 @@ function App(): ReactElement {
   }, [])
 
   return (
-    <>
-      <Routes>
-        <Route
+    <StudyPlanProvider>
+      <>
+        <Routes>
+          <Route
           path="/"
           element={<LoginPage isBackendConnected={isBackendConnected} />}
         />
@@ -102,6 +109,17 @@ function App(): ReactElement {
         />
 
         <Route
+          path="/plano-estudos"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <PlanoEstudosPage />
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
           path="/analise"
           element={
             <PrivateRoute>
@@ -112,23 +130,14 @@ function App(): ReactElement {
           }
         />
 
-        <Route
-          path="/plano-estudos"
-          element={
-            <PrivateRoute>
-              <PrivateLayout>
-                <h1>Você está em: /plano-estudos</h1>
-              </PrivateLayout>
-            </PrivateRoute>
-          }
-        />
+
 
         <Route
           path="/progresso"
           element={
             <PrivateRoute>
               <PrivateLayout>
-                <h1>Você está em: /progresso</h1>
+                <ProgressoPage />
               </PrivateLayout>
             </PrivateRoute>
           }
@@ -139,7 +148,7 @@ function App(): ReactElement {
           element={
             <PrivateRoute>
               <PrivateLayout>
-                <HistoricoPage/>
+                <HistoricoPage />
               </PrivateLayout>
             </PrivateRoute>
           }
@@ -148,6 +157,7 @@ function App(): ReactElement {
 
       <CookieBanner />
     </>
+    </StudyPlanProvider>
   )
 }
 

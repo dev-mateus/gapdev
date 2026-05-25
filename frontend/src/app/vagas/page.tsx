@@ -40,14 +40,14 @@ function VagasPage() {
           <div className={styles.pageStack}>
             <PageHeader
               title="Vagas"
-              description="Adicione vagas de interesse para salvar no seu historico."
+              description="Adicione vagas de interesse para salvar no seu histórico."
             />
 
             <TabSwitcher tabs={tabs} activeTabId="analisar-vaga" onTabChange={handleTabChange} />
 
             <SectionCard
               title="Salvar vaga"
-              description="Cole a descricao completa da vaga e salve no historico."
+              description="Cole a descrição completa da vaga e salve no histórico."
               icon={<ClipboardList size={20} />}
             >
               <form className={styles.form} onSubmit={handleSubmit}>
@@ -73,8 +73,8 @@ function VagasPage() {
                 </div>
 
                 <TextArea
-                  label="Descricao da vaga"
-                  placeholder="Cole aqui a descricao da vaga, com requisitos tecnicos, tecnologias e ferramentas necessarias"
+                  label="Descrição da vaga"
+                  placeholder="Cole aqui a descrição da vaga, com requisitos técnicos, tecnologias e ferramentas necessárias"
                   value={formState.description}
                   onChange={(event) => updateField('description', event.target.value)}
                   required

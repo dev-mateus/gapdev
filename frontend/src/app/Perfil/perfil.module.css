@@ -1,37 +1,37 @@
 .profileTabs {
   display: inline-flex;
-  align-items: center;
   width: fit-content;
-  max-width: fit-content;
-
-  padding: 4px;
-
-  border-radius: 16px;
-  border: 1px solid #4b6678;
-
-  background: rgba(6, 24, 36, 0.9);
+  padding: 0.25rem;
+  border: 1px solid var(--color-border-shell);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-switcher);
+  overflow: hidden;
 }
 
 .tab,
 .activeTab {
-  min-width: 170px;
-  height: 52px;
-
-  border: none;
-  border-radius: 12px;
-
+  min-width: 9.5rem;
+  height: 2.45rem;
+  min-height: 2.45rem;
+  border: 0;
+  border-radius: calc(var(--radius-control) - 0.2rem);
   background: transparent;
-  color: #d6e3ec;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color var(--transition-default),
+    background-color var(--transition-default),
+    transform var(--transition-default);
 
+  /* alinhamento do conteúdo */
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 
-  font-size: 15px;
-  font-weight: 600;
-
-  cursor: pointer;
+  padding: 0 18px;
+  line-height: 1;
 }
 
 .activeTab {
@@ -48,7 +48,9 @@
   width: 22px;
   height: 22px;
   flex-shrink: 0;
+  display: block;
 }
+
 
 .content {
   width: 100%;
@@ -187,21 +189,23 @@
 }
 
 .profileCard {
-  border: 1px solid #345468;
-  border-radius: 12px;
-
-  background: rgba(7, 28, 43, 0.65);
-
+  border: 1px solid var(--color-border-shell);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-panel);
+  padding: 1.25rem;
   overflow: hidden;
+  display: grid;
+  gap: 1.3rem;
 }
 
 .profileTop {
-  padding: 36px 42px;
-
-  display: flex;
-  align-items: center;
-  gap: 24px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: start;
 }
+
 
 .avatar {
   width: 78px;
@@ -241,13 +245,14 @@
 .profileBottom {
   border-top: 1px solid #1c3c50;
 
-  padding: 32px 42px;
+  padding-top: 1.85rem;
 
   display: grid;
   grid-template-columns: 1fr 1.4fr;
 
-  gap: 80px;
+  gap: 5rem;
 }
+
 
 .profileBottom h3 {
   margin: 0 0 12px;
