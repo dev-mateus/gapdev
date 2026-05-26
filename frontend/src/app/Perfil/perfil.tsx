@@ -92,66 +92,11 @@ function Perfil() {
     <div className={styles.content}>
       <PageContainer className={styles.expandedContainer}>
         <div className={styles.pageStack}>
-
           <PageHeader
             title="Perfil do usuário"
             description="Configure seu perfil técnico para receber recomendações personalizadas de estudo."
           />
 
-
-          <div className={styles.profileTabs}>
-            <button
-              type="button"
-              className={styles.activeTab}
-            >
-              <User size={18} />
-
-              <span>Dados Pessoais</span>
-            </button>
-
-            <button
-              type="button"
-              className={styles.tab}
-              onClick={() => navigateTo('/perfil/tecnologias')}
-            >
-              <Code2 size={18} />
-
-              <span>Tecnologias</span>
-            </button>
-          </div>
-
-          {editando ? (
-            <SectionCard
-              title="Informações básicas"
-              description="Defina seu nome, objetivo profissional e área de interesse"
-              icon={<User size={22} />}
-            >
-              <form className={styles.form} onSubmit={handleSubmit}>
-                <div className={styles.formContent}>
-                  <div className={styles.leftForm}>
-                    <div className={styles.topFields}>
-                      <Input
-                        label="Nome completo"
-                        type="text"
-                        placeholder="Seu nome"
-                        value={perfil.nome}
-                        onChange={(event) =>
-                          updateField('nome', event.target.value)
-                        }
-                        required
-                      />
-
-                      <Input
-                        label="E-mail"
-                        type="text"
-                        placeholder="seu@gmail.com"
-                        value={perfil.email}
-                        onChange={(event) =>
-                          updateField('email', event.target.value)
-                        }
-                        required
-                      />
-                    </div>
           <TabSwitcher
             tabs={profileTabs}
             activeTabId={activeTab}
@@ -249,7 +194,6 @@ function Perfil() {
                         <span className={styles.characterCount}>
                           {perfil.objetivo.length}/300
                         </span>
-
                       </div>
 
                       <div className={styles.passwordArea}>
@@ -400,11 +344,10 @@ function Perfil() {
                       className={styles.editButton}
                       icon={<Edit size={18} />}
                       onClick={() => setEditando(true)}
-                  >
-                    Editar
+                    >
+                      Editar
                     </PrimaryButton>
                   </div>
-
 
                   <div className={styles.profileBottom}>
                     <div>

@@ -56,10 +56,8 @@ function VagasPage() {
             <TabSwitcher tabs={tabs} activeTabId="analisar-vaga" onTabChange={handleTabChange} />
 
             <SectionCard
-              title="Salvar vaga"
-              description="Cole a descrição completa da vaga e salve no histórico."
               title="Analisar vaga"
-              description="Cole a descricao completa da vaga e analise com a IA."
+              description="Cole a descrição completa da vaga e analise com a IA."
               icon={<ClipboardList size={20} />}
             >
               <form className={styles.form} onSubmit={handleSubmit}>
