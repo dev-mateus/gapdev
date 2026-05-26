@@ -1,5 +1,4 @@
-
-  import {
+import {
   Braces,
   Cloud,
   Code2,
@@ -14,6 +13,7 @@
   Smartphone,
   Wrench,
   X,
+  type LucideIcon,
 } from 'lucide-react'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -30,261 +30,62 @@ type Tecnologia = {
 }
 
 const tecnologiasMock: Tecnologia[] = [
-  // Linguagens
-  {
-    id: 1,
-    nome: 'JavaScript',
-    descricao: 'Linguagem de programação para web',
-    categoria: 'Linguagens',
-  },
-  {
-    id: 2,
-    nome: 'Python',
-    descricao: 'Linguagem versátil para backend e IA',
-    categoria: 'Linguagens',
-  },
+  { id: 1, nome: 'JavaScript', descricao: 'Linguagem de programação para web', categoria: 'Linguagens' },
+  { id: 2, nome: 'Python', descricao: 'Linguagem versátil para backend e IA', categoria: 'Linguagens' },
 
-  // Frontend
-  {
-    id: 3,
-    nome: 'React',
-    descricao: 'Biblioteca JavaScript para interfaces',
-    categoria: 'Frontend',
-  },
-  {
-    id: 4,
-    nome: 'Next.js',
-    descricao: 'Framework React para aplicações web',
-    categoria: 'Frontend',
-  },
+  { id: 3, nome: 'React', descricao: 'Biblioteca JavaScript para interfaces', categoria: 'Frontend' },
+  { id: 4, nome: 'Next.js', descricao: 'Framework React para aplicações web', categoria: 'Frontend' },
 
-  // Backend
-  {
-    id: 5,
-    nome: 'Node.js',
-    descricao: 'Runtime JavaScript para backend',
-    categoria: 'Backend',
-  },
-  {
-    id: 6,
-    nome: 'FastAPI',
-    descricao: 'Framework Python para APIs',
-    categoria: 'Backend',
-  },
+  { id: 5, nome: 'Node.js', descricao: 'Runtime JavaScript para backend', categoria: 'Backend' },
+  { id: 6, nome: 'FastAPI', descricao: 'Framework Python para APIs', categoria: 'Backend' },
 
-  // Mobile
-  {
-    id: 7,
-    nome: 'React Native',
-    descricao: 'Framework mobile multiplataforma',
-    categoria: 'Mobile',
-  },
-  {
-    id: 8,
-    nome: 'Flutter',
-    descricao: 'Framework para aplicativos móveis',
-    categoria: 'Mobile',
-  },
+  { id: 7, nome: 'React Native', descricao: 'Framework mobile multiplataforma', categoria: 'Mobile' },
+  { id: 8, nome: 'Flutter', descricao: 'Framework para aplicativos móveis', categoria: 'Mobile' },
 
-  // Banco de Dados
-  {
-    id: 9,
-    nome: 'PostgreSQL',
-    descricao: 'Banco de dados relacional',
-    categoria: 'Banco de Dados',
-  },
-  {
-    id: 10,
-    nome: 'MongoDB',
-    descricao: 'Banco de dados NoSQL',
-    categoria: 'Banco de Dados',
-  },
+  { id: 9, nome: 'PostgreSQL', descricao: 'Banco de dados relacional', categoria: 'Banco de Dados' },
+  { id: 10, nome: 'MongoDB', descricao: 'Banco de dados NoSQL', categoria: 'Banco de Dados' },
 
-  // DevOps & Cloud
-  {
-    id: 11,
-    nome: 'Docker',
-    descricao: 'Ferramenta de containers',
-    categoria: 'DevOps & Cloud',
-  },
-  {
-    id: 12,
-    nome: 'AWS',
-    descricao: 'Serviços em nuvem',
-    categoria: 'DevOps & Cloud',
-  },
+  { id: 11, nome: 'Docker', descricao: 'Ferramenta de containers', categoria: 'DevOps & Cloud' },
+  { id: 12, nome: 'AWS', descricao: 'Serviços em nuvem', categoria: 'DevOps & Cloud' },
 
-  // Ferramentas
-  {
-    id: 13,
-    nome: 'Postman',
-    descricao: 'Teste e documentação de APIs',
-    categoria: 'Ferramentas',
-  },
-  {
-    id: 14,
-    nome: 'Insomnia',
-    descricao: 'Cliente para APIs REST',
-    categoria: 'Ferramentas',
-  },
+  { id: 13, nome: 'Postman', descricao: 'Teste e documentação de APIs', categoria: 'Ferramentas' },
+  { id: 14, nome: 'Insomnia', descricao: 'Cliente para APIs REST', categoria: 'Ferramentas' },
 
-  // Testes
-  {
-    id: 15,
-    nome: 'Jest',
-    descricao: 'Framework de testes JavaScript',
-    categoria: 'Testes',
-  },
-  {
-    id: 16,
-    nome: 'Cypress',
-    descricao: 'Testes end-to-end',
-    categoria: 'Testes',
-  },
+  { id: 15, nome: 'Jest', descricao: 'Framework de testes JavaScript', categoria: 'Testes' },
+  { id: 16, nome: 'Cypress', descricao: 'Testes end-to-end', categoria: 'Testes' },
 
-  // UI/UX
-  {
-    id: 17,
-    nome: 'Figma',
-    descricao: 'Design de interfaces',
-    categoria: 'UI/UX',
-  },
-  {
-    id: 18,
-    nome: 'Design System',
-    descricao: 'Sistema visual reutilizável',
-    categoria: 'UI/UX',
-  },
+  { id: 17, nome: 'Figma', descricao: 'Design de interfaces', categoria: 'UI/UX' },
+  { id: 18, nome: 'Design System', descricao: 'Sistema visual reutilizável', categoria: 'UI/UX' },
 
-  // IA
-  {
-    id: 19,
-    nome: 'Machine Learning',
-    descricao: 'Modelos inteligentes e preditivos',
-    categoria: 'IA',
-  },
-  {
-    id: 20,
-    nome: 'TensorFlow',
-    descricao: 'Framework para IA',
-    categoria: 'IA',
-  },
+  { id: 19, nome: 'Machine Learning', descricao: 'Modelos inteligentes e preditivos', categoria: 'IA' },
+  { id: 20, nome: 'TensorFlow', descricao: 'Framework para IA', categoria: 'IA' },
 
-  // cibersegurança
-  {
-  id: 21,
-  nome: 'JWT',
-  descricao: 'Autenticação baseada em tokens',
-  categoria: 'Cibersegurança',
-},
-{
-  id: 22,
-  nome: 'OAuth',
-  descricao: 'Autorização segura',
-  categoria: 'Cibersegurança',
-},
+  { id: 21, nome: 'JWT', descricao: 'Autenticação baseada em tokens', categoria: 'Cibersegurança' },
+  { id: 22, nome: 'OAuth', descricao: 'Autorização segura', categoria: 'Cibersegurança' },
 
-  // Dados
-  {
-    id: 23,
-    nome: 'Pandas',
-    descricao: 'Manipulação de dados em Python',
-    categoria: 'Dados',
-  },
-  {
-    id: 24,
-    nome: 'Power BI',
-    descricao: 'Visualização de dados',
-    categoria: 'Dados',
-  },
+  { id: 23, nome: 'Pandas', descricao: 'Manipulação de dados em Python', categoria: 'Dados' },
+  { id: 24, nome: 'Power BI', descricao: 'Visualização de dados', categoria: 'Dados' },
 
-  // Game Dev
-  {
-    id: 25,
-    nome: 'Unity',
-    descricao: 'Engine para jogos',
-    categoria: 'Game Dev',
-  },
-  {
-    id: 26,
-    nome: 'Unreal Engine',
-    descricao: 'Engine gráfica para jogos',
-    categoria: 'Game Dev',
-  },
+  { id: 25, nome: 'Unity', descricao: 'Engine para jogos', categoria: 'Game Dev' },
+  { id: 26, nome: 'Unreal Engine', descricao: 'Engine gráfica para jogos', categoria: 'Game Dev' },
 
-  // Low Code
-  {
-    id: 27,
-    nome: 'Bubble',
-    descricao: 'Plataforma low code',
-    categoria: 'Low Code',
-  },
-  {
-    id: 28,
-    nome: 'FlutterFlow',
-    descricao: 'Construção visual de apps',
-    categoria: 'Low Code',
-  },
+  { id: 27, nome: 'Bubble', descricao: 'Plataforma low code', categoria: 'Low Code' },
+  { id: 28, nome: 'FlutterFlow', descricao: 'Construção visual de apps', categoria: 'Low Code' },
 
-  // APIs
-  {
-    id: 29,
-    nome: 'REST',
-    descricao: 'Arquitetura para APIs',
-    categoria: 'APIs',
-  },
-  {
-    id: 30,
-    nome: 'GraphQL',
-    descricao: 'Linguagem de consulta para APIs',
-    categoria: 'APIs',
-  },
+  { id: 29, nome: 'REST', descricao: 'Arquitetura para APIs', categoria: 'APIs' },
+  { id: 30, nome: 'GraphQL', descricao: 'Linguagem de consulta para APIs', categoria: 'APIs' },
 
-  // CMS
-  {
-    id: 31,
-    nome: 'WordPress',
-    descricao: 'CMS para sites',
-    categoria: 'CMS',
-  },
-  {
-    id: 32,
-    nome: 'Strapi',
-    descricao: 'CMS Headless',
-    categoria: 'CMS',
-  },
+  { id: 31, nome: 'WordPress', descricao: 'CMS para sites', categoria: 'CMS' },
+  { id: 32, nome: 'Strapi', descricao: 'CMS Headless', categoria: 'CMS' },
 
-  // Versionamento
-  {
-    id: 33,
-    nome: 'Git',
-    descricao: 'Controle de versão',
-    categoria: 'Versionamento',
-  },
-  {
-    id: 34,
-    nome: 'GitHub',
-    descricao: 'Hospedagem de repositórios',
-    categoria: 'Versionamento',
-  },
+  { id: 33, nome: 'Git', descricao: 'Controle de versão', categoria: 'Versionamento' },
+  { id: 34, nome: 'GitHub', descricao: 'Hospedagem de repositórios', categoria: 'Versionamento' },
 
-  // Arquitetura
-  {
-    id: 35,
-    nome: 'Clean Architecture',
-    descricao: 'Arquitetura escalável de software',
-    categoria: 'Arquitetura',
-  },
-  {
-    id: 36,
-    nome: 'Microservices',
-    descricao: 'Arquitetura distribuída',
-    categoria: 'Arquitetura',
-  },
+  { id: 35, nome: 'Clean Architecture', descricao: 'Arquitetura escalável de software', categoria: 'Arquitetura' },
+  { id: 36, nome: 'Microservices', descricao: 'Arquitetura distribuída', categoria: 'Arquitetura' },
 ]
 
-
-const categoryIcons = {
+const categoryIcons: Record<string, LucideIcon> = {
   Linguagens: Braces,
   Frontend: Laptop,
   Backend: Server,
@@ -305,11 +106,42 @@ const categoryIcons = {
   Arquitetura: Braces,
 }
 
-
 function Tecnologias() {
   const [busca, setBusca] = useState('')
   const [selecionadas, setSelecionadas] = useState<Tecnologia[]>([])
+  const [isSaving, setIsSaving] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+  const [modoVisualizacao, setModoVisualizacao] = useState(false)
 
+  const searchRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const tecnologiasSalvas = localStorage.getItem('tecnologiasSelecionadas')
+
+    if (tecnologiasSalvas) {
+      const tecnologias = JSON.parse(tecnologiasSalvas) as Tecnologia[]
+
+      setSelecionadas(tecnologias)
+      setModoVisualizacao(tecnologias.length > 0)
+    }
+  }, [])
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setBusca('')
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const tecnologiasFiltradas = useMemo(() => {
     const termo = busca.trim().toLowerCase()
@@ -324,8 +156,8 @@ function Tecnologias() {
       )
 
       return correspondeBusca && !jaSelecionada
-  })
-}, [busca, selecionadas])
+    })
+  }, [busca, selecionadas])
 
   const tecnologiasPorCategoria = useMemo(() => {
     return selecionadas.reduce<Record<string, Tecnologia[]>>((acc, tech) => {
@@ -338,8 +170,6 @@ function Tecnologias() {
       return acc
     }, {})
   }, [selecionadas])
-
-  
 
   const deveMostrarSugestoes = busca.trim().length > 0
   const deveMostrarSelecionadas = selecionadas.length > 0
@@ -360,24 +190,26 @@ function Tecnologias() {
     )
   }
 
-  const searchRef = useRef<HTMLDivElement | null>(null)
+  function handleSave() {
+    setIsSaving(true)
 
-    useEffect(() => {
-      function handleClickOutside(event: MouseEvent) {
-        if (
-          searchRef.current &&
-          !searchRef.current.contains(event.target as Node)
-        ) {
-          setBusca('')
-        }
-      }
+    localStorage.setItem(
+      'tecnologiasSelecionadas',
+      JSON.stringify(selecionadas),
+    )
 
-      document.addEventListener('mousedown', handleClickOutside)
+    setTimeout(() => {
+      setIsSaving(false)
+      setBusca('')
+      setSuccessMessage('Tecnologias salvas com sucesso! Seu perfil técnico foi atualizado.')
+      setModoVisualizacao(true)
+    }, 800)
+  }
 
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside)
-      }
-    }, [])
+  function handleEdit() {
+    setModoVisualizacao(false)
+    setSuccessMessage('')
+  }
 
   return (
     <section className={styles.container}>
@@ -390,88 +222,86 @@ function Tecnologias() {
           recomendações de estudo personalizadas.
         </p>
       </div>
-      
-     <div
-        className={styles.searchWrapper}
-        ref={searchRef}
-      >
-        <div className={styles.searchBox}>
-          <Search size={30} />
 
-          <input
-            type="text"
-            placeholder="Digite uma tecnologia"
-            value={busca}
-            onChange={(event) => setBusca(event.target.value)}
-          />
-        </div>
+      {!modoVisualizacao && (
+        <div className={styles.searchWrapper} ref={searchRef}>
+          <div className={styles.searchBox}>
+            <Search size={30} />
 
-        {deveMostrarSugestoes && (
-          <div className={styles.techList}>
-            {tecnologiasFiltradas.length > 0 ? (
-              tecnologiasFiltradas.map((tech) => {
-                const Icon =
-                  categoryIcons[
-                    tech.categoria as keyof typeof categoryIcons
-                  ] ?? Code2
-
-                return (
-                  <div key={tech.id} className={styles.techCard}>
-                    <div className={styles.techInfo}>
-                      <div
-                        className={styles.techIcon}
-                        data-category={tech.categoria}
-                      >
-                        <Icon size={26} />
-                      </div>
-
-                      <div>
-                        <strong>{tech.nome}</strong>
-                        <span>{tech.descricao}</span>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      className={styles.addButton}
-                      onClick={() => adicionarTecnologia(tech)}
-                    >
-                      <Plus size={30} />
-                    </button>
-                  </div>
-                )
-              })
-            ) : (
-              <p className={styles.emptyMessage}>
-                Nenhuma tecnologia encontrada.
-              </p>
-            )}
+            <input
+              type="text"
+              placeholder="Digite uma tecnologia"
+              value={busca}
+              onChange={(event) => setBusca(event.target.value)}
+            />
           </div>
-        )}
-      </div>
-      
+
+          {deveMostrarSugestoes && (
+            <div className={styles.techList}>
+              {tecnologiasFiltradas.length > 0 ? (
+                tecnologiasFiltradas.map((tech) => {
+                  const Icon = categoryIcons[tech.categoria] ?? Code2
+
+                  return (
+                    <div key={tech.id} className={styles.techCard}>
+                      <div className={styles.techInfo}>
+                        <div
+                          className={styles.techIcon}
+                          data-category={tech.categoria}
+                        >
+                          <Icon size={26} />
+                        </div>
+
+                        <div>
+                          <strong>{tech.nome}</strong>
+                          <span>{tech.descricao}</span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className={styles.addButton}
+                        onClick={() => adicionarTecnologia(tech)}
+                      >
+                        <Plus size={30} />
+                      </button>
+                    </div>
+                  )
+                })
+              ) : (
+                <p className={styles.emptyMessage}>
+                  Nenhuma tecnologia encontrada.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {deveMostrarSelecionadas && (
         <div className={styles.selectedWrapper}>
-          <h3>
-            Tecnologias selecionadas ({selecionadas.length})
-          </h3>
+          <div className={styles.selectedHeader}>
+            <h3>Tecnologias selecionadas ({selecionadas.length})</h3>
+
+            {modoVisualizacao && (
+              <button
+                type="button"
+                className={styles.editSkillsButton}
+                onClick={handleEdit}
+              >
+                Editar tecnologias
+              </button>
+            )}
+          </div>
 
           <div className={styles.categoryList}>
             {Object.entries(tecnologiasPorCategoria).map(
               ([categoria, tecnologias]) => {
-                const Icon =
-                  categoryIcons[
-                    categoria as keyof typeof categoryIcons
-                  ] ?? Code2
+                const Icon = categoryIcons[categoria] ?? Code2
 
                 return (
-                  <div
-                    key={categoria}
-                    className={styles.categoryRow}
-                  >
+                  <div key={categoria} className={styles.categoryRow}>
                     <div className={styles.categoryInfo}>
-
                       <div
                         className={styles.categoryIcon}
                         data-category={categoria}
@@ -486,20 +316,17 @@ function Tecnologias() {
 
                     <div className={styles.selectedArea}>
                       {tecnologias.map((tech) => (
-                        <div
-                          key={tech.id}
-                          className={styles.tag}
-                        >
+                        <div key={tech.id} className={styles.tag}>
                           <span>{tech.nome}</span>
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              removerTecnologia(tech.id)
-                            }
-                          >
-                            <X size={18} />
-                          </button>
+                          {!modoVisualizacao && (
+                            <button
+                              type="button"
+                              onClick={() => removerTecnologia(tech.id)}
+                            >
+                              <X size={18} />
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -511,7 +338,11 @@ function Tecnologias() {
         </div>
       )}
 
-      
+      {successMessage && (
+        <p className={styles.successMessage}>
+          {successMessage}
+        </p>
+      )}
 
       <div className={styles.footer}>
         <PrimaryButton
@@ -521,13 +352,16 @@ function Tecnologias() {
           Voltar
         </PrimaryButton>
 
-        <PrimaryButton
-          type="button"
-          className={styles.saveButton}
-          disabled={!deveMostrarSelecionadas}
-        >
-          Salvar e Continuar
-        </PrimaryButton>
+        {!modoVisualizacao && (
+          <PrimaryButton
+            type="button"
+            className={styles.saveButton}
+            disabled={!deveMostrarSelecionadas || isSaving}
+            onClick={handleSave}
+          >
+            {isSaving ? 'Salvando...' : 'Salvar'}
+          </PrimaryButton>
+        )}
       </div>
     </section>
   )

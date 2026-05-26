@@ -21,7 +21,6 @@ type SidebarProps = {
 const menuItems = [
   { label: 'Perfil', path: '/perfil', icon: UserRoundCog },
   { label: 'Vagas', path: '/vagas', icon: Newspaper },
-  { label: 'Análise', path: '/analise', icon: ChartNoAxesCombined },
   { label: 'Plano de estudos', path: '/plano-estudos', icon: BookOpen },
   { label: 'Progresso', path: '/progresso', icon: ChartColumnIncreasing },
   { label: 'Histórico de Vagas', path: '/historico-vagas', icon: History },

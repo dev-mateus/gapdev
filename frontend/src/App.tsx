@@ -101,16 +101,6 @@ function App(): ReactElement {
           }
         />
 
-        <Route
-          path="/analise"
-          element={
-            <PrivateRoute>
-              <PrivateLayout>
-                <h1>Você está em: /analise</h1>
-              </PrivateLayout>
-            </PrivateRoute>
-          }
-        />
 
         <Route
           path="/plano-estudos"

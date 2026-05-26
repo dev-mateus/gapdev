@@ -52,6 +52,8 @@ function VagasPage() {
             >
               <form className={styles.form} onSubmit={handleSubmit}>
                 <div className={styles.row}>
+
+
                   <Input
                     label="Titulo da vaga"
                     type="text"
@@ -70,6 +72,32 @@ function VagasPage() {
                     onChange={(event) => updateField('company', event.target.value)}
                     required
                   />
+
+                </div>
+
+                <div className={styles.seniorityGroup}>
+                  <label className={styles.seniorityLabel}>Senioridade</label>
+
+                  <div className={styles.seniorityOptions}>
+                    {['Júnior', 'Pleno', 'Sênior'].map((level) => (
+                      <button
+                        key={level}
+                        type="button"
+                        className={`${styles.seniorityOption} ${
+                          formState.seniority === level ? styles.seniorityOptionActive : ''
+                        }`}
+                        onClick={(event) => {
+                          event.preventDefault()
+                          console.log('clicou:', level)
+                          updateField('seniority', level)
+                        }}
+                      >
+                        {level}
+                      </button>
+                      
+                    ))}
+                  </div>
+
                 </div>
 
                 <TextArea
@@ -92,6 +120,7 @@ function VagasPage() {
                   </PrimaryButton>
                 </div>
               </form>
+              
             </SectionCard>
           </div>
         </PageContainer>

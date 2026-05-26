@@ -20,12 +20,7 @@ export const SIDEBAR_NAV_LINKS = [
 		href: '/vagas',
 		iconKey: 'jobs',
 	},
-	{
-		id: 'analise',
-		label: 'Análise',
-		href: '/analise',
-		iconKey: 'analysis',
-	},
+	
 	{
 		id: 'plano-estudos',
 		label: 'Plano de estudos',
