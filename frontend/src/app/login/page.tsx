@@ -1,13 +1,25 @@
-import { useState } from 'react'
-import { FaArrowTrendUp, FaBookOpen, FaChartLine, FaEnvelope, FaEye, FaEyeSlash, FaGoogle, FaLock } from 'react-icons/fa6'
+import { useState, type FormEvent } from 'react'
+import {
+  FaArrowTrendUp,
+  FaBookOpen,
+  FaChartLine,
+  FaEnvelope,
+  FaEye,
+  FaEyeSlash,
+  FaGoogle,
+  FaLock,
+} from 'react-icons/fa6'
+
+import { useGoogleLogin } from '@react-oauth/google'
+import { useNavigate } from 'react-router-dom'
+
 import Button from '../../components/Button/Button'
 import Checkbox from '../../components/Checkbox/Checkbox'
 import Input from '../../components/Input/Input'
-import { validateEmail, validatePassword } from '../../utils/validators'
-import styles from './login.module.css'
-import { useGoogleLogin } from '@react-oauth/google'
-import { useNavigate } from 'react-router-dom'
 import { apiPost } from '../../services/api'
+import { validateEmail, validatePassword } from '../../utils/validators'
+
+import styles from './login.module.css'
 
 
 const features = [
@@ -29,8 +41,8 @@ const features = [
 ] as const
 
 type LoginPageProps = {
-  isBackendConnected?: boolean;
-};
+  isBackendConnected?: boolean
+}
 
 type LoginResponse = {
   access_token: string
@@ -46,50 +58,47 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
 
   const navigate = useNavigate()
 
-const loginWithGoogle = useGoogleLogin({
-  onSuccess: async (tokenResponse) => {
-    try {
-      const googleAccessToken = tokenResponse.access_token
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const googleAccessToken = tokenResponse.access_token
 
-      if (!googleAccessToken) {
-        throw new Error('Nao foi possivel recuperar o token do Google.')
+        if (!googleAccessToken) {
+          throw new Error('Nao foi possivel recuperar o token do Google.')
+        }
+
+        const data = await apiPost<LoginResponse>('/auth/google', {
+          google_token: googleAccessToken,
+        })
+
+        localStorage.setItem('access_token', data.access_token)
+        localStorage.setItem('usuarioLogado', 'true')
+        localStorage.removeItem('usuarioEmail')
+
+        window.dispatchEvent(new Event('auth-changed'))
+
+        setFormMessageType('success')
+        setFormMessage('Login realizado com sucesso.')
+
+        navigate('/perfil')
+      } catch (error) {
+        setFormMessageType('error')
+
+        setFormMessage(
+          error instanceof Error
+            ? error.message
+            : 'Erro ao fazer login com Google.'
+        )
       }
+    },
 
-      const data = await apiPost<LoginResponse>('/auth/google', {
-        google_token: googleAccessToken,
-      })
-
-      localStorage.setItem('access_token', data.access_token)
-      localStorage.setItem('usuarioLogado', 'true')
-
-      localStorage.removeItem('usuarioEmail')
-
-      window.dispatchEvent(new Event('auth-changed'))
-
-      setFormMessageType('success')
-      setFormMessage('Login realizado com sucesso.')
-
-      navigate('/perfil')
-
-    } catch (error) {
+    onError: () => {
       setFormMessageType('error')
+      setFormMessage('Erro ao autenticar com Google.')
+    },
+  })
 
-      setFormMessage(
-        error instanceof Error
-          ? error.message
-          : 'Erro ao fazer login com Google.'
-      )
-    }
-  },
-
-  onError: () => {
-    setFormMessageType('error')
-    setFormMessage('Erro ao autenticar com Google.')
-  },
-})
-
-
-async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
   e.preventDefault()
 
   const trimmedEmail = email.trim()

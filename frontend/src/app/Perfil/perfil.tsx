@@ -194,7 +194,6 @@ function Perfil() {
                         <span className={styles.characterCount}>
                           {perfil.objetivo.length}/300
                         </span>
-
                       </div>
 
                       <div className={styles.passwordArea}>
@@ -345,11 +344,10 @@ function Perfil() {
                       className={styles.editButton}
                       icon={<Edit size={18} />}
                       onClick={() => setEditando(true)}
-                  >
-                    Editar
+                    >
+                      Editar
                     </PrimaryButton>
                   </div>
-
 
                   <div className={styles.profileBottom}>
                     <div>
