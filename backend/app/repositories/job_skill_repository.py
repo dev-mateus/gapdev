@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.job_skill import JobSkill
@@ -16,12 +17,10 @@ from app.schemas.job_skill import JobSkillCreate
 def _normalize_skill_slug(raw_name: str) -> str:
 	"""Generate a stable slug for a skill name."""
 
-	normalized = re.sub(r"[^a-z0-9]+", "", raw_name.strip().lower())
-	if normalized:
-		return normalized
-
-	fallback = re.sub(r"\s+", "-", raw_name.strip().lower())
-	return fallback or "skill"
+	name = raw_name.strip().lower()
+	ascii_name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode("ascii")
+	normalized = re.sub(r"[^a-z0-9]+", "-", ascii_name).strip("-")
+	return normalized or "skill"
 
 
 def get_skill_by_slug(db: Session, slug: str) -> Skill | None:
@@ -38,19 +37,46 @@ def get_skill_by_id(db: Session, skill_id: str) -> Skill | None:
 	return db.scalars(statement).first()
 
 
+def get_skill_by_canonical_name(db: Session, canonical_name: str) -> Skill | None:
+	"""Return a catalog skill by canonical name (case-insensitive)."""
+
+	clean_name = canonical_name.strip()
+	if not clean_name:
+		return None
+
+	statement = select(Skill).where(func.lower(Skill.canonical_name) == clean_name.lower())
+	return db.scalars(statement).first()
+
+
 def get_or_create_skill(db: Session, raw_name: str) -> Skill:
 	"""Return a catalog skill for a raw analysis name."""
 
-	slug = _normalize_skill_slug(raw_name)
+	clean_name = raw_name.strip() or "skill"
+	slug = _normalize_skill_slug(clean_name)
 	existing = get_skill_by_slug(db, slug)
 	if existing:
 		return existing
 
-	skill = Skill(canonical_name=raw_name.strip() or slug, slug=slug)
+	existing_by_name = get_skill_by_canonical_name(db, clean_name)
+	if existing_by_name:
+		return existing_by_name
+
+	skill = Skill(canonical_name=clean_name, slug=slug)
 	db.add(skill)
 	db.commit()
 	db.refresh(skill)
 	return skill
+
+
+def list_active_skills(db: Session) -> list[Skill]:
+	"""Return active catalog skills sorted by category and name."""
+
+	statement = (
+		select(Skill)
+		.where(Skill.active.is_(True))
+		.order_by(Skill.category.asc(), Skill.canonical_name.asc())
+	)
+	return list(db.scalars(statement).all())
 
 
 def _map_level(level_name: str | None) -> SkillLevel:

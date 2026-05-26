@@ -7,7 +7,8 @@ from app.api.routes.user import router as user_router
 from app.api.routes.analise import router as analise_router
 from app.api.routes.user_skill import router as user_skill_router
 from app.db.base import Base
-from app.db.session import engine
+from app.db.seed_skills import seed_skills_catalog
+from app.db.session import SessionLocal, engine
 
 app = FastAPI()
 
@@ -35,6 +36,8 @@ async def on_startup() -> None:
     """Prepare SQLAlchemy metadata on application startup."""
 
     Base.metadata.create_all(bind=engine)
+    with SessionLocal() as db:
+        seed_skills_catalog(db)
 
 
 @app.get("/")
