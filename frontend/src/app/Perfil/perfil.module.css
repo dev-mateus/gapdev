@@ -56,18 +56,20 @@
 .content {
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
+  padding-block: 1rem;
 
   color: #fff;
 }
 
 .expandedContainer {
-  max-width: 1280px;
+  max-width: min(100%, 84rem);
 }
 
 .pageStack {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 1.6rem;
 }
 
 .form {

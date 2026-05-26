@@ -1,16 +1,17 @@
-.expandedContainer {
-  max-width: min(100%, 84rem);
-  padding-inline: 0;
+.content {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-block: 1rem;
 }
 
-.pageContainer {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
+.expandedContainer {
+  max-width: min(100%, 84rem);
+}
+
+.pageStack {
+  display: grid;
+  gap: 1.6rem;
 }
 
 .summaryCards {
