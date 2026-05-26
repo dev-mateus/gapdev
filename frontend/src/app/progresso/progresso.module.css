@@ -1,0 +1,448 @@
+.page {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.content {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-block: 1rem;
+}
+
+.expandedContainer {
+  max-width: min(100%, 84rem);
+}
+
+.page {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.card {
+  padding: 1.1rem;
+  border-radius: 1rem;
+  height: 100%;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+/* reforço extra para garantir layout previsível em cards de métrica */
+.cardMeta {
+  flex: 1;
+}
+
+
+
+.cardGlass {
+  background: var(--color-bg-shell);
+
+  border: 1px solid var(--color-border-shell);
+  box-shadow: var(--shadow-feature);
+  backdrop-filter: blur(10px);
+}
+
+.cardGlass {
+  display: flex;
+}
+
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  justify-content: space-between;
+}
+
+
+.cardIcon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(58, 192, 240, 0.14);
+  border: 1px solid rgba(88, 224, 255, 0.32);
+  color: #baf3ff;
+  font-weight: 800;
+}
+
+.cardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+
+.cardTitle {
+  font-size: 0.98rem;
+  color: var(--color-text-muted-soft);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.cardValueRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.cardValue {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  min-width: 3rem;
+  flex-shrink: 0;
+}
+
+
+.cardMeta {
+  min-width: 0;
+}
+
+.badgePlus {
+  font-size: 0.82rem;
+  color: #aef1ff;
+  background: rgba(31, 163, 198, 0.16);
+  border: 1px solid rgba(31, 163, 198, 0.35);
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+
+
+.badgeRecord {
+  font-size: 0.82rem;
+  color: #c6f6d8;
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.33);
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+
+
+.cardHint {
+  margin-top: 0.25rem;
+  font-size: 0.86rem;
+  color: var(--color-text-muted);
+}
+
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Melhor responsividade para telas menores */
+@media (max-width: 520px) {
+  .cards {
+    grid-template-columns: 1fr !important;
+  }
+
+  .barWrap {
+    height: 150px;
+  }
+}
+
+
+.panel {
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+}
+
+.panelGlass {
+  background: var(--color-bg-shell);
+  border: 1px solid var(--color-border-shell);
+  box-shadow: var(--shadow-feature);
+  backdrop-filter: blur(10px);
+}
+
+.panelHeader {
+  margin-bottom: 0.85rem;
+}
+
+.panelTitle {
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.panelSubtitle {
+  margin-top: 0.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.exceptionText {
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+/* Barras */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 0.15rem 0 0;
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.barWrap {
+  width: 100%;
+  height: 190px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(88, 224, 255, 0.95), rgba(31, 163, 198, 0.5));
+  box-shadow: 0 0 0 1px rgba(88, 224, 255, 0.18), 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+
+.barValue,
+.barValueZero {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 900;
+  font-size: 0.9rem;
+  color: #dff7ff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.barValueZero {
+  color: rgba(223, 247, 255, 0.55);
+}
+
+.barLabel {
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+}
+
+/* =========================
+   Skills (Progresso por skill)
+   Redesigned - visual premium
+   (somente CSS de skill)
+   ========================= */
+
+.skillList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  /* mesmo container/painel dos cards do topo (Conteúdos/Sequência) */
+  padding: 32px;
+  border-radius: 1rem;
+
+  background: rgba(2, 17, 27, 0.52);
+  border: 1px solid rgba(88, 224, 255, 0.12);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+}
+
+
+
+.skillRow {
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(88, 224, 255, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    rgba(2, 17, 27, 0.55);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 10px 30px rgba(0, 0, 0, 0.25);
+
+  /* evita elementos apertados em telas menores */
+  min-height: 86px;
+}
+
+.skillTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.skillName {
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: #f2fbff;
+  letter-spacing: 0.2px;
+}
+
+.skillName :global(*) {
+  /* garante consistência caso a label inclua elementos */
+  flex-shrink: 0;
+}
+
+.skillPercent {
+  font-weight: 1000;
+  color: #46d9ff;
+  text-shadow: 0 0 12px rgba(70, 217, 255, 0.25);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.32);
+  color: #b6f7c9;
+  font-size: 0.78rem;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.08);
+}
+
+.progressTrack {
+  margin-top: 14px;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.progressTrack::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      800px circle at 0% 50%,
+      rgba(70, 217, 255, 0.16),
+      transparent 35%
+    );
+  pointer-events: none;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #46d9ff, #238fac);
+  box-shadow: 0 0 12px rgba(70, 217, 255, 0.45);
+
+  transition:
+    width 420ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 420ms ease;
+
+  position: relative;
+}
+
+.progressFill::before {
+  content: '';
+  position: absolute;
+  inset: -40% -20%;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.26) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  opacity: 0.25;
+  transform: translateX(-25%);
+  animation: progressSheen 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes progressSheen {
+  0% {
+    transform: translateX(-35%);
+  }
+  55% {
+    transform: translateX(35%);
+  }
+  100% {
+    transform: translateX(35%);
+  }
+}
+
+.progressFill[data-done='true'] {
+  background: linear-gradient(90deg, #22c55e, #15803d);
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.42);
+}
+
+.progressFill[data-done='true']::before {
+  animation-duration: 2.2s;
+}
+
+.skillStatus {
+  margin-top: 10px;
+  color: rgba(223, 247, 255, 0.72);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+}
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,9 @@
+Return ONLY a VALID JSON object. Keep it compact and single-line.
+Structure: {"summary": string, "job_skills": [{"raw_name": string, "required_level": string, "priority": string, "evidence": string, "recommendation": string}]}
+Constraints: max 12 skills; required_level one of [basic, intermediate, advanced]; priority one of [required, desirable].
+Include for each skill a short `evidence` (1-2 sentences) explaining why the skill was identified, and a `recommendation` (1-2 sentences) on how to prioritize or train for it.
+Provide a concise overall `summary` highlighting the key areas the candidate should focus on.
+Do NOT include explanations outside the JSON, examples, or extra text — ONLY the JSON object.
+
+Vaga:
+{description}

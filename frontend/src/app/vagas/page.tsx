@@ -24,7 +24,17 @@ function navigateTo(path: string) {
 }
 
 function VagasPage() {
-  const { formState, isSubmitting, statusMessage, statusType, updateField, handleSubmit } = useAnalisarVagaForm()
+  function handleAnalysisSuccess(title: string, description: string, jobId: string) {
+    const company = formState.company.trim()
+    const analysisContext = JSON.stringify({ title, company, description })
+    window.sessionStorage.setItem(`analysis:${jobId}`, analysisContext)
+
+    const params = new URLSearchParams()
+    params.set('jobId', jobId)
+    navigateTo(`/compatibility?${params.toString()}`)
+  }
+
+  const { formState, isSubmitting, statusMessage, statusType, updateField, handleSubmit } = useAnalisarVagaForm(handleAnalysisSuccess)
 
   function handleTabChange(tab: TabSwitcherItem) {
     if (!tab.href) {
@@ -40,14 +50,14 @@ function VagasPage() {
           <div className={styles.pageStack}>
             <PageHeader
               title="Vagas"
-              description="Adicione vagas de interesse para salvar no seu historico."
+              description="Adicione vagas de interesse para salvar no seu histórico."
             />
 
             <TabSwitcher tabs={tabs} activeTabId="analisar-vaga" onTabChange={handleTabChange} />
 
             <SectionCard
-              title="Salvar vaga"
-              description="Cole a descricao completa da vaga e salve no historico."
+              title="Analisar vaga"
+              description="Cole a descrição completa da vaga e analise com a IA."
               icon={<ClipboardList size={20} />}
             >
               <form className={styles.form} onSubmit={handleSubmit}>
@@ -101,8 +111,8 @@ function VagasPage() {
                 </div>
 
                 <TextArea
-                  label="Descricao da vaga"
-                  placeholder="Cole aqui a descricao da vaga, com requisitos tecnicos, tecnologias e ferramentas necessarias"
+                  label="Descrição da vaga"
+                  placeholder="Cole aqui a descrição da vaga, com requisitos técnicos, tecnologias e ferramentas necessárias"
                   value={formState.description}
                   onChange={(event) => updateField('description', event.target.value)}
                   required
@@ -116,7 +126,7 @@ function VagasPage() {
 
                 <div className={styles.actions}>
                   <PrimaryButton type="submit" icon={<Plus />} className={styles.submitButton} disabled={isSubmitting}>
-                    {isSubmitting ? 'Salvando vaga...' : 'Salvar vaga'}
+                    {isSubmitting ? 'Analisando vaga...' : 'Analisar vaga'}
                   </PrimaryButton>
                 </div>
               </form>

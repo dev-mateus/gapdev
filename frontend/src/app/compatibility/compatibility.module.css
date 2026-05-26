@@ -1,0 +1,133 @@
+.content {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-block: 1rem;
+}
+
+.expandedContainer {
+  max-width: min(100%, 84rem);
+}
+
+.page {
+  display: grid;
+  gap: 1.7rem;
+}
+
+.hero {
+  display: grid;
+  gap: 1rem;
+}
+
+.heroHeading {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 2.95rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--color-text-heading-hero);
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 50rem;
+  color: rgba(232, 246, 255, 0.82);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.infoBanner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.95rem 1rem;
+  border-radius: 0.95rem;
+  background: rgba(3, 33, 52, 0.95);
+  border: 1px solid rgba(95, 214, 255, 0.35);
+  color: rgba(240, 249, 255, 0.9);
+}
+
+.infoBanner p {
+  margin: 0;
+  color: inherit;
+  font-size: 0.92rem;
+}
+
+.infoIcon {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(95, 214, 255, 0.35);
+  background: rgba(22, 95, 138, 0.85);
+  color: #7adfff;
+}
+
+.skillsSection {
+  display: grid;
+  gap: 1rem;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.sectionIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.85rem;
+  background: rgba(37, 111, 159, 0.9);
+  border: 1px solid rgba(95, 214, 255, 0.35);
+  color: #7adfff;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.grid {
+  display: grid;
+  gap: 1.8rem;
+}
+
+.loadingState {
+  min-height: 24rem;
+  display: grid;
+  place-items: center;
+  color: rgba(232, 246, 255, 0.82);
+  font-size: 1rem;
+}
+
+.actionContainer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(95, 214, 255, 0.15);
+}
+
+.actionContainer button {
+  min-width: 12rem;
+}
+
+@media (min-width: 980px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
