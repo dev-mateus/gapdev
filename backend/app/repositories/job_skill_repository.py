@@ -9,9 +9,10 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.job_skill import JobSkill
-from app.models.skill import Skill
 from app.models.enums import SkillLevel, SkillPriority
+from app.models.skill import Skill
 from app.schemas.job_skill import JobSkillCreate
+from app.models.skill_alias import SkillAlias
 
 
 def _normalize_skill_slug(raw_name: str) -> str:
@@ -23,6 +24,36 @@ def _normalize_skill_slug(raw_name: str) -> str:
 	return normalized or "skill"
 
 
+def normalize_skill_alias_key(raw_name: str) -> str:
+	"""Generate the alias key used by the canonical catalog."""
+
+	name = raw_name.strip().lower()
+	if not name:
+		return ""
+
+	overrides = {
+		"c#": "csharp",
+		"c sharp": "csharp",
+		"c-sharp": "csharp",
+		"c++": "cpp",
+		"c plus plus": "cpp",
+		"f#": "fsharp",
+		"f sharp": "fsharp",
+		".net": "dotnet",
+		"dot net": "dotnet",
+		"node.js": "nodejs",
+		"react.js": "reactjs",
+		"next.js": "nextjs",
+		"vue.js": "vuejs",
+		"ci/cd": "cicd",
+		"rest api": "restapi",
+		"api rest": "apirest",
+	}
+	if name in overrides:
+		return overrides[name]
+
+	ascii_name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode("ascii")
+	return re.sub(r"[^a-z0-9]+", "", ascii_name)
 def get_skill_by_slug(db: Session, slug: str) -> Skill | None:
 	"""Return a catalog skill by slug."""
 
@@ -48,6 +79,20 @@ def get_skill_by_canonical_name(db: Session, canonical_name: str) -> Skill | Non
 	return db.scalars(statement).first()
 
 
+def get_skill_by_normalized_alias(db: Session, normalized_alias: str) -> Skill | None:
+	"""Return a catalog skill by normalized alias."""
+
+	clean_alias = normalized_alias.strip()
+	if not clean_alias:
+		return None
+
+	statement = (
+		select(Skill)
+		.join(SkillAlias, SkillAlias.skill_id == Skill.id)
+		.where(SkillAlias.normalized_alias == clean_alias)
+	)
+	return db.scalars(statement).first()
+
 def get_or_create_skill(db: Session, raw_name: str) -> Skill:
 	"""Return a catalog skill for a raw analysis name."""
 
@@ -67,6 +112,31 @@ def get_or_create_skill(db: Session, raw_name: str) -> Skill:
 	db.refresh(skill)
 	return skill
 
+
+def resolve_catalog_skill(db: Session, skill_id: str | None = None, raw_name: str | None = None) -> Skill | None:
+	"""Resolve a catalog skill without creating new records."""
+
+	if skill_id:
+		skill = get_skill_by_id(db, skill_id)
+		if skill:
+			return skill
+
+	if not raw_name:
+		return None
+
+	clean_name = raw_name.strip()
+	if not clean_name:
+		return None
+
+	skill = get_skill_by_canonical_name(db, clean_name)
+	if skill:
+		return skill
+
+	skill = get_skill_by_slug(db, _normalize_skill_slug(clean_name))
+	if skill:
+		return skill
+
+	return get_skill_by_normalized_alias(db, normalize_skill_alias_key(clean_name))
 
 def list_active_skills(db: Session) -> list[Skill]:
 	"""Return active catalog skills sorted by category and name."""

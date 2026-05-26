@@ -1,15 +1,18 @@
 """Seed data for the canonical skills catalog."""
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.repositories.job_skill_repository import get_or_create_skill
+from app.models.skill import Skill
+from app.models.skill_alias import SkillAlias
+from app.repositories.job_skill_repository import get_or_create_skill, get_skill_by_slug, normalize_skill_alias_key
 
-DEFAULT_SKILL_CATALOG: list[dict[str, str]] = [
+DEFAULT_SKILL_CATALOG: list[dict[str, object]] = [
     {"canonical_name": "JavaScript", "description": "Linguagem de programação para web", "category": "Linguagens"},
     {"canonical_name": "TypeScript", "description": "Superset tipado de JavaScript", "category": "Linguagens"},
     {"canonical_name": "Python", "description": "Linguagem versátil para backend e IA", "category": "Linguagens"},
     {"canonical_name": "Java", "description": "Linguagem orientada a objetos multiplataforma", "category": "Linguagens"},
-    {"canonical_name": "C#", "description": "Linguagem moderna para ecossistema .NET", "category": "Linguagens"},
+    {"canonical_name": "C#", "slug": "csharp", "description": "Linguagem moderna para ecossistema .NET", "category": "Linguagens"},
     {"canonical_name": "Go", "description": "Linguagem performática para serviços concorrentes", "category": "Linguagens"},
     {"canonical_name": "Rust", "description": "Linguagem focada em segurança de memória", "category": "Linguagens"},
     {"canonical_name": "Kotlin", "description": "Linguagem moderna para Android e backend", "category": "Linguagens"},
@@ -31,7 +34,7 @@ DEFAULT_SKILL_CATALOG: list[dict[str, str]] = [
     {"canonical_name": "Django", "description": "Framework Python completo para aplicações web", "category": "Backend"},
     {"canonical_name": "Flask", "description": "Microframework Python para serviços web", "category": "Backend"},
     {"canonical_name": "Spring Boot", "description": "Framework Java para microsserviços e APIs", "category": "Backend"},
-    {"canonical_name": ".NET", "description": "Plataforma para aplicações enterprise", "category": "Backend"},
+    {"canonical_name": ".NET", "slug": "dotnet", "description": "Plataforma para aplicações enterprise", "category": "Backend"},
     {"canonical_name": "NestJS", "description": "Framework Node.js estruturado e escalável", "category": "Backend"},
     {"canonical_name": "React Native", "description": "Framework mobile multiplataforma", "category": "Mobile"},
     {"canonical_name": "Flutter", "description": "Framework para aplicativos móveis", "category": "Mobile"},
@@ -115,30 +118,129 @@ DEFAULT_SKILL_CATALOG: list[dict[str, str]] = [
     {"canonical_name": "Kibana", "description": "Visualização e exploração de logs e eventos", "category": "Observabilidade"},
 ]
 
+DEFAULT_SKILL_ALIASES: list[dict[str, str]] = [
+    {"skill_slug": "javascript", "alias": "JS"},
+    {"skill_slug": "javascript", "alias": "Java Script"},
+    {"skill_slug": "javascript", "alias": "ECMAScript"},
+    {"skill_slug": "typescript", "alias": "TS"},
+    {"skill_slug": "typescript", "alias": "Type Script"},
+    {"skill_slug": "react", "alias": "React.js"},
+    {"skill_slug": "next-js", "alias": "Next"},
+    {"skill_slug": "node-js", "alias": "Node"},
+    {"skill_slug": "node-js", "alias": "Node.js"},
+    {"skill_slug": "express-js", "alias": "Express"},
+    {"skill_slug": "express-js", "alias": "Express.js"},
+    {"skill_slug": "csharp", "alias": "C#"},
+    {"skill_slug": "csharp", "alias": "C Sharp"},
+    {"skill_slug": "dotnet", "alias": ".NET"},
+    {"skill_slug": "dotnet", "alias": "Dot Net"},
+    {"skill_slug": "postgresql", "alias": "Postgres"},
+    {"skill_slug": "postgresql", "alias": "Postgre"},
+    {"skill_slug": "mongodb", "alias": "Mongo"},
+    {"skill_slug": "machine-learning", "alias": "ML"},
+    {"skill_slug": "jwt", "alias": "JSON Web Token"},
+    {"skill_slug": "oauth", "alias": "OAuth2"},
+    {"skill_slug": "cicd", "alias": "CI/CD"},
+    {"skill_slug": "cicd", "alias": "CICD"},
+    {"skill_slug": "cicd", "alias": "Continuous Integration"},
+    {"skill_slug": "cicd", "alias": "Continuous Delivery"},
+    {"skill_slug": "rest", "alias": "REST API"},
+    {"skill_slug": "rest", "alias": "API REST"},
+    {"skill_slug": "graphql", "alias": "GraphQL API"},
+    {"skill_slug": "power-bi", "alias": "PowerBI"},
+    {"skill_slug": "power-bi", "alias": "Power BI"},
+    {"skill_slug": "websockets", "alias": "WebSocket"},
+    {"skill_slug": "swagger-openapi", "alias": "OpenAPI"},
+    {"skill_slug": "swagger-openapi", "alias": "Swagger"},
+    {"skill_slug": "tailwind-css", "alias": "Tailwind"},
+    {"skill_slug": "tailwind-css", "alias": "TailwindCSS"},
+]
+
+
+def _ensure_skill(db: Session, item: dict[str, object]) -> tuple[Skill, bool]:
+    """Create or update a canonical skill record from the seed catalog."""
+
+    canonical_name = str(item["canonical_name"])
+    slug = str(item.get("slug") or "").strip() or None
+    skill = get_skill_by_slug(db, slug) if slug else None
+    if not skill:
+        skill = get_or_create_skill(db, canonical_name)
+
+    should_commit = False
+    if skill.canonical_name != canonical_name:
+        skill.canonical_name = canonical_name
+        should_commit = True
+
+    if slug and skill.slug != slug:
+        skill.slug = slug
+        should_commit = True
+
+    category = item.get("category")
+    if isinstance(category, str) and skill.category != category:
+        skill.category = category
+        should_commit = True
+
+    description = item.get("description")
+    if isinstance(description, str) and skill.description != description:
+        skill.description = description
+        should_commit = True
+
+    if not skill.active:
+        skill.active = True
+        should_commit = True
+
+    if should_commit:
+        db.commit()
+        db.refresh(skill)
+
+    return skill, should_commit
+
+
+def _upsert_skill_alias(db: Session, skill: Skill, alias: str) -> bool:
+    """Insert or update a normalized alias for a canonical skill."""
+
+    normalized_alias = normalize_skill_alias_key(alias)
+    if not normalized_alias:
+        return False
+
+    statement = select(SkillAlias).where(SkillAlias.normalized_alias == normalized_alias)
+    existing_alias = db.scalars(statement).first()
+    if existing_alias:
+        if existing_alias.skill_id != skill.id or existing_alias.alias != alias:
+            existing_alias.skill_id = skill.id
+            existing_alias.alias = alias
+            return True
+        return False
+
+    db.add(SkillAlias(skill_id=str(skill.id), alias=alias, normalized_alias=normalized_alias))
+    return True
+
 
 def seed_skills_catalog(db: Session) -> int:
     """Ensure the default skill catalog exists and is synchronized."""
 
     changed = 0
+    seen_alias_keys: set[str] = set()
 
     for item in DEFAULT_SKILL_CATALOG:
-        skill = get_or_create_skill(db, item["canonical_name"])
-
-        should_commit = False
-        if skill.category != item["category"]:
-            skill.category = item["category"]
-            should_commit = True
-
-        if skill.description != item["description"]:
-            skill.description = item["description"]
-            should_commit = True
-
-        if not skill.active:
-            skill.active = True
-            should_commit = True
-
-        if should_commit:
+        _, skill_changed = _ensure_skill(db, item)
+        if skill_changed:
             changed += 1
+
+    for alias_item in DEFAULT_SKILL_ALIASES:
+        skill_slug = alias_item["skill_slug"]
+        alias = alias_item["alias"]
+        normalized_alias = normalize_skill_alias_key(alias)
+        if not normalized_alias or normalized_alias in seen_alias_keys:
+            continue
+
+        skill = get_skill_by_slug(db, skill_slug)
+        if not skill:
+            continue
+
+        if _upsert_skill_alias(db, skill, alias):
+            changed += 1
+            seen_alias_keys.add(normalized_alias)
 
     if changed > 0:
         db.commit()

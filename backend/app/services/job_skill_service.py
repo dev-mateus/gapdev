@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from app.repositories.job_repository import get_job_by_id
 from app.repositories.job_skill_repository import (
 	create_or_update_job_skill,
-	get_or_create_skill,
 	get_skill_by_id,
+	resolve_catalog_skill,
 	list_job_skills_by_job,
 )
 from app.repositories.user_repo import get_user_by_email
@@ -36,13 +36,9 @@ def _resolve_job_for_user(db: Session, user_email: str, job_id: str):
 def _resolve_catalog_skill(db: Session, skill_id: str | None = None, raw_name: str | None = None):
 	"""Resolve a catalog skill from an id or a raw skill label."""
 
-	if skill_id:
-		skill = get_skill_by_id(db, skill_id)
-		if skill:
-			return skill
-
-	if raw_name:
-		return get_or_create_skill(db, raw_name)
+	skill = resolve_catalog_skill(db, skill_id, raw_name)
+	if skill:
+		return skill
 
 	raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Skill invalida.")
 

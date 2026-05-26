@@ -12,8 +12,8 @@ from app.repositories.user_skill_repository import (
 	update_user_skill,
 )
 from app.repositories.job_skill_repository import (
-	get_or_create_skill,
 	get_skill_by_id,
+	resolve_catalog_skill,
 	list_active_skills,
 )
 from app.repositories.user_repo import get_user_by_email
@@ -73,11 +73,7 @@ def create_skill(db: Session, user_email: str, payload: UserSkillCreate) -> User
 	"""Create a skill for the authenticated user."""
 
 	user_id = _resolve_user_id(db, user_email)
-	catalog_skill = None
-	if payload.skill_id:
-		catalog_skill = get_skill_by_id(db, payload.skill_id)
-	if not catalog_skill and payload.skill_name:
-		catalog_skill = get_or_create_skill(db, payload.skill_name)
+	catalog_skill = resolve_catalog_skill(db, payload.skill_id, payload.skill_name)
 	if not catalog_skill:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Skill invalida.")
 

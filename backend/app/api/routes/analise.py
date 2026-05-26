@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_database
 from app.schemas.analise import AnaliseRequest, AnaliseResponse
 from app.schemas.job_skill import JobSkillCreate
-from app.services.job_skill_service import create_job_skill, list_job_skills_for_job, _resolve_catalog_skill
+from app.repositories.job_skill_repository import resolve_catalog_skill
+from app.services.job_skill_service import create_job_skill, list_job_skills_for_job
 
 try:
     from dotenv import load_dotenv
@@ -39,18 +40,7 @@ def _get_user_email(x_user_email: str | None = Header(default=None, alias="X-Use
 
 
 def _normalize_skill_name(name: str) -> str:
-    lookup = {
-        "javascript": "JavaScript/TypeScript",
-        "typescript": "JavaScript/TypeScript",
-        "javascript, typescript": "JavaScript/TypeScript",
-        "react": "React",
-        "html, css": "HTML/CSS",
-        "apis (rest)": "APIs REST",
-        "rest apis": "APIs REST",
-        "git, github": "Git/GitHub",
-        "responsive ui and ux practices": "UI responsiva",
-    }
-    return lookup.get(name.strip().lower(), name.strip())
+    return name.strip()
 
 
 def _map_skill_level(required_level: str | None) -> str:
@@ -181,6 +171,24 @@ def _normalize_analysis(parsed: dict) -> dict:
     return parsed
 
 
+def _normalize_job_skill_payload(db: Session, skill: dict) -> dict | None:
+    """Resolve an AI skill payload to the canonical catalog representation."""
+
+    raw_name = skill.get("raw_name") or skill.get("skill_name") or skill.get("name")
+    raw_name_text = raw_name if isinstance(raw_name, str) else None
+    resolved_skill = resolve_catalog_skill(db, skill.get("skill_id"), raw_name_text)
+    if not resolved_skill:
+        return None
+
+    return {
+        "skill_id": str(resolved_skill.id),
+        "skill_name": resolved_skill.canonical_name,
+        "raw_name": raw_name_text.strip() if raw_name_text and raw_name_text.strip() else resolved_skill.canonical_name,
+        "required_level": _map_skill_level(skill.get("required_level")),
+        "priority": _map_skill_priority(skill.get("priority", skill.get("importance"))),
+    }
+
+
 def _load_prompt_template() -> str:
     return PROMPT_PATH.read_text(encoding="utf-8")
 
@@ -202,6 +210,8 @@ def analisar_vaga_route(
                 "summary": "Análise já realizada anteriormente",
                 "job_skills": [
                     {
+                        "skill_id": skill.skill_id,
+                        "skill_name": skill.skill.canonical_name,
                         "raw_name": skill.raw_name or skill.skill.canonical_name,
                         "required_level": _reverse_map_level(skill.required_level),
                         "priority": _reverse_map_importance(skill.priority),
@@ -210,7 +220,8 @@ def analisar_vaga_route(
                 ],
                 "skills": [
                     {
-                        "name": skill.raw_name or skill.skill.canonical_name,
+                        "skill_id": skill.skill_id,
+                        "name": skill.skill.canonical_name,
                         "required_level": _reverse_map_level(skill.required_level),
                         "importance": _reverse_map_importance(skill.priority),
                     }
@@ -248,18 +259,40 @@ def analisar_vaga_route(
 
     # Save skills to database only if job_id is provided
     if payload.job_id and parsed.get("job_skills"):
+        normalized_job_skills = []
         for skill in parsed["job_skills"]:
             try:
+                if not isinstance(skill, dict):
+                    continue
+
+                normalized_skill = _normalize_job_skill_payload(db, skill)
+                if not normalized_skill:
+                    continue
+
                 skill_create = JobSkillCreate(
                     job_id=payload.job_id,
-                    skill_id=skill.get("skill_id"),
-                    raw_name=skill.get("raw_name", skill.get("skill_name", skill.get("name", ""))),
-                    required_level=_map_skill_level(skill.get("required_level")),
-                    priority=_map_skill_priority(skill.get("priority", skill.get("importance"))),
+                    skill_id=normalized_skill["skill_id"],
+                    raw_name=normalized_skill["raw_name"],
+                    required_level=normalized_skill["required_level"],
+                    priority=normalized_skill["priority"],
                 )
                 create_job_skill(db, user_email, skill_create)
+                normalized_job_skills.append(normalized_skill)
             except Exception as e:
                 # Log error but continue saving other skills
                 print(f"Error saving skill: {e}")
+
+        if normalized_job_skills:
+            parsed = dict(parsed)
+            parsed["job_skills"] = normalized_job_skills
+            parsed["skills"] = [
+                {
+                    "skill_id": skill["skill_id"],
+                    "name": skill["skill_name"],
+                    "required_level": skill["required_level"],
+                    "importance": skill["priority"],
+                }
+                for skill in normalized_job_skills
+            ]
 
     return parsed
