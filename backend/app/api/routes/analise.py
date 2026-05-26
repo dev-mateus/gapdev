@@ -1,12 +1,13 @@
 """Analise routes for job descriptions."""
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pathlib import Path
 import os
 import json
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_database
+from app.api.deps import get_current_user, get_database
+from app.models.user import User
 from app.schemas.analise import AnaliseRequest, AnaliseResponse
 from app.schemas.job_skill import JobSkillCreate
 from app.repositories.job_skill_repository import resolve_catalog_skill
@@ -25,18 +26,6 @@ router = APIRouter(prefix="/analise", tags=["analise"])
 
 MODEL = "mistralai/Mistral-7B-Instruct-v0.2:featherless-ai"
 PROMPT_PATH = Path(__file__).resolve().parents[4] / "ai_service" / "app" / "prompts" / "analise_prompt.txt"
-
-
-def _get_user_email(x_user_email: str | None = Header(default=None, alias="X-User-Email")) -> str:
-    """Return the logged user's e-mail from the request headers."""
-
-    if not x_user_email:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuario nao autenticado.",
-        )
-
-    return x_user_email.strip()
 
 
 def _normalize_skill_name(name: str) -> str:
@@ -197,9 +186,11 @@ def _load_prompt_template() -> str:
 def analisar_vaga_route(
     payload: AnaliseRequest,
     db: Session = Depends(get_database),
-    user_email: str = Depends(_get_user_email),
+    current_user: User = Depends(get_current_user),
 ) -> dict:
     """Analisa a descrição da vaga e retorna resumo estruturado de habilidades."""
+
+    user_email = str(current_user.email)
 
     # Check if this job has already been analyzed (only if job_id provided)
     if payload.job_id:
