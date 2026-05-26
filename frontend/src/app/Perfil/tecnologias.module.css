@@ -225,22 +225,22 @@
 
 .categoryIcon[data-category='Linguagens'],
 .techIcon[data-category='Linguagens'] {
-  color: #60a5fa;
+  color: #3576c7;
 }
 
 .categoryIcon[data-category='Frontend'],
 .techIcon[data-category='Frontend'] {
-  color: #22d3ee;
+  color: #0e9fb6;
 }
 
 .categoryIcon[data-category='Backend'],
 .techIcon[data-category='Backend'] {
-  color: #34d399;
+  color: #21c287;
 }
 
 .categoryIcon[data-category='Banco de Dados'],
 .techIcon[data-category='Banco de Dados'] {
-  color: #a78bfa;
+  color: #6a44db;
 }
 
 .categoryIcon[data-category='Mobile'],
@@ -250,22 +250,22 @@
 
 .categoryIcon[data-category='DevOps & Cloud'],
 .techIcon[data-category='DevOps & Cloud'] {
-  color: #fb923c;
+  color: #00c6f8;
 }
 
 .categoryIcon[data-category='Ferramentas'],
 .techIcon[data-category='Ferramentas'] {
-  color: #facc15;
+  color: #e2b80e;
 }
 
 .categoryIcon[data-category='Testes'],
 .techIcon[data-category='Testes'] {
-  color: #2dd4bf;
+  color: #1cc2ac;
 }
 
 .categoryIcon[data-category='UI/UX'],
 .techIcon[data-category='UI/UX'] {
-  color: #d946ef;
+  color: #ba37ce;
 }
 
 .categoryIcon[data-category='IA'],
@@ -275,7 +275,7 @@
 
 .categoryIcon[data-category='Cibersegurança'],
 .techIcon[data-category='Cibersegurança'] {
-  color: #f87171;
+  color: #df5050;
 }
 
 .categoryIcon[data-category='Dados'],
@@ -285,17 +285,17 @@
 
 .categoryIcon[data-category='Game Dev'],
 .techIcon[data-category='Game Dev'] {
-  color: #8b5cf6;
+  color: #5924d3;
 }
 
 .categoryIcon[data-category='Low Code'],
 .techIcon[data-category='Low Code'] {
-  color: #a3e635;
+  color: #84c718;
 }
 
 .categoryIcon[data-category='APIs'],
 .techIcon[data-category='APIs'] {
-  color: #3b82f6;
+  color: #1a58bd;
 }
 
 .categoryIcon[data-category='CMS'],
@@ -310,5 +310,5 @@
 
 .categoryIcon[data-category='Arquitetura'],
 .techIcon[data-category='Arquitetura'] {
-  color: #14b8a6;
+  color: #088879;
 }
