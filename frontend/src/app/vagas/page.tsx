@@ -14,6 +14,13 @@ const tabs: TabSwitcherItem[] = [
   { id: 'minhas-vagas', label: 'Minhas vagas', href: '/historico-vagas' },
 ]
 
+const seniorityLevels = [
+  { label: 'Estágio', value: 'Intern'},
+  { label: 'Júnior', value: 'Junior' },
+  { label: 'Pleno', value: 'MidLevel'},
+  { label: 'Sênior', value: 'Senior' },
+]
+
 function navigateTo(path: string) {
   if (window.location.pathname === path) {
     return
@@ -89,22 +96,17 @@ function VagasPage() {
                   <label className={styles.seniorityLabel}>Senioridade</label>
 
                   <div className={styles.seniorityOptions}>
-                    {['Júnior', 'Pleno', 'Sênior'].map((level) => (
+                    {seniorityLevels.map((level) => (
                       <button
-                        key={level}
+                        key={level.value}
                         type="button"
                         className={`${styles.seniorityOption} ${
-                          formState.seniority === level ? styles.seniorityOptionActive : ''
+                          formState.seniority === level.value ? styles.seniorityOptionActive : ''
                         }`}
-                        onClick={(event) => {
-                          event.preventDefault()
-                          console.log('clicou:', level)
-                          updateField('seniority', level)
-                        }}
+                        onClick={() => updateField('seniority', level.value)}
                       >
-                        {level}
+                        {level.label}
                       </button>
-                      
                     ))}
                   </div>
 

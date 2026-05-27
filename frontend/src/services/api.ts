@@ -22,6 +22,20 @@ function buildHeaders(extraHeaders?: HeadersInit): Headers {
     headers.set('Authorization', `Bearer ${token}`)
   }
 
+const perfilUsuario = localStorage.getItem('perfilUsuario')
+const usuarioLogado = localStorage.getItem('usuarioLogado')
+
+const userEmail =
+  perfilUsuario ? JSON.parse(perfilUsuario).email :
+  usuarioLogado ? JSON.parse(usuarioLogado).email :
+  ''
+
+if (userEmail) {
+  headers.set('X-User-Email', userEmail)
+}
+
+
+
   return headers
 }
 
