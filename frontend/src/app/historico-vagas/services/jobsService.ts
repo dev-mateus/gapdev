@@ -7,7 +7,8 @@ export type JobItem = {
   job_title: string
   description: string
   created_at: string
-  compatibilidade?: string
+  compatibility?: number
+  compatibilidade?: number
   tecnologias?: string[]
 }
 

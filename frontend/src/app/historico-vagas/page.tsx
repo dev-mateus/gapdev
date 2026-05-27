@@ -20,6 +20,14 @@ function navigateTo(path: string) {
   window.dispatchEvent(new PopStateEvent('popstate'))
 }
 
+function getJobCompatibility(job: JobItem): number | undefined {
+  if (typeof job.compatibility === 'number') {
+    return job.compatibility
+  }
+
+  return undefined
+}
+
 function HistoricoPage() {
   const [jobs, setJobs] = useState<JobItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -103,22 +111,22 @@ function HistoricoPage() {
                     <FaCalendar />
                     <span>Analisado em {new Intl.DateTimeFormat('pt-BR').format(new Date(job.created_at))}</span>
                   </div>
+
+                  <div className={styles.tags}>
+                    {job.tecnologias?.slice(0, 5).map((tech) => (
+                      <span key={tech} className={styles.tag}>{tech}</span>
+                    ))}
+                  </div>
                 </div>
 
                 <div className={styles.right}>
                   <div className={styles.match}>
                     <div className={styles.matchValue}>
-                      {job.compatibilidade ?? '-'}
+                      {getJobCompatibility(job) !== undefined ? `${getJobCompatibility(job)}%` : '-'}
                     </div>
                     <div className={styles.matchLabel}>
                       Compatibilidade
                     </div>
-                  </div>
-
-                  <div className={styles.tags}>
-                    {job.tecnologias?.map((tech) => (
-                      <span key={tech} className={styles.tag}>{tech}</span>
-                    ))}
                   </div>
                 </div>
               </article>

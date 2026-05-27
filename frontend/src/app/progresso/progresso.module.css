@@ -3,46 +3,26 @@
   gap: 1.6rem;
 }
 
-
-.pageActions {
-  display: flex;
-  justify-content: flex-start;
-  gap: 1rem;
-}
-
-.pageActionLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.95rem 1.25rem;
-  border-radius: 0.95rem;
-  background: rgba(88, 224, 255, 0.12);
-  border: 1px solid rgba(88, 224, 255, 0.3);
-  color: #e7f9ff;
-  font-weight: 700;
-  text-decoration: none;
-  transition: background 180ms ease, transform 180ms ease;
-}
-
-.pageActionLink:hover {
-  background: rgba(88, 224, 255, 0.18);
-  transform: translateY(-1px);
-}
-
-.pageContainer {
+.content {
   width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-block: 1rem;
+}
+
+.expandedContainer {
+  max-width: min(100%, 84rem);
+}
+
+.page {
+  display: grid;
+  gap: 1.6rem;
 }
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
   align-items: stretch;
   grid-auto-rows: 1fr;
 }
@@ -223,7 +203,7 @@
 .grid {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
-  gap: 24px;
+  gap: 1.25rem;
   align-items: stretch;
 }
 
@@ -248,7 +228,7 @@
 
 .panel {
   border-radius: 1rem;
-  padding: 1.1rem;
+  padding: 1rem 1.1rem;
 }
 
 .panelGlass {
@@ -259,7 +239,7 @@
 }
 
 .panelHeader {
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
 }
 
 .panelTitle {

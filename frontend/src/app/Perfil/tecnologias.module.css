@@ -1,0 +1,326 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.searchContent {
+  border: 1px solid #8ea6b7;
+  border-radius: 16px;
+  min-height: 255px;
+  padding: 32px;
+  background: rgba(7, 28, 43, 0.45);
+}
+
+.searchContent h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: #ffffff;
+}
+
+.searchContent p {
+  margin: 0 0 28px;
+  color: #c7d6e2;
+  font-size: 16px;
+}
+
+.searchBox {
+  height: 64px;
+  border: 2px solid #1fc7ef;
+  border-radius: 18px;
+  padding: 0 24px;
+  background: #061521;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: #ffffff;
+}
+
+.searchBox input {
+  flex: 1;
+
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.searchBox svg {
+  color: #ffffff;
+}
+
+.techList {
+  border: 1px solid #6d8798;
+  border-top: none;
+  border-radius: 0 0 18px 18px;
+  overflow: hidden;
+  background: #0c2b40;
+}
+
+.techCard {
+  min-height: 74px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(142, 166, 183, 0.35);
+}
+
+.techCard:last-child {
+  border-bottom: none;
+}
+
+.techInfo {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.techIcon,
+.categoryIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.categoryIcon {
+  width: 46px;
+  height: 46px;
+}
+
+.techInfo strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #ffffff;
+  font-size: 19px;
+}
+
+.techInfo span {
+  color: #c7d6e2;
+  font-size: 13px;
+}
+
+.addButton {
+  border: none;
+  background: transparent;
+  color: #20d4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.emptyMessage {
+  padding: 22px;
+  margin: 0 !important;
+  color: #e6e4e4;
+}
+
+.errorMessage {
+  margin: -12px 0 0;
+  color: #fda4af;
+  font-size: 14px;
+}
+
+.successMessage {
+  margin: -12px 0 0;
+  color: #86efac;
+  font-size: 14px;
+}
+
+.selectedWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.selectedWrapper h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.categoryList {
+  border: 1px solid #345468;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(7, 28, 43, 0.45);
+}
+
+.categoryRow {
+  padding: 18px 22px;
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid rgba(142, 166, 183, 0.28);
+}
+
+.categoryRow:last-child {
+  border-bottom: none;
+}
+
+.categoryInfo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.categoryTitle {
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.selectedArea {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tag {
+  height: 52px;
+  border: 1px solid #8ea6b7;
+  border-radius: 18px;
+  padding: 0 18px;
+  background: #0c2b40;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.tag button {
+  border: none;
+  background: transparent;
+  color: #c7d6e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.backButton {
+  width: 155px !important;
+  height: 54px !important;
+  background: transparent !important;
+  border: 1px solid #8ea6b7 !important;
+}
+
+.saveButton {
+  width: 260px !important;
+  height: 54px !important;
+}
+
+.saveButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.searchWrapper {
+  width: 58%;
+}
+
+.categoryIcon[data-category='Linguagens'],
+.techIcon[data-category='Linguagens'] {
+  color: #60a5fa;
+}
+
+.categoryIcon[data-category='Frontend'],
+.techIcon[data-category='Frontend'] {
+  color: #22d3ee;
+}
+
+.categoryIcon[data-category='Backend'],
+.techIcon[data-category='Backend'] {
+  color: #34d399;
+}
+
+.categoryIcon[data-category='Banco de Dados'],
+.techIcon[data-category='Banco de Dados'] {
+  color: #a78bfa;
+}
+
+.categoryIcon[data-category='Mobile'],
+.techIcon[data-category='Mobile'] {
+  color: #f472b6;
+}
+
+.categoryIcon[data-category='DevOps & Cloud'],
+.techIcon[data-category='DevOps & Cloud'] {
+  color: #fb923c;
+}
+
+.categoryIcon[data-category='Ferramentas'],
+.techIcon[data-category='Ferramentas'] {
+  color: #facc15;
+}
+
+.categoryIcon[data-category='Testes'],
+.techIcon[data-category='Testes'] {
+  color: #2dd4bf;
+}
+
+.categoryIcon[data-category='UI/UX'],
+.techIcon[data-category='UI/UX'] {
+  color: #d946ef;
+}
+
+.categoryIcon[data-category='IA'],
+.techIcon[data-category='IA'] {
+  color: #38bdf8;
+}
+
+.categoryIcon[data-category='Cibersegurança'],
+.techIcon[data-category='Cibersegurança'] {
+  color: #f87171;
+}
+
+.categoryIcon[data-category='Dados'],
+.techIcon[data-category='Dados'] {
+  color: #84cc16;
+}
+
+.categoryIcon[data-category='Game Dev'],
+.techIcon[data-category='Game Dev'] {
+  color: #8b5cf6;
+}
+
+.categoryIcon[data-category='Low Code'],
+.techIcon[data-category='Low Code'] {
+  color: #a3e635;
+}
+
+.categoryIcon[data-category='APIs'],
+.techIcon[data-category='APIs'] {
+  color: #3b82f6;
+}
+
+.categoryIcon[data-category='CMS'],
+.techIcon[data-category='CMS'] {
+  color: #f59e0b;
+}
+
+.categoryIcon[data-category='Versionamento'],
+.techIcon[data-category='Versionamento'] {
+  color: #fb7185;
+}
+
+.categoryIcon[data-category='Arquitetura'],
+.techIcon[data-category='Arquitetura'] {
+  color: #14b8a6;
+}

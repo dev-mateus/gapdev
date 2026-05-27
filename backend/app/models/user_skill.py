@@ -2,17 +2,22 @@
 
 from uuid import uuid4
 
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, Enum as SQLEnum, ForeignKey, String
+from sqlalchemy.orm import relationship
 
 from app.db.base import Base
+from app.models.enums import SkillLevel
 
 
 class UserSkill(Base):
-    """Skills associated to a user."""
+	"""Skills associated to a user."""
 
-    __tablename__ = "user_skills"
+	__tablename__ = "user_skills"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid4()))
-    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
-    skill_name = Column(String(120), nullable=False)
-    level = Column(Integer, nullable=False, default=1)
+	id = Column(String(36), primary_key=True, default=lambda: str(uuid4()))
+	user_id = Column("user_id", String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+	skill_id = Column("skill_id", String(36), ForeignKey("skills.id", ondelete="RESTRICT"), nullable=False, index=True)
+	level = Column(SQLEnum(SkillLevel), nullable=False, default=SkillLevel.Beginner)
+
+	user = relationship("User", back_populates="skills")
+	skill = relationship("Skill", back_populates="user_skills")

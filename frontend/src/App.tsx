@@ -5,6 +5,8 @@ import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
 import VagasPage from './app/vagas/page'
 import PlanoEstudosPage from './app/plano-estudos/page'
+import CompatibilityPage from './app/compatibility/page'
+import ResultadoAnalisePage from './app/resultado-analise/page'
 import Sidebar from './components/Sidebar/Sidebar'
 import HistoricoPage from './app/historico-vagas/page'
 import ProgressoPage from './app/progresso/page'
@@ -69,44 +71,52 @@ function App(): ReactElement {
       <>
         <Routes>
           <Route
-          path="/"
-          element={<LoginPage isBackendConnected={isBackendConnected} />}
-        />
+            path="/"
+            element={<LoginPage isBackendConnected={isBackendConnected} />}
+          />
 
-        <Route
-          path="/login"
-          element={<LoginPage isBackendConnected={isBackendConnected} />}
-        />
+          <Route
+            path="/login"
+            element={<LoginPage isBackendConnected={isBackendConnected} />}
+          />
 
-        <Route
-          path="/cadastro"
-          element={<CadastroPage isBackendConnected={isBackendConnected} />}
-        />
+          <Route
+            path="/cadastro"
+            element={<CadastroPage isBackendConnected={isBackendConnected} />}
+          />
 
-        {/* 🔒 ROTAS PROTEGIDAS */}
+          <Route
+            path="/perfil"
+            element={
+              <PrivateRoute>
+                <PrivateLayout>
+                  <Perfil />
+                </PrivateLayout>
+              </PrivateRoute>
+            }
+          />
 
-        <Route
-          path="/perfil"
+          <Route
+          path="/compatibility"
           element={
             <PrivateRoute>
               <PrivateLayout>
-                <Perfil />
+                <CompatibilityPage />
               </PrivateLayout>
             </PrivateRoute>
           }
         />
-        
 
-        <Route
-          path="/vagas"
-          element={
-            <PrivateRoute>
-              <PrivateLayout>
-                <VagasPage />
-              </PrivateLayout>
-            </PrivateRoute>
-          }
-        />
+          <Route
+            path="/vagas"
+            element={
+              <PrivateRoute>
+                <PrivateLayout>
+                  <VagasPage />
+                </PrivateLayout>
+              </PrivateRoute>
+            }
+          />
 
         <Route
           path="/plano-estudos"
@@ -119,44 +129,53 @@ function App(): ReactElement {
           }
         />
 
-        <Route
-          path="/analise"
-          element={
-            <PrivateRoute>
-              <PrivateLayout>
-                <h1>Você está em: /analise</h1>
-              </PrivateLayout>
-            </PrivateRoute>
-          }
-        />
+          <Route
+            path="/analise"
+            element={
+              <PrivateRoute>
+                <PrivateLayout>
+                  <ResultadoAnalisePage />
+                </PrivateLayout>
+              </PrivateRoute>
+            }
+          />
 
+          <Route
+            path="/resultado-analise"
+            element={
+              <PrivateRoute>
+                <PrivateLayout>
+                  <ResultadoAnalisePage />
+                </PrivateLayout>
+              </PrivateRoute>
+            }
+          />
 
+          <Route
+            path="/progresso"
+            element={
+              <PrivateRoute>
+                <PrivateLayout>
+                  <ProgressoPage />
+                </PrivateLayout>
+              </PrivateRoute>
+            }
+          />
 
-        <Route
-          path="/progresso"
-          element={
-            <PrivateRoute>
-              <PrivateLayout>
-                <ProgressoPage />
-              </PrivateLayout>
-            </PrivateRoute>
-          }
-        />
+          <Route
+            path="/historico-vagas"
+            element={
+              <PrivateRoute>
+                <PrivateLayout>
+                  <HistoricoPage />
+                </PrivateLayout>
+              </PrivateRoute>
+            }
+          />
+        </Routes>
 
-        <Route
-          path="/historico-vagas"
-          element={
-            <PrivateRoute>
-              <PrivateLayout>
-                <HistoricoPage />
-              </PrivateLayout>
-            </PrivateRoute>
-          }
-        />
-      </Routes>
-
-      <CookieBanner />
-    </>
+        <CookieBanner />
+      </>
     </StudyPlanProvider>
   )
 }
