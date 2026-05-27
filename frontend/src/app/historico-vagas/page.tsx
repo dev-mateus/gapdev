@@ -20,6 +20,14 @@ function navigateTo(path: string) {
   window.dispatchEvent(new PopStateEvent('popstate'))
 }
 
+function getJobCompatibility(job: JobItem): number | undefined {
+  if (typeof job.compatibility === 'number') {
+    return job.compatibility
+  }
+
+  return undefined
+}
+
 function HistoricoPage() {
   const [jobs, setJobs] = useState<JobItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -114,7 +122,7 @@ function HistoricoPage() {
                 <div className={styles.right}>
                   <div className={styles.match}>
                     <div className={styles.matchValue}>
-                      {job.compatibilidade !== undefined ? `${job.compatibilidade}%` : '-'}
+                      {getJobCompatibility(job) !== undefined ? `${getJobCompatibility(job)}%` : '-'}
                     </div>
                     <div className={styles.matchLabel}>
                       Compatibilidade
