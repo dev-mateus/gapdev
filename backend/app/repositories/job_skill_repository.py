@@ -6,7 +6,7 @@ import re
 import unicodedata
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.models.job_skill import JobSkill
 from app.models.enums import SkillLevel, SkillPriority
@@ -144,6 +144,18 @@ def list_active_skills(db: Session) -> list[Skill]:
 	statement = (
 		select(Skill)
 		.where(Skill.active.is_(True))
+		.order_by(Skill.category.asc(), Skill.canonical_name.asc())
+	)
+	return list(db.scalars(statement).all())
+
+
+def list_active_skills_with_aliases(db: Session) -> list[Skill]:
+	"""Return active catalog skills with aliases preloaded."""
+
+	statement = (
+		select(Skill)
+		.where(Skill.active.is_(True))
+		.options(selectinload(Skill.aliases))
 		.order_by(Skill.category.asc(), Skill.canonical_name.asc())
 	)
 	return list(db.scalars(statement).all())

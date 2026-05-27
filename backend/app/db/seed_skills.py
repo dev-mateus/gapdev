@@ -53,6 +53,7 @@ DEFAULT_SKILL_CATALOG: list[dict[str, object]] = [
     {"canonical_name": "Terraform", "description": "Infraestrutura como código declarativa", "category": "DevOps & Cloud"},
     {"canonical_name": "Ansible", "description": "Automação de configuração e provisionamento", "category": "DevOps & Cloud"},
     {"canonical_name": "Jenkins", "description": "Servidor de integração contínua", "category": "DevOps & Cloud"},
+    {"canonical_name": "CI/CD", "slug": "cicd", "description": "Integração e entrega contínua", "category": "DevOps & Cloud"},
     {"canonical_name": "GitLab CI", "description": "Pipelines de CI/CD no GitLab", "category": "DevOps & Cloud"},
     {"canonical_name": "Nginx", "description": "Servidor web e proxy reverso", "category": "DevOps & Cloud"},
     {"canonical_name": "Linux", "description": "Sistema operacional para servidores e automação", "category": "DevOps & Cloud"},

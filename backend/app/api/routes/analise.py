@@ -4,13 +4,18 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pathlib import Path
 import os
 import json
+import re
+import unicodedata
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_database
 from app.models.user import User
 from app.schemas.analise import AnaliseRequest, AnaliseResponse
 from app.schemas.job_skill import JobSkillCreate
-from app.repositories.job_skill_repository import resolve_catalog_skill
+from app.repositories.job_skill_repository import (
+    list_active_skills_with_aliases,
+    resolve_catalog_skill,
+)
 from app.services.job_skill_service import create_job_skill, list_job_skills_for_job
 
 try:
@@ -28,8 +33,149 @@ MODEL = "mistralai/Mistral-7B-Instruct-v0.2:featherless-ai"
 PROMPT_PATH = Path(__file__).resolve().parents[4] / "ai_service" / "app" / "prompts" / "analise_prompt.txt"
 
 
+SECTION_REQUIRED_MARKERS = (
+    "requisitos",
+    "requisito",
+    "necessario",
+    "necessária",
+    "necessario",
+    "requirements",
+    "must have",
+    "must-haves",
+)
+
+SECTION_OPTIONAL_MARKERS = (
+    "diferenciais",
+    "diferencial",
+    "desejável",
+    "desejaveis",
+    "nice to have",
+    "plus",
+)
+
+TEXT_REPLACEMENTS = (
+    (r"c\s*#", "csharp"),
+    (r"c\s*\+\+", "cpp"),
+    (r"f\s*#", "fsharp"),
+    (r"\.net", "dotnet"),
+    (r"node\s*\.\s*js", "nodejs"),
+    (r"react\s*\.\s*js", "reactjs"),
+    (r"next\s*\.\s*js", "nextjs"),
+    (r"vue\s*\.\s*js", "vuejs"),
+    (r"ci\s*/\s*cd", "cicd"),
+    (r"rest\s+api", "restapi"),
+    (r"api\s+rest", "apirest"),
+)
+
+
 def _normalize_skill_name(name: str) -> str:
     return name.strip()
+
+
+def _normalize_text_for_matching(text: str) -> str:
+    """Normalize free text so skill aliases can be matched reliably."""
+
+    normalized = text.lower()
+    for pattern, replacement in TEXT_REPLACEMENTS:
+        normalized = re.sub(pattern, replacement, normalized, flags=re.IGNORECASE)
+
+    normalized = unicodedata.normalize("NFKD", normalized).encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"[^a-z0-9]+", " ", normalized).strip()
+
+
+def _infer_default_required_level(description: str) -> str:
+    """Infer a default required level from the vacancy seniority hints."""
+
+    text = description.lower()
+    if any(marker in text for marker in ("senior", "sênior", "sr", "arquitet")):
+        return "advanced"
+    if any(marker in text for marker in ("pleno", "intermedi", "mid")):
+        return "intermediate"
+    if any(marker in text for marker in ("junior", "júnior", "jr", "estagi")):
+        return "basic"
+    return "basic"
+
+
+def _classify_section(line: str, current_section: str) -> str:
+    """Track whether the current block is required or desirable."""
+
+    lower = line.lower().strip()
+    if not lower:
+        return current_section
+
+    if any(marker in lower for marker in SECTION_REQUIRED_MARKERS):
+        return "required"
+
+    if any(marker in lower for marker in SECTION_OPTIONAL_MARKERS):
+        return "desirable"
+
+    return current_section
+
+
+def _build_skill_lookup(db: Session) -> list[tuple[dict, set[str]]]:
+    """Load active catalog skills and precompute searchable keys."""
+
+    lookup: list[tuple[dict, set[str]]] = []
+    for skill in list_active_skills_with_aliases(db):
+        keys = {_normalize_text_for_matching(skill.canonical_name)}
+        for alias in getattr(skill, "aliases", []):
+            keys.add(_normalize_text_for_matching(getattr(alias, "alias", "")))
+
+        keys = {key for key in keys if key}
+        if not keys:
+            continue
+
+        lookup.append((
+            {
+                "skill_id": str(skill.id),
+                "skill_name": skill.canonical_name,
+                "canonical_key": _normalize_text_for_matching(skill.canonical_name),
+            },
+            keys,
+        ))
+
+    return lookup
+
+
+def _extract_catalog_skills(db: Session, description: str) -> list[dict]:
+    """Deterministically extract only catalog skills present in the vacancy text."""
+
+    default_level = _infer_default_required_level(description)
+    lookup = _build_skill_lookup(db)
+
+    lines = [line.strip() for line in description.splitlines()]
+    matched: dict[str, dict] = {}
+    current_section = "required"
+
+    for raw_line in lines:
+        if not raw_line:
+            continue
+
+        current_section = _classify_section(raw_line, current_section)
+        normalized_line = _normalize_text_for_matching(raw_line)
+        if not normalized_line:
+            continue
+
+        for skill_info, keys in lookup:
+            if skill_info["skill_id"] in matched:
+                continue
+
+            if not any(
+                (f" {key} " in f" {normalized_line} ")
+                for key in keys
+            ):
+                continue
+
+            matched[skill_info["skill_id"]] = {
+                "skill_id": skill_info["skill_id"],
+                "skill_name": skill_info["skill_name"],
+                "raw_name": skill_info["skill_name"],
+                "required_level": default_level if current_section == "required" else "basic",
+                "priority": current_section,
+                "evidence": raw_line,
+            }
+
+    return list(matched.values())[:12]
 
 
 def _map_skill_level(required_level: str | None) -> str:
@@ -160,6 +306,22 @@ def _normalize_analysis(parsed: dict) -> dict:
     return parsed
 
 
+def _merge_skills(detected: list[dict], ai_skills: list[dict]) -> list[dict]:
+    """Prefer deterministic catalog matches while preserving any AI-only metadata."""
+
+    merged: dict[str, dict] = {}
+    for skill in ai_skills:
+        skill_id = skill.get("skill_id") if isinstance(skill, dict) else None
+        if not skill_id:
+            continue
+        merged[str(skill_id)] = dict(skill)
+
+    for skill in detected:
+        merged[str(skill["skill_id"])] = dict(skill)
+
+    return list(merged.values())[:12]
+
+
 def _normalize_job_skill_payload(db: Session, skill: dict) -> dict | None:
     """Resolve an AI skill payload to the canonical catalog representation."""
 
@@ -231,6 +393,10 @@ def analisar_vaga_route(
 
     prompt = _load_prompt_template().replace("{description}", payload.description)
 
+    detected_skills = _extract_catalog_skills(db, payload.description)
+    catalog_preview = "\n".join(f"- {skill['skill_name']}" for skill in detected_skills) or "- Nenhuma skill detectada no catálogo"
+    prompt = prompt.replace("{catalog_skills}", catalog_preview)
+
     try:
         completion = client.chat.completions.create(
             model=MODEL,
@@ -247,6 +413,18 @@ def analisar_vaga_route(
     except Exception as exc:
         # Fallback: return the raw text in summary
         parsed = {"summary": str(exc), "job_skills": [], "skills": []}
+
+    parsed = dict(parsed)
+    parsed["job_skills"] = _merge_skills(detected_skills, list(parsed.get("job_skills") or parsed.get("skills") or []))
+    parsed["skills"] = [
+        {
+            "skill_id": skill.get("skill_id"),
+            "name": skill.get("skill_name", skill.get("raw_name", "")),
+            "required_level": skill.get("required_level"),
+            "importance": skill.get("priority"),
+        }
+        for skill in parsed["job_skills"]
+    ]
 
     # Save skills to database only if job_id is provided
     if payload.job_id and parsed.get("job_skills"):
