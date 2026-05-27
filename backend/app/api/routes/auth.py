@@ -61,18 +61,35 @@ def google_login(
 ) -> dict[str, str]:
 	"""Authenticate user with Google OAuth token."""
 
-	response = httpx.get(
-		"https://www.googleapis.com/oauth2/v2/userinfo",
-		headers={
-			"Authorization": f"Bearer {payload.google_token}",
-		},
-		timeout=10.0,
-	)
+	try:
+		response = httpx.get(
+			"https://www.googleapis.com/oauth2/v2/userinfo",
+			headers={
+				"Authorization": f"Bearer {payload.google_token}",
+			},
+			timeout=10.0,
+		)
+	except httpx.TimeoutException:
+		raise HTTPException(
+			status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+			detail="Timeout ao comunicar com o Google. Tente novamente.",
+		)
+	except httpx.RequestError as exc:
+		raise HTTPException(
+			status_code=status.HTTP_502_BAD_GATEWAY,
+			detail=f"Erro ao comunicar com o Google: {exc}",
+		)
+
+	if response.status_code == 401:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Token do Google invalido ou expirado.",
+		)
 
 	if response.status_code != 200:
 		raise HTTPException(
 			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Token do Google invalido",
+			detail=f"Google retornou status {response.status_code}.",
 		)
 
 	user_data = response.json()
