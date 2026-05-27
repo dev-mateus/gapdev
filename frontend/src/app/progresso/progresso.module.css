@@ -41,10 +41,12 @@
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
   align-items: stretch;
+  grid-auto-rows: 1fr;
 }
+
 
 @media (max-width: 1100px) {
   .cards {
@@ -54,114 +56,159 @@
 
 
 .card {
-  padding: 1.1rem;
-  border-radius: 1rem;
-  height: 100%;
-  min-height: 180px;
+  padding: 1.3rem 1.35rem;
+  border-radius: 1.25rem;
+  min-height: 210px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: stretch;
-}
-
-/* reforço extra para garantir layout previsível em cards de métrica */
-.cardMeta {
-  flex: 1;
-}
-
-
-
-.cardGlass {
-  background: var(--color-bg-shell);
-
-  border: 1px solid var(--color-border-shell);
-  box-shadow: var(--shadow-feature);
-  backdrop-filter: blur(10px);
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .cardGlass {
-  display: flex;
+  background: rgba(10, 20, 30, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(14px);
 }
-
 
 .cardTop {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 1rem;
+  width: 100%;
 }
 
-
 .cardIcon {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  background: rgba(58, 192, 240, 0.14);
-  border: 1px solid rgba(88, 224, 255, 0.32);
-  color: #baf3ff;
+  border-radius: 16px;
+  background: rgba(88, 224, 255, 0.12);
+  border: 1px solid rgba(88, 224, 255, 0.24);
+  color: #c5f3ff;
   font-weight: 800;
+  flex-shrink: 0;
 }
 
 .cardMeta {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 0.55rem;
   min-width: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-
 .cardTitle {
-  font-size: 0.98rem;
-  color: var(--color-text-muted-soft);
+  font-size: 0.92rem;
+  color: rgba(223, 247, 255, 0.72);
   font-weight: 700;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
 }
 
 .cardValueRow {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 0.75rem;
 }
 
 .cardValue {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 900;
-  letter-spacing: -0.02em;
-  min-width: 3rem;
+  letter-spacing: -0.04em;
+  color: #f4fbff;
+  min-width: 3.2rem;
+  line-height: 1;
   flex-shrink: 0;
 }
 
-
-.cardMeta {
-  min-width: 0;
+.badgePlus,
+.badgeRecord {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: rgba(223, 247, 255, 0.7);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
 .badgePlus {
-  font-size: 0.82rem;
-  color: #aef1ff;
-  background: rgba(31, 163, 198, 0.16);
-  border: 1px solid rgba(31, 163, 198, 0.35);
-  padding: 0.25rem 0.55rem;
-  border-radius: 999px;
-  white-space: nowrap;
+  color: #b4f0ff;
 }
 
-
-
 .badgeRecord {
-  font-size: 0.82rem;
-  color: #c6f6d8;
-  background: rgba(34, 197, 94, 0.14);
-  border: 1px solid rgba(34, 197, 94, 0.33);
-  padding: 0.25rem 0.55rem;
-  border-radius: 999px;
-  white-space: nowrap;
+  color: #d7f7e8;
+}
+
+.ringWrap {
+  width: 76px;
+  min-width: 76px;
+  height: 76px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ring {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: inset 0 0 0 1px rgba(88, 224, 255, 0.08);
+  position: relative;
+}
+
+.ringFill {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    rgba(70, 217, 255, 0.95) calc(var(--ring-progress) * 1%),
+    rgba(70, 217, 255, 0.16) 0
+  );
+  transform: rotate(-90deg);
+}
+
+.ringCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+}
+
+.ringNumber {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #f4fbff;
+}
+
+.ringSub {
+  font-size: 0.75rem;
+  color: rgba(223, 247, 255, 0.68);
+  text-align: center;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
 }
 
 
@@ -216,7 +263,7 @@
 }
 
 .panelTitle {
-  font-size: 1.05rem;
+  font-size: 2.05rem;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -242,57 +289,99 @@
   text-align: center;
 }
 
-/* Barras */
+/* Barras - estilo tipo "cards" alinhados à base */
 .bars {
   display: flex;
   align-items: flex-end;
-  gap: 1rem;
-  padding: 0.25rem 0;
+  gap: clamp(0.75rem, 2.2vw, 1.25rem);
+  padding: 0.35rem 0 0;
+  margin-top: 0.55rem;
+  justify-content: center;
 }
 
 .barCol {
-  flex: 1;
+  flex: 0 0 auto;
+  width: clamp(84px, 14vw, 140px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
 }
 
 .barWrap {
   width: 100%;
-  height: 190px;
+  height: 120px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   position: relative;
+  padding: 0;
 }
 
 .bar {
   width: 100%;
-  border-radius: 12px;
-  background: linear-gradient(180deg, rgba(88, 224, 255, 0.95), rgba(31, 163, 198, 0.5));
-  box-shadow: 0 0 0 1px rgba(88, 224, 255, 0.18), 0 14px 40px rgba(0, 0, 0, 0.35);
+  /* altura idealmente controlada por JS (inline style) ou por variável CSS */
+  max-height: 100%;
+  min-height: 40px;
+  align-self: flex-end;
+  border-radius: 0.9rem;
+  background: linear-gradient(180deg, rgba(82, 205, 245, 0.96), rgba(27, 145, 196, 0.55));
+  box-shadow: 0 12px 30px rgba(34, 105, 130, 0.32), 0 6px 18px rgba(70,217,255,0.08) inset;
+  transition: height 360ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 220ms;
+  overflow: hidden;
+  position: relative;
+  top: 280px;
 }
 
+.bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 6px 20px rgba(70,217,255,0.12);
+  pointer-events: none;
+}
+
+/* número centralizado acima da barra */
 .barValue,
 .barValueZero {
   position: absolute;
-  top: 10px;
+  top: -1.15rem;
   left: 50%;
   transform: translateX(-50%);
   font-weight: 900;
   font-size: 0.9rem;
-  color: #dff7ff;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+  color: #effbff;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+  z-index: 2;
+  white-space: nowrap;
+  top: 220px;
 }
 
 .barValueZero {
-  color: rgba(223, 247, 255, 0.55);
+  color: rgba(223, 247, 255, 0.7);
 }
 
 .barLabel {
-  color: var(--color-text-muted);
-  font-size: 0.86rem;
+  margin-top: 18.25rem;
+  color: rgba(223, 247, 255, 0.72);
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+/* Responsividade específica para o bloco */
+@media (max-width: 1100px) {
+  .barWrap { height: 110px; }
+  .barValue, .barValueZero { font-size: 0.82rem; top: -1rem; }
+  .barCol { width: clamp(84px, 22vw, 180px); }
+}
+
+@media (max-width: 520px) {
+  .bars { gap: 0.6rem; }
+  .barWrap { height: 100px; }
+  .bar { min-height: 36px; border-radius: 0.8rem; }
+  .barValue, .barValueZero { font-size: 0.78rem; top: -0.9rem; }
 }
 
 /* =========================

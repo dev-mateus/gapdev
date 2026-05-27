@@ -19,6 +19,27 @@ function formatPercentBR(value: number) {
   return `${value.toFixed(2).replace('.', ',')}%`
 }
 
+function startOfDay(date: Date) {
+  const result = new Date(date)
+  result.setHours(0, 0, 0, 0)
+  result.setMilliseconds(0)
+  return result
+}
+
+function startOfWeek(date: Date) {
+  const result = startOfDay(date)
+  const day = result.getDay()
+  const diffFromMonday = (day + 6) % 7
+  result.setDate(result.getDate() - diffFromMonday)
+  return result
+}
+
+function addDays(date: Date, amount: number) {
+  const result = new Date(date)
+  result.setDate(result.getDate() + amount)
+  return result
+}
+
 export default function ProgressoPage() {
   const { plans } = useStudyPlan()
 
@@ -44,42 +65,38 @@ export default function ProgressoPage() {
     return { name: plan.name, percent, status }
   })
 
-  // Progresso semanal deve ser baseado no tempo (7 dias), não na quantidade de tarefas.
-  // Como o modelo atual só possui `done: boolean` (sem timestamps de conclusão),
-  // o gráfico semanal passa a refletir: "qual semana está no tempo" e a fração
-  // concluída dentro da semana atual (por simplicidade: contabiliza todas as tarefas
-  // concluídas como pertencentes à semana atual).
-  //
-  // Importante: para precisão real de "tarefas concluídas dentro de cada semana",
-  // é necessário armazenar data/hora de conclusão (ex.: `doneAt`).
-
   const weeksCount = 4
+  const weeklyTarget = 7
+  const today = startOfDay(new Date())
+  const currentWeekStart = startOfWeek(today)
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  const weeklyRanges = Array.from({ length: weeksCount }, (_, index) => {
+    const start = addDays(currentWeekStart, -7 * (weeksCount - 1 - index))
+    const end = addDays(start, 6)
+    return {
+      label: index === weeksCount - 1 ? 'Semana Atual' : `Semana ${index + 1}`,
+      start,
+      end,
+    }
+  })
 
-  // dataInicio: enquanto não existir no contexto, usamos a data de início do plano como hoje - 7*(weeksCount-1)
-  // para que o usuário veja 4 semanas relativas ao período atual.
-  // Recomendação: futuramente adicionar `startDate`/`dataInicio` no StudyPlanContext.
-  const startDate = new Date(today)
-  startDate.setDate(startDate.getDate() - 7 * (weeksCount - 1))
+  const parseDoneAt = (doneAt?: string) => {
+    if (!doneAt) return null
+    const date = new Date(doneAt)
+    return Number.isNaN(date.getTime()) ? null : date
+  }
 
-  const daysPassed = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-  const currentWeekNumber = Math.floor(daysPassed / 7) + 1 // 1..n
-  const dayInCurrentWeek = (daysPassed % 7) + 1 // 1..7
-
-  const currentWeekIndex = currentWeekNumber - 1 // 0..3
-  const weeklyData: WeeklyData[] = Array.from({ length: weeksCount }, (_, index) => {
-    const isPast = index < currentWeekIndex
-    const isCurrent = index === currentWeekIndex
-
-    const total = 7 // unidade visual: dias da semana
-    const completed = isPast ? total : isCurrent ? Math.min(dayInCurrentWeek, total) : 0
+  const weeklyData: WeeklyData[] = weeklyRanges.map((week) => {
+    const completed = allTasks.filter((task) => {
+      if (!task.done || !task.doneAt) return false
+      const doneDate = parseDoneAt(task.doneAt)
+      return doneDate ? doneDate >= week.start && doneDate <= week.end : false
+    }).length
 
     return {
-      label: `Semana ${index + 1}`,
+      label: week.label,
       completed,
-      total,
+      total: weeklyTarget,
     }
   })
 
@@ -89,7 +106,6 @@ export default function ProgressoPage() {
     else break
   }
 
-
   return (
     <PageContainer className={styles.pageContainer}>
       <div className={styles.page}>
@@ -98,7 +114,6 @@ export default function ProgressoPage() {
           title="Progresso"
           description="Visualize seu crescimento usando os dados do plano de estudos"
         />
-
 
         <section className={styles.cards} aria-label="Resumo do progresso">
           <div className={`${styles.card} ${styles.cardGlass}`}>
@@ -136,8 +151,6 @@ export default function ProgressoPage() {
               <div className={styles.cardMeta}>
                 <h3 className={styles.cardTitle}>Skills dominadas</h3>
               </div>
-
-
             </div>
           </div>
 
