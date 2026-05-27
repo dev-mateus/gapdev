@@ -5,11 +5,12 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_database
 from app.models.user import User
-from app.schemas.user_skill import UserSkillCreate, UserSkillRead, UserSkillUpdate
+from app.schemas.user_skill import SkillCatalogRead, UserSkillCreate, UserSkillRead, UserSkillUpdate
 from app.services.user_skill_service import (
 	create_skill,
 	delete_skill,
 	get_skill,
+	list_catalog,
 	list_skills,
 	list_skills_for_job,
 	update_skill,
@@ -37,6 +38,16 @@ def list_skills_route(
 	"""List all skills for the current user."""
 
 	return list_skills(db, str(current_user.email))
+
+
+@router.get("/catalog", response_model=list[SkillCatalogRead])
+def list_catalog_route(
+	db: Session = Depends(get_database),
+	current_user: User = Depends(get_current_user),
+) -> list[SkillCatalogRead]:
+	"""List active catalog skills used by technology search."""
+
+	return list_catalog(db, str(current_user.email))
 
 
 @router.get("/{skill_id}", response_model=UserSkillRead)

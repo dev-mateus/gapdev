@@ -11,9 +11,18 @@ from app.repositories.user_skill_repository import (
 	list_skills_by_user,
 	update_user_skill,
 )
-from app.repositories.job_skill_repository import get_or_create_skill, get_skill_by_id
+from app.repositories.job_skill_repository import (
+	get_skill_by_id,
+	resolve_catalog_skill,
+	list_active_skills,
+)
 from app.repositories.user_repo import get_user_by_email
-from app.schemas.user_skill import UserSkillCreate, UserSkillRead, UserSkillUpdate
+from app.schemas.user_skill import (
+	SkillCatalogRead,
+	UserSkillCreate,
+	UserSkillRead,
+	UserSkillUpdate,
+)
 
 
 def _skill_to_read(skill: object) -> UserSkillRead:
@@ -36,6 +45,17 @@ def _skill_to_read(skill: object) -> UserSkillRead:
 	)
 
 
+def _catalog_skill_to_read(skill: object) -> SkillCatalogRead:
+	"""Convert a SQLAlchemy catalog skill into the public payload."""
+
+	return SkillCatalogRead(
+		id=str(getattr(skill, "id")),
+		name=str(getattr(skill, "canonical_name")),
+		category=getattr(skill, "category", None),
+		description=getattr(skill, "description", None),
+	)
+
+
 def _resolve_user_id(db: Session, user_email: str) -> str:
 	"""Resolve the user id from the logged user's e-mail."""
 
@@ -53,16 +73,20 @@ def create_skill(db: Session, user_email: str, payload: UserSkillCreate) -> User
 	"""Create a skill for the authenticated user."""
 
 	user_id = _resolve_user_id(db, user_email)
-	catalog_skill = None
-	if payload.skill_id:
-		catalog_skill = get_skill_by_id(db, payload.skill_id)
-	if not catalog_skill and payload.skill_name:
-		catalog_skill = get_or_create_skill(db, payload.skill_name)
+	catalog_skill = resolve_catalog_skill(db, payload.skill_id, payload.skill_name)
 	if not catalog_skill:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Skill invalida.")
 
 	created_skill = create_user_skill_record(db, user_id, str(catalog_skill.id), payload)
 	return _skill_to_read(created_skill)
+
+
+def list_catalog(db: Session, user_email: str) -> list[SkillCatalogRead]:
+	"""List all active skills from the canonical catalog."""
+
+	_resolve_user_id(db, user_email)
+	skills = list_active_skills(db)
+	return [_catalog_skill_to_read(skill) for skill in skills]
 
 
 def get_skill(db: Session, user_email: str, skill_id: str) -> UserSkillRead:

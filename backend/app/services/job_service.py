@@ -47,7 +47,7 @@ def _job_to_read_with_skills(job: object) -> JobWithSkillsRead:
 		job_title=str(getattr(job, "job_title")),
 		description=str(getattr(job, "description")),
 		level=level_str,
-		compatibilidade=int(getattr(job, "compatibility", 0)),
+		compatibility=int(getattr(job, "compatibility", 0)),
 		tecnologias=skill_names,
 		created_at=getattr(job, "created_at"),
 	)

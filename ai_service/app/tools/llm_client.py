@@ -8,7 +8,7 @@ from huggingface_hub import InferenceClient
 
 load_dotenv()
 
-DEFAULT_CHAT_MODEL = "mistralai/Mistral-7B-Instruct-v0.2:featherless-ai"
+DEFAULT_CHAT_MODEL = "Qwen/Qwen2.5-7B-Instruct:together"
 
 
 @lru_cache(maxsize=1)

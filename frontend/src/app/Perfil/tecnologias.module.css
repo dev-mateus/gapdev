@@ -123,6 +123,18 @@
   color: #e6e4e4;
 }
 
+.errorMessage {
+  margin: -12px 0 0;
+  color: #fda4af;
+  font-size: 14px;
+}
+
+.successMessage {
+  margin: -12px 0 0;
+  color: #86efac;
+  font-size: 14px;
+}
+
 .selectedWrapper {
   display: flex;
   flex-direction: column;

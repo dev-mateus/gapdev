@@ -17,271 +17,30 @@
 } from 'lucide-react'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
+import { apiGet, apiPost } from '../../services/api'
 
 import styles from './tecnologias.module.css'
 
 type Tecnologia = {
-  id: number
+  id: string
   nome: string
   descricao: string
   categoria: string
 }
 
-const tecnologiasMock: Tecnologia[] = [
-  // Linguagens
-  {
-    id: 1,
-    nome: 'JavaScript',
-    descricao: 'Linguagem de programação para web',
-    categoria: 'Linguagens',
-  },
-  {
-    id: 2,
-    nome: 'Python',
-    descricao: 'Linguagem versátil para backend e IA',
-    categoria: 'Linguagens',
-  },
+type SkillCatalogItem = {
+  id: string
+  name: string
+  category: string | null
+  description: string | null
+}
 
-  // Frontend
-  {
-    id: 3,
-    nome: 'React',
-    descricao: 'Biblioteca JavaScript para interfaces',
-    categoria: 'Frontend',
-  },
-  {
-    id: 4,
-    nome: 'Next.js',
-    descricao: 'Framework React para aplicações web',
-    categoria: 'Frontend',
-  },
-
-  // Backend
-  {
-    id: 5,
-    nome: 'Node.js',
-    descricao: 'Runtime JavaScript para backend',
-    categoria: 'Backend',
-  },
-  {
-    id: 6,
-    nome: 'FastAPI',
-    descricao: 'Framework Python para APIs',
-    categoria: 'Backend',
-  },
-
-  // Mobile
-  {
-    id: 7,
-    nome: 'React Native',
-    descricao: 'Framework mobile multiplataforma',
-    categoria: 'Mobile',
-  },
-  {
-    id: 8,
-    nome: 'Flutter',
-    descricao: 'Framework para aplicativos móveis',
-    categoria: 'Mobile',
-  },
-
-  // Banco de Dados
-  {
-    id: 9,
-    nome: 'PostgreSQL',
-    descricao: 'Banco de dados relacional',
-    categoria: 'Banco de Dados',
-  },
-  {
-    id: 10,
-    nome: 'MongoDB',
-    descricao: 'Banco de dados NoSQL',
-    categoria: 'Banco de Dados',
-  },
-
-  // DevOps & Cloud
-  {
-    id: 11,
-    nome: 'Docker',
-    descricao: 'Ferramenta de containers',
-    categoria: 'DevOps & Cloud',
-  },
-  {
-    id: 12,
-    nome: 'AWS',
-    descricao: 'Serviços em nuvem',
-    categoria: 'DevOps & Cloud',
-  },
-
-  // Ferramentas
-  {
-    id: 13,
-    nome: 'Postman',
-    descricao: 'Teste e documentação de APIs',
-    categoria: 'Ferramentas',
-  },
-  {
-    id: 14,
-    nome: 'Insomnia',
-    descricao: 'Cliente para APIs REST',
-    categoria: 'Ferramentas',
-  },
-
-  // Testes
-  {
-    id: 15,
-    nome: 'Jest',
-    descricao: 'Framework de testes JavaScript',
-    categoria: 'Testes',
-  },
-  {
-    id: 16,
-    nome: 'Cypress',
-    descricao: 'Testes end-to-end',
-    categoria: 'Testes',
-  },
-
-  // UI/UX
-  {
-    id: 17,
-    nome: 'Figma',
-    descricao: 'Design de interfaces',
-    categoria: 'UI/UX',
-  },
-  {
-    id: 18,
-    nome: 'Design System',
-    descricao: 'Sistema visual reutilizável',
-    categoria: 'UI/UX',
-  },
-
-  // IA
-  {
-    id: 19,
-    nome: 'Machine Learning',
-    descricao: 'Modelos inteligentes e preditivos',
-    categoria: 'IA',
-  },
-  {
-    id: 20,
-    nome: 'TensorFlow',
-    descricao: 'Framework para IA',
-    categoria: 'IA',
-  },
-
-  // cibersegurança
-  {
-  id: 21,
-  nome: 'JWT',
-  descricao: 'Autenticação baseada em tokens',
-  categoria: 'Cibersegurança',
-},
-{
-  id: 22,
-  nome: 'OAuth',
-  descricao: 'Autorização segura',
-  categoria: 'Cibersegurança',
-},
-
-  // Dados
-  {
-    id: 23,
-    nome: 'Pandas',
-    descricao: 'Manipulação de dados em Python',
-    categoria: 'Dados',
-  },
-  {
-    id: 24,
-    nome: 'Power BI',
-    descricao: 'Visualização de dados',
-    categoria: 'Dados',
-  },
-
-  // Game Dev
-  {
-    id: 25,
-    nome: 'Unity',
-    descricao: 'Engine para jogos',
-    categoria: 'Game Dev',
-  },
-  {
-    id: 26,
-    nome: 'Unreal Engine',
-    descricao: 'Engine gráfica para jogos',
-    categoria: 'Game Dev',
-  },
-
-  // Low Code
-  {
-    id: 27,
-    nome: 'Bubble',
-    descricao: 'Plataforma low code',
-    categoria: 'Low Code',
-  },
-  {
-    id: 28,
-    nome: 'FlutterFlow',
-    descricao: 'Construção visual de apps',
-    categoria: 'Low Code',
-  },
-
-  // APIs
-  {
-    id: 29,
-    nome: 'REST',
-    descricao: 'Arquitetura para APIs',
-    categoria: 'APIs',
-  },
-  {
-    id: 30,
-    nome: 'GraphQL',
-    descricao: 'Linguagem de consulta para APIs',
-    categoria: 'APIs',
-  },
-
-  // CMS
-  {
-    id: 31,
-    nome: 'WordPress',
-    descricao: 'CMS para sites',
-    categoria: 'CMS',
-  },
-  {
-    id: 32,
-    nome: 'Strapi',
-    descricao: 'CMS Headless',
-    categoria: 'CMS',
-  },
-
-  // Versionamento
-  {
-    id: 33,
-    nome: 'Git',
-    descricao: 'Controle de versão',
-    categoria: 'Versionamento',
-  },
-  {
-    id: 34,
-    nome: 'GitHub',
-    descricao: 'Hospedagem de repositórios',
-    categoria: 'Versionamento',
-  },
-
-  // Arquitetura
-  {
-    id: 35,
-    nome: 'Clean Architecture',
-    descricao: 'Arquitetura escalável de software',
-    categoria: 'Arquitetura',
-  },
-  {
-    id: 36,
-    nome: 'Microservices',
-    descricao: 'Arquitetura distribuída',
-    categoria: 'Arquitetura',
-  },
-]
+type UserSkillItem = {
+  skill_id: string
+}
 
 
 const categoryIcons = {
@@ -307,8 +66,73 @@ const categoryIcons = {
 
 
 function Tecnologias() {
+  const navigate = useNavigate()
   const [busca, setBusca] = useState('')
+  const [tecnologiasCatalogo, setTecnologiasCatalogo] = useState<Tecnologia[]>([])
+  const [carregandoCatalogo, setCarregandoCatalogo] = useState(true)
+  const [erroCatalogo, setErroCatalogo] = useState<string | null>(null)
   const [selecionadas, setSelecionadas] = useState<Tecnologia[]>([])
+  const [salvando, setSalvando] = useState(false)
+  const [mensagemSucesso, setMensagemSucesso] = useState<string | null>(null)
+  const [erroSalvar, setErroSalvar] = useState<string | null>(null)
+
+  useEffect(() => {
+    let ativo = true
+
+    async function carregarCatalogo() {
+      try {
+        setCarregandoCatalogo(true)
+        setErroCatalogo(null)
+        setErroSalvar(null)
+        setMensagemSucesso(null)
+
+        const [catalogo, userSkills] = await Promise.all([
+          apiGet<SkillCatalogItem[]>('/skills/catalog'),
+          apiGet<UserSkillItem[]>('/skills'),
+        ])
+
+        if (!ativo) return
+
+        const tecnologias = catalogo
+          .map((item) => ({
+            id: item.id,
+            nome: item.name,
+            descricao: item.description ?? 'Sem descrição disponível',
+            categoria: item.category ?? 'Outras',
+          }))
+          .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+
+        const idsUsuario = new Set(
+          (userSkills ?? [])
+            .map((item) => item.skill_id)
+            .filter((value): value is string => Boolean(value)),
+        )
+
+        const preSelecionadas = tecnologias.filter((item) => idsUsuario.has(item.id))
+
+        setTecnologiasCatalogo(tecnologias)
+        setSelecionadas(preSelecionadas)
+      } catch (error) {
+        if (!ativo) return
+
+        setErroCatalogo(
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível carregar as tecnologias.',
+        )
+      } finally {
+        if (ativo) {
+          setCarregandoCatalogo(false)
+        }
+      }
+    }
+
+    carregarCatalogo()
+
+    return () => {
+      ativo = false
+    }
+  }, [])
 
 
   const tecnologiasFiltradas = useMemo(() => {
@@ -316,7 +140,7 @@ function Tecnologias() {
 
     if (!termo) return []
 
-    return tecnologiasMock.filter((tech) => {
+    return tecnologiasCatalogo.filter((tech) => {
       const correspondeBusca = tech.nome.toLowerCase().startsWith(termo)
 
       const jaSelecionada = selecionadas.some(
@@ -325,7 +149,7 @@ function Tecnologias() {
 
       return correspondeBusca && !jaSelecionada
   })
-}, [busca, selecionadas])
+}, [busca, selecionadas, tecnologiasCatalogo])
 
   const tecnologiasPorCategoria = useMemo(() => {
     return selecionadas.reduce<Record<string, Tecnologia[]>>((acc, tech) => {
@@ -345,6 +169,9 @@ function Tecnologias() {
   const deveMostrarSelecionadas = selecionadas.length > 0
 
   function adicionarTecnologia(tecnologia: Tecnologia) {
+    setErroSalvar(null)
+    setMensagemSucesso(null)
+
     const jaSelecionada = selecionadas.some(
       (tech) => tech.id === tecnologia.id,
     )
@@ -354,10 +181,49 @@ function Tecnologias() {
     setSelecionadas((prev) => [...prev, tecnologia])
   }
 
-  function removerTecnologia(id: number) {
+  function removerTecnologia(id: string) {
+    setErroSalvar(null)
+    setMensagemSucesso(null)
+
     setSelecionadas((prev) =>
       prev.filter((tech) => tech.id !== id),
     )
+  }
+
+  async function salvarTecnologias() {
+    if (selecionadas.length === 0 || salvando) {
+      return
+    }
+
+    setSalvando(true)
+    setErroSalvar(null)
+    setMensagemSucesso(null)
+
+    const resultados = await Promise.allSettled(
+      selecionadas.map((tech) =>
+        apiPost<{ id: string; skill_id: string }>('/skills', {
+          skill_id: tech.id,
+          level: 'Basic',
+        }),
+      ),
+    )
+
+    const sucesso = resultados.filter((item) => item.status === 'fulfilled').length
+
+    if (sucesso === 0) {
+      setErroSalvar('Não foi possível salvar suas tecnologias. Tente novamente.')
+      setSalvando(false)
+      return
+    }
+
+    if (sucesso < resultados.length) {
+      setMensagemSucesso(`${sucesso} tecnologias foram salvas. Algumas não puderam ser persistidas agora.`)
+    } else {
+      setMensagemSucesso('Tecnologias salvas com sucesso.')
+    }
+
+    setSalvando(false)
+    navigate('/vagas')
   }
 
   const searchRef = useRef<HTMLDivElement | null>(null)
@@ -408,7 +274,11 @@ function Tecnologias() {
 
         {deveMostrarSugestoes && (
           <div className={styles.techList}>
-            {tecnologiasFiltradas.length > 0 ? (
+            {carregandoCatalogo ? (
+              <p className={styles.emptyMessage}>Carregando tecnologias...</p>
+            ) : erroCatalogo ? (
+              <p className={styles.emptyMessage}>{erroCatalogo}</p>
+            ) : tecnologiasFiltradas.length > 0 ? (
               tecnologiasFiltradas.map((tech) => {
                 const Icon =
                   categoryIcons[
@@ -426,6 +296,14 @@ function Tecnologias() {
                       </div>
 
                       <div>
+
+                      {erroSalvar ? (
+                        <p className={styles.errorMessage}>{erroSalvar}</p>
+                      ) : null}
+
+                      {mensagemSucesso ? (
+                        <p className={styles.successMessage}>{mensagemSucesso}</p>
+                      ) : null}
                         <strong>{tech.nome}</strong>
                         <span>{tech.descricao}</span>
                       </div>
@@ -524,9 +402,10 @@ function Tecnologias() {
         <PrimaryButton
           type="button"
           className={styles.saveButton}
-          disabled={!deveMostrarSelecionadas}
+          disabled={!deveMostrarSelecionadas || salvando}
+          onClick={salvarTecnologias}
         >
-          Salvar e Continuar
+          {salvando ? 'Salvando...' : 'Salvar e Continuar'}
         </PrimaryButton>
       </div>
     </section>

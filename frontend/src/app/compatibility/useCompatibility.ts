@@ -7,6 +7,16 @@ const OPTIONAL_WEIGHT = 5
 
 const storageKey = (title: string) => `gnose:compat:${title}`
 
+function normalizeSkillKey(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
 export function useCompatibility(initial: CompatibilityResponse): UseCompatibilityReturn {
   const { title, compatibility: initialCompatibility, requiredSkills, optionalSkills } = initial
 
@@ -27,8 +37,11 @@ export function useCompatibility(initial: CompatibilityResponse): UseCompatibili
   })
 
   const [catalogByName, setCatalogByName] = useState<Record<string, string>>({})
+  const [catalogNameById, setCatalogNameById] = useState<Record<string, string>>({})
   const [userSkillByCatalogId, setUserSkillByCatalogId] = useState<Record<string, string>>({})
+  const [ownedSkillKeys, setOwnedSkillKeys] = useState<Record<string, boolean>>({})
   const [syncingMap, setSyncingMap] = useState<Record<string, boolean>>({})
+  const [preselectionApplied, setPreselectionApplied] = useState(false)
 
   useEffect(() => {
     let storedSelections: SkillSelectionState | null = null
@@ -53,6 +66,10 @@ export function useCompatibility(initial: CompatibilityResponse): UseCompatibili
     })
   }, [title, requiredSkills, optionalSkills])
 
+  useEffect(() => {
+    setPreselectionApplied(false)
+  }, [title])
+
   // Load catalog and user's saved skills to enable syncing by skill_id
   useEffect(() => {
     let mounted = true
@@ -61,24 +78,44 @@ export function useCompatibility(initial: CompatibilityResponse): UseCompatibili
       try {
         const [catalog, userSkills] = await Promise.all([
           apiGet<Array<{ id: string; canonical_name?: string; name?: string }>>('/skills/catalog'),
-          apiGet<Array<{ id: string; skill_id?: string }>>('/skills'),
+          apiGet<Array<{ id: string; skill_id?: string; skill_name?: string }>>('/skills'),
         ])
 
         if (!mounted) return
 
         const byName: Record<string, string> = {}
+        const nameById: Record<string, string> = {}
         for (const item of catalog || []) {
-          const name = (item.canonical_name || item.name || '').toString().trim().toLowerCase()
-          if (name) byName[name] = String(item.id)
+          const name = (item.canonical_name || item.name || '').toString().trim()
+          const normalizedName = normalizeSkillKey(name)
+          if (normalizedName) {
+            byName[normalizedName] = String(item.id)
+          }
+
+          if (name) {
+            nameById[String(item.id)] = name
+          }
         }
 
         const userMap: Record<string, string> = {}
+        const owned: Record<string, boolean> = {}
         for (const us of userSkills || []) {
           if (us.skill_id) userMap[String(us.skill_id)] = String(us.id)
+
+          const skillNameFromPayload = (us.skill_name || '').toString().trim()
+          if (skillNameFromPayload) {
+            owned[normalizeSkillKey(skillNameFromPayload)] = true
+          }
+
+          if (us.skill_id && nameById[String(us.skill_id)]) {
+            owned[normalizeSkillKey(nameById[String(us.skill_id)])] = true
+          }
         }
 
         setCatalogByName(byName)
+        setCatalogNameById(nameById)
         setUserSkillByCatalogId(userMap)
+        setOwnedSkillKeys(owned)
       } catch (_) {
         // ignore errors; syncing will fallback to names
       }
@@ -97,6 +134,31 @@ export function useCompatibility(initial: CompatibilityResponse): UseCompatibili
     } catch (_) {}
   }, [selections, title])
 
+  useEffect(() => {
+    if (preselectionApplied || Object.keys(ownedSkillKeys).length === 0) {
+      return
+    }
+
+    setSelections((current) => ({
+      selectedRequired: Object.fromEntries(
+        requiredSkills.map((skill) => {
+          const currentValue = current.selectedRequired[skill] ?? false
+          const shouldPreselect = Boolean(ownedSkillKeys[normalizeSkillKey(skill)])
+          return [skill, currentValue || shouldPreselect]
+        }),
+      ),
+      selectedOptional: Object.fromEntries(
+        optionalSkills.map((skill) => {
+          const currentValue = current.selectedOptional[skill] ?? false
+          const shouldPreselect = Boolean(ownedSkillKeys[normalizeSkillKey(skill)])
+          return [skill, currentValue || shouldPreselect]
+        }),
+      ),
+    }))
+
+    setPreselectionApplied(true)
+  }, [ownedSkillKeys, optionalSkills, preselectionApplied, requiredSkills])
+
   const toggleRequired = (skill: string, value?: boolean) => {
     const newValue = value ?? !selections.selectedRequired[skill]
     setSelections(prev => ({
@@ -109,8 +171,8 @@ export function useCompatibility(initial: CompatibilityResponse): UseCompatibili
       const skillKey = skill
       setSyncingMap(prev => ({ ...prev, [skillKey]: true }))
       try {
-        const nameKey = skill.trim().toLowerCase()
-        const catalogId = catalogByName[nameKey]
+        const normalizedSkill = normalizeSkillKey(skill)
+        const catalogId = catalogByName[normalizedSkill]
 
         if (newValue) {
           const body = catalogId ? { skill_id: catalogId, level: 'Basic' } : { skill_name: skill, level: 'Basic' }
@@ -129,6 +191,12 @@ export function useCompatibility(initial: CompatibilityResponse): UseCompatibili
 
           if (created?.skill_id) {
             setUserSkillByCatalogId(prev => ({ ...prev, [String(created!.skill_id)]: String(created!.id) }))
+            if (catalogNameById[String(created.skill_id)]) {
+              setOwnedSkillKeys((prev) => ({
+                ...prev,
+                [normalizeSkillKey(catalogNameById[String(created.skill_id)])]: true,
+              }))
+            }
           }
         } else {
           if (catalogId) {
@@ -173,8 +241,8 @@ export function useCompatibility(initial: CompatibilityResponse): UseCompatibili
       const skillKey = skill
       setSyncingMap(prev => ({ ...prev, [skillKey]: true }))
       try {
-        const nameKey = skill.trim().toLowerCase()
-        const catalogId = catalogByName[nameKey]
+        const normalizedSkill = normalizeSkillKey(skill)
+        const catalogId = catalogByName[normalizedSkill]
 
         if (newValue) {
           const body = catalogId ? { skill_id: catalogId, level: 'Basic' } : { skill_name: skill, level: 'Basic' }
@@ -193,6 +261,12 @@ export function useCompatibility(initial: CompatibilityResponse): UseCompatibili
 
           if (created?.skill_id) {
             setUserSkillByCatalogId(prev => ({ ...prev, [String(created!.skill_id)]: String(created!.id) }))
+            if (catalogNameById[String(created.skill_id)]) {
+              setOwnedSkillKeys((prev) => ({
+                ...prev,
+                [normalizeSkillKey(catalogNameById[String(created.skill_id)])]: true,
+              }))
+            }
           }
         } else {
           if (catalogId) {

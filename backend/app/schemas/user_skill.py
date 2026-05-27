@@ -24,6 +24,15 @@ class UserSkillRead(UserSkillCreate):
     model_config = {"from_attributes": True}
 
 
+class SkillCatalogRead(BaseModel):
+    """Catalog skill payload used by technology search."""
+
+    id: str
+    name: str
+    category: Optional[str] = None
+    description: Optional[str] = None
+
+
 class UserSkillUpdate(BaseModel):
     """Payload to update a user skill."""
 
