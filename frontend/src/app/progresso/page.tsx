@@ -19,6 +19,13 @@ function formatPercentBR(value: number) {
   return `${value.toFixed(2).replace('.', ',')}%`
 }
 
+function startOfDay(date: Date) {
+  const result = new Date(date)
+  result.setHours(0, 0, 0, 0)
+  result.setMilliseconds(0)
+  return result
+}
+
 export default function ProgressoPage() {
   const { plans } = useStudyPlan()
 
@@ -49,9 +56,8 @@ export default function ProgressoPage() {
   })
 
   const weeksCount = 4
-
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  const weeklyTarget = 7
+  const today = startOfDay(new Date())
 
   const startDate = new Date(today)
   startDate.setDate(startDate.getDate() - 7 * (weeksCount - 1))
@@ -65,13 +71,13 @@ export default function ProgressoPage() {
     const isPast = index < currentWeekIndex
     const isCurrent = index === currentWeekIndex
 
-    const total = 7
+    const total = weeklyTarget
     const completed = isPast ? total : isCurrent ? Math.min(dayInCurrentWeek, total) : 0
 
     return {
       label: `Semana ${index + 1}`,
       completed,
-      total,
+      total: weeklyTarget,
     }
   })
 

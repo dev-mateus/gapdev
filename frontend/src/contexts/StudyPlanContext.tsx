@@ -4,6 +4,7 @@ type StudyTask = {
   id: string
   title: string
   done: boolean
+  doneAt?: string
 }
 
 type SkillPlan = {
@@ -19,7 +20,7 @@ const initialPlans: SkillPlan[] = [
     name: 'Docker',
     priority: 'alta',
     tasks: [
-      { id: 'docker-1', title: 'Fundamentos de Cloud Computing', done: true },
+      { id: 'docker-1', title: 'Fundamentos de Cloud Computing', done: true, doneAt: '2026-05-20T10:00:00.000Z' },
       { id: 'docker-2', title: 'Serviços principais da AWS', done: false },
       { id: 'docker-3', title: 'Deploy com EC2 e S3', done: false },
     ],
@@ -40,7 +41,7 @@ const initialPlans: SkillPlan[] = [
     name: 'AWS',
     priority: 'baixa',
     tasks: [
-      { id: 'aws-1', title: 'Fundamentos de Cloud Computing', done: true },
+      { id: 'aws-1', title: 'Fundamentos de Cloud Computing', done: true, doneAt: '2026-05-18T14:20:00.000Z' },
       { id: 'aws-2', title: 'Serviços principais da AWS', done: false },
       { id: 'aws-3', title: 'Deploy com EC2 e S3', done: false },
     ],
@@ -81,9 +82,16 @@ export function StudyPlanProvider({ children }: { children: React.ReactNode }) {
           ? plan
           : {
               ...plan,
-              tasks: plan.tasks.map((task) =>
-                task.id === taskId ? { ...task, done: !task.done } : task,
-              ),
+              tasks: plan.tasks.map((task) => {
+                if (task.id !== taskId) return task
+
+                const nextDone = !task.done
+                return {
+                  ...task,
+                  done: nextDone,
+                  doneAt: nextDone ? new Date().toISOString() : undefined,
+                }
+              }),
             },
       ),
     )
