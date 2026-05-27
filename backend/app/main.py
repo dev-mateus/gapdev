@@ -1,5 +1,13 @@
+from pathlib import Path
+import sys
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from app.api.routes.auth import router as auth_router
 from app.api.routes.job import router as job_router
