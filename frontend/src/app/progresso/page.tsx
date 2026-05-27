@@ -26,20 +26,6 @@ function startOfDay(date: Date) {
   return result
 }
 
-function startOfWeek(date: Date) {
-  const result = startOfDay(date)
-  const day = result.getDay()
-  const diffFromMonday = (day + 6) % 7
-  result.setDate(result.getDate() - diffFromMonday)
-  return result
-}
-
-function addDays(date: Date, amount: number) {
-  const result = new Date(date)
-  result.setDate(result.getDate() + amount)
-  return result
-}
-
 export default function ProgressoPage() {
   const { plans } = useStudyPlan()
 
@@ -72,10 +58,6 @@ export default function ProgressoPage() {
   const weeksCount = 4
   const weeklyTarget = 7
   const today = startOfDay(new Date())
-  const currentWeekStart = startOfWeek(today)
-
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
 
   const startDate = new Date(today)
   startDate.setDate(startDate.getDate() - 7 * (weeksCount - 1))
@@ -89,11 +71,11 @@ export default function ProgressoPage() {
     const isPast = index < currentWeekIndex
     const isCurrent = index === currentWeekIndex
 
-    const total = 7
+    const total = weeklyTarget
     const completed = isPast ? total : isCurrent ? Math.min(dayInCurrentWeek, total) : 0
 
     return {
-      label: week.label,
+      label: `Semana ${index + 1}`,
       completed,
       total: weeklyTarget,
     }
