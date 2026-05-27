@@ -7,6 +7,7 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
+from app.schemas.user import UserCreate 
 
 from app.api.deps import get_database
 from app.core.security import (
@@ -108,9 +109,11 @@ def google_login(
 	if not user:
 		user = user_repo.create_user(
 			db=db,
-			name=name or "Usuario Google",
-			email=email,
-			password=hash_password(str(uuid4())),
+			payload=UserCreate(
+				name=name or "Usuario Google",
+				email=email,
+				password=hash_password(str(uuid4())),
+			),
 		)
 
 	return {
