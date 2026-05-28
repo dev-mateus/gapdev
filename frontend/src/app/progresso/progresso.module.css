@@ -48,7 +48,7 @@
 
 .cardGlass {
   background: rgba(10, 20, 30, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border-shell-inner);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.16);
   backdrop-filter: blur(14px);
 }
@@ -105,7 +105,7 @@
   font-size: 2.5rem;
   font-weight: 900;
   letter-spacing: -0.04em;
-  color: #f4fbff;
+  color: var(--color-text-primary);
   min-width: 3.2rem;
   line-height: 1;
   flex-shrink: 0;
@@ -121,7 +121,7 @@
   line-height: 1.2;
   color: rgba(223, 247, 255, 0.7);
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border-shell-inner);
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
   white-space: nowrap;
@@ -180,7 +180,7 @@
 .ringNumber {
   font-size: 1.6rem;
   font-weight: 900;
-  color: #f4fbff;
+  color: var(--color-text-primary);
 }
 
 .ringSub {
@@ -259,7 +259,7 @@
   padding: 1.25rem;
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border-shell-inner);
   color: var(--color-text-muted);
   font-size: 0.95rem;
   line-height: 1.6;
@@ -415,7 +415,7 @@
   align-items: center;
   gap: 10px;
   min-width: 0;
-  color: #f2fbff;
+  color: var(--color-text-primary);
   letter-spacing: 0.2px;
 }
 
@@ -426,7 +426,7 @@
 
 .skillPercent {
   font-weight: 1000;
-  color: #46d9ff;
+  color: var(--color-brand-accent);
   text-shadow: 0 0 12px rgba(70, 217, 255, 0.25);
 }
 
@@ -451,7 +451,7 @@
   overflow: hidden;
 
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border-shell-inner);
   position: relative;
 }
 
@@ -471,7 +471,7 @@
 .progressFill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #46d9ff, #238fac);
+  background: linear-gradient(90deg, var(--color-brand-accent), var(--color-brand-primary));
   box-shadow: 0 0 12px rgba(70, 217, 255, 0.45);
 
   transition:
@@ -526,12 +526,3 @@
   font-weight: 700;
   letter-spacing: 0.1px;
 }
-
-
-
-
-
-
-
-
-
