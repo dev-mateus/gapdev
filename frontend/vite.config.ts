@@ -10,6 +10,11 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom'],
   },
+  server: {                                           // ← ADICIONA DAQUI
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+    },
+  },                                                  // ← ATÉ AQUI
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
