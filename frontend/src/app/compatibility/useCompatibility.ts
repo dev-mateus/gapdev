@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import type { CompatibilityResponse, SkillSelectionState, UseCompatibilityReturn } from './types'
 import { apiGet, apiPost, apiDelete } from '../../services/api'
 
-const REQUIRED_WEIGHT = 15
-const OPTIONAL_WEIGHT = 5
 
 const storageKey = (title: string) => `gnose:compat:${title}`
 
@@ -301,15 +299,34 @@ export function useCompatibility(initial: CompatibilityResponse): UseCompatibili
   }
 
   const recalculatedCompatibility = useMemo(() => {
-    let added = 0
-    Object.entries(selections.selectedRequired).forEach(([, v]) => {
-      if (v) added += REQUIRED_WEIGHT
-    })
-    Object.entries(selections.selectedOptional).forEach(([, v]) => {
-      if (v) added += OPTIONAL_WEIGHT
-    })
+    const delta = Math.max(0, 100 - baseCompatibility)
 
-    const total = Math.min(100, baseCompatibility + added)
+    const requiredKeys = Object.keys(selections.selectedRequired)
+    const optionalKeys = Object.keys(selections.selectedOptional)
+    const nRequired = requiredKeys.length
+    const nOptional = optionalKeys.length
+
+    // Multipliers
+    const REQUIRED_MULT = 2
+    const OPTIONAL_MULT = 1
+
+    const totalMultiplier = nRequired * REQUIRED_MULT + nOptional * OPTIONAL_MULT
+    if (totalMultiplier === 0) return baseCompatibility
+
+    // Compute added amount by distributing the delta proportionally
+    let added = 0
+    for (const key of requiredKeys) {
+      if (selections.selectedRequired[key]) {
+        added += (delta * REQUIRED_MULT) / totalMultiplier
+      }
+    }
+    for (const key of optionalKeys) {
+      if (selections.selectedOptional[key]) {
+        added += (delta * OPTIONAL_MULT) / totalMultiplier
+      }
+    }
+
+    const total = Math.min(100, Math.round(baseCompatibility + added))
     return total
   }, [selections, baseCompatibility])
 
