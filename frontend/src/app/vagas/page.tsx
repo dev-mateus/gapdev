@@ -82,6 +82,26 @@ function VagasPage() {
                   />
                 </div>
 
+                <div className={styles.seniorityGroup}>
+                  <label className={styles.seniorityLabel}>Senioridade</label>
+
+                  <div className={styles.seniorityOptions}>
+                    {['Estágio', 'Júnior', 'Pleno', 'Sênior'].map((level) => (
+                      <button
+                        key={level}
+                        type="button"
+                        className={`${styles.seniorityOption} ${
+                          formState.seniority === level ? styles.seniorityOptionActive : ''
+                        }`}
+                        onClick={() => updateField('seniority', level)}
+                      >
+                        {level}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+
                 <TextArea
                   label="Descrição da vaga"
                   placeholder="Cole aqui a descrição da vaga, com requisitos técnicos, tecnologias e ferramentas necessárias"

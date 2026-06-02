@@ -5,6 +5,7 @@ import type { AnalyzeJobFormState } from '../types/analisarVaga'
 const initialState: AnalyzeJobFormState = {
   title: '',
   company: '',
+  seniority: '',
   description: '',
 }
 
@@ -16,6 +17,10 @@ function getErrorMessage(state: AnalyzeJobFormState): string {
   if (!state.company.trim()) {
     return 'Informe a empresa da vaga.'
   }
+
+  if (!state.seniority.trim()) {
+      return 'Selecione a senioridade da vaga.'
+    }
 
   if (!state.description.trim()) {
     return 'Cole a descricao completa da vaga.'
@@ -56,6 +61,7 @@ export function useAnalisarVagaForm(onSuccess?: (title: string, description: str
       const response = await submitJobForAnalysis({
         title: formState.title.trim(),
         company: formState.company.trim(),
+        seniority: formState.seniority.trim(),
         description: formState.description.trim(),
       })
 

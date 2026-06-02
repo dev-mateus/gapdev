@@ -3,6 +3,30 @@ import { apiPost } from '../../services/api'
 
 type AnaliseSkill = { name?: string; raw_name?: string; importance?: string; priority?: string }
 
+function normalizeSkillKey(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+function uniqueSkills(skills: string[]): string[] {
+  const seen = new Set<string>()
+
+  return skills.filter((skill) => {
+    const key = normalizeSkillKey(skill)
+    if (!key || seen.has(key)) {
+      return false
+    }
+
+    seen.add(key)
+    return true
+  })
+}
+
 function mapAnaliseToCompatibility(data: unknown, title?: string): CompatibilityResponse {
   const d = (data ?? {}) as Record<string, unknown>
 
@@ -52,11 +76,16 @@ function mapAnaliseToCompatibility(data: unknown, title?: string): Compatibility
     .map(s => s.raw_name ?? s.name ?? '')
     .filter(Boolean)
 
+  const uniqueRequired = uniqueSkills(required)
+  const uniqueOptional = uniqueSkills(optional).filter(
+    (skill) => !uniqueRequired.some((requiredSkill) => normalizeSkillKey(requiredSkill) === normalizeSkillKey(skill))
+  )
+
   return {
     title: title ?? (typeof d.title === 'string' ? d.title : 'Vaga analisada'),
     compatibility: typeof d.compatibility === 'number' ? Math.max(0, Math.min(100, Math.round(d.compatibility))) : 0,
-    requiredSkills: required,
-    optionalSkills: optional,
+    requiredSkills: uniqueRequired,
+    optionalSkills: uniqueOptional,
   }
 }
 
