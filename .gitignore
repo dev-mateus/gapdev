@@ -1,26 +1,21 @@
-# ENV
-backend/.env
-frontend/.env
-
-# NODE
+# Node
 node_modules/
-frontend/node_modules/
-backend/node_modules/
-
-# BUILD
 dist/
-build/
+dist-ssr/
 
-# PYTHON
+# Python
 __pycache__/
-*.py[cod]
-*.pyo
+*.pyc
+.venv/
 
-# DATABASE
-*.db
+# Environment
+.env
+.env.local
+.env.development.local
+.env.production.local
 
-# VSCODE
+# VSCode
 .vscode/
 
-# LOGS
-*.log
+# Sistema
+.DS_Store
