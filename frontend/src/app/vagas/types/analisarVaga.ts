@@ -1,6 +1,7 @@
 export type AnalyzeJobRequest = {
   title: string
   company: string
+  seniority: string
   description: string
 }
 
@@ -27,5 +28,6 @@ export type AnalyzeJobAiResponse = {
 export type AnalyzeJobFormState = {
   title: string
   company: string
+  seniority: string
   description: string
 }
