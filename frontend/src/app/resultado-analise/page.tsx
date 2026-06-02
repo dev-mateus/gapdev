@@ -21,15 +21,24 @@ import type { AnalysisResult } from './types'
 
 function getStoredAnalysisData(): AnalysisResult | null {
   try {
-    const stored = window.sessionStorage.getItem('analysisResult')
+    const usuarioLogado = JSON.parse(
+      localStorage.getItem('usuarioLogado') || '{}'
+    )
+
+    const stored = window.sessionStorage.getItem(
+      `analysisResult_${usuarioLogado.email}`
+    )
+
     if (stored) {
       return JSON.parse(stored) as AnalysisResult
     }
   } catch (e) {
     console.error('Failed to parse analysis data:', e)
   }
+
   return null
 }
+
 
 export default function ResultadoAnalisePage() {
   const navigate = useNavigate()

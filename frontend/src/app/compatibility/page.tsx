@@ -68,7 +68,14 @@ export default function CompatibilityPage() {
       recommendation: buildRecommendation(compat.selections.selectedRequired, compat.selections.selectedOptional),
     }
 
-    window.sessionStorage.setItem('analysisResult', JSON.stringify(analysisData))
+    const usuarioLogado = JSON.parse(
+      localStorage.getItem('usuarioLogado') || '{}'
+    )
+
+    window.sessionStorage.setItem(
+      `analysisResult_${usuarioLogado.email}`,
+      JSON.stringify(analysisData)
+    )
 
     navigate('/analise', { replace: true })
   }
