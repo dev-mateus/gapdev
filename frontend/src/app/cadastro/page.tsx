@@ -99,14 +99,18 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
           }
         )
 
+
+
         localStorage.setItem(
           'access_token',
           data.access_token
         )
-
+        
         localStorage.setItem(
           'usuarioLogado',
-          'true'
+          JSON.stringify({
+            nome: name,
+          })
         )
 
         localStorage.removeItem('usuarioEmail')
@@ -223,6 +227,15 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
           email: trimmedEmail,
           password,
         }
+      )
+
+
+      localStorage.setItem(
+        `usuario_${trimmedEmail}`,
+        JSON.stringify({
+          nome: trimmedName,
+          email: trimmedEmail,
+        })
       )
 
       setFormMessageType('success')

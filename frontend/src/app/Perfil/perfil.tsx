@@ -53,26 +53,33 @@ function Perfil() {
     objetivo: '',
   })
 
+
   useEffect(() => {
-    const perfilSalvo = localStorage.getItem('perfilUsuario')
-    const usuarioLogado = localStorage.getItem('usuarioLogado')
+  const perfilSalvo = localStorage.getItem('perfilUsuario')
+  const usuarioLogado = localStorage.getItem('usuarioLogado')
 
-    if (perfilSalvo) {
-      setPerfil(JSON.parse(perfilSalvo))
-      setEditando(false)
-      return
-    }
+  if (perfilSalvo) {
+    const perfilCarregado = JSON.parse(perfilSalvo)
 
-    if (usuarioLogado) {
-      const usuario = JSON.parse(usuarioLogado)
+    setPerfil((prev) => ({
+      ...prev,
+      ...perfilCarregado,
+    }))
 
-      setPerfil((prev) => ({
-        ...prev,
-        nome: usuario.name || usuario.nome || '',
-        email: usuario.email || '',
-      }))
-    }
-  }, [])
+    setEditando(false)
+    return
+  }
+
+  if (usuarioLogado) {
+    const usuario = JSON.parse(usuarioLogado)
+
+    setPerfil((prev) => ({
+      ...prev,
+      nome: usuario.nome || usuario.name || '',
+      email: usuario.email || '',
+    }))
+  }
+}, [])
 
   function updateField(field: keyof PerfilUsuario, value: string) {
     setPerfil((prev) => ({
@@ -81,12 +88,30 @@ function Perfil() {
     }))
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
 
-    localStorage.setItem('perfilUsuario', JSON.stringify(perfil))
-    setEditando(false)
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault()
+
+  localStorage.setItem('perfilUsuario', JSON.stringify(perfil))
+
+  const usuarioLogado = localStorage.getItem('usuarioLogado')
+
+  if (usuarioLogado) {
+    const usuario = JSON.parse(usuarioLogado)
+
+    localStorage.setItem(
+      'usuarioLogado',
+      JSON.stringify({
+        ...usuario,
+        nome: perfil.nome,
+        name: perfil.nome,
+        email: perfil.email,
+      })
+    )
   }
+
+  setEditando(false)
+}
 
   return (
     <div className={styles.content}>

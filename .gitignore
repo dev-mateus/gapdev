@@ -1,5 +1,21 @@
-backend/.env
-frontend/.env
---- a/file:///c%3A/Users/1065133/gapdev/backend/.env
-+++ b/file:///c%3A/Users/1065133/gapdev/backend/.env
-@@ -1,2 +1,2 @@
+# Node
+node_modules/
+dist/
+dist-ssr/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.production.local
+
+# VSCode
+.vscode/
+
+# Sistema
+.DS_Store

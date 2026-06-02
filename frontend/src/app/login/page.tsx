@@ -72,7 +72,16 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
         })
 
         localStorage.setItem('access_token', data.access_token)
-        localStorage.setItem('usuarioLogado', 'true')
+        
+
+        localStorage.setItem(
+          'usuarioLogado',
+          JSON.stringify({
+            email: '',
+            nome: '',
+          })
+        )
+
         localStorage.removeItem('usuarioEmail')
 
         window.dispatchEvent(new Event('auth-changed'))
@@ -129,7 +138,20 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
     })
 
     localStorage.setItem('access_token', data.access_token)
-    localStorage.setItem('usuarioLogado', 'true')
+
+
+    const usuarioCadastrado = localStorage.getItem(`usuario_${trimmedEmail}`)
+    const usuario = usuarioCadastrado ? JSON.parse(usuarioCadastrado) : null
+ 
+
+    localStorage.setItem(
+      'usuarioLogado',
+      JSON.stringify({
+        nome: usuario?.nome || '',
+        email: trimmedEmail,
+      })
+    )
+
     localStorage.removeItem('usuarioEmail')
     window.dispatchEvent(new Event('auth-changed'))
     navigate('/perfil')
