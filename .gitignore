@@ -1,5 +1,26 @@
+# ENV
 backend/.env
 frontend/.env
---- a/file:///c%3A/Users/1065133/gapdev/backend/.env
-+++ b/file:///c%3A/Users/1065133/gapdev/backend/.env
-@@ -1,2 +1,2 @@
+
+# NODE
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# BUILD
+dist/
+build/
+
+# PYTHON
+__pycache__/
+*.py[cod]
+*.pyo
+
+# DATABASE
+*.db
+
+# VSCODE
+.vscode/
+
+# LOGS
+*.log
