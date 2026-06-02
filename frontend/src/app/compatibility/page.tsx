@@ -9,6 +9,7 @@ import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import { fetchCompatibility } from './compatibilityService'
 import type { CompatibilityResponse } from './types'
 import { useCompatibility } from './useCompatibility'
+import LoadingState from '../../components/LoadingState/LoadingState'
 import styles from './compatibility.module.css'
 
 const defaultData = {
@@ -77,7 +78,7 @@ export default function CompatibilityPage() {
     return (
       <div className={styles.content}>
         <PageContainer className={styles.expandedContainer}>
-          <div className={styles.loadingState}>Carregando análise da vaga...</div>
+          <LoadingState message="Gerando análise da vaga" />
         </PageContainer>
       </div>
     )

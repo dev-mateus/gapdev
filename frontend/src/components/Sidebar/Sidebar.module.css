@@ -3,8 +3,8 @@
   box-sizing: border-box;
   overflow: hidden;
 
-  background-color: #0a2538;
-  color: white;
+  background-color: var(--color-bg-sidebar);
+  color: var(--color-text-primary);
 
   display: flex;
   flex-direction: column;
@@ -31,7 +31,7 @@
 .sidebarToggleButton {
   background: none;
   border: none;
-  color: white;
+  color: var(--color-text-primary);
   cursor: pointer;
 
   margin-bottom: 20px;
@@ -48,7 +48,7 @@
 }
 
 .sidebarToggleButton:hover {
-  background-color: #12394d;
+  background-color: var(--color-bg-sidebar-hover);
 }
 
 .chevronCollapsed {
@@ -64,7 +64,7 @@
 }
 
 .sidebarLogoBox {
-  background: #1fa3c6;
+  background: var(--color-bg-sidebar-active);
   padding: 8px;
   border-radius: 8px;
 }
@@ -95,7 +95,7 @@
   border-radius: 8px;
 
   text-decoration: none;
-  color: white;
+  color: var(--color-text-primary);
 
   transition: background 0.2s;
 }
@@ -109,11 +109,11 @@
 }
 
 .sidebarItem:hover {
-  background-color: #12394d;
+  background-color: var(--color-bg-sidebar-hover);
 }
 
 .active {
-  background-color: #1fa3c6;
+  background-color: var(--color-bg-sidebar-active);
 }
 
 .sidebarFooter {
@@ -139,7 +139,7 @@
 
   background: transparent;
 
-  color: #c7d3dd;
+  color: var(--color-text-sidebar-muted);
 
   cursor: pointer;
 
@@ -157,8 +157,8 @@
 }
 
 .logoutButton:hover {
-  background-color: #b83434;
-  color: white;
+  background-color: var(--color-bg-danger-hover);
+  color: var(--color-text-primary);
 }
 
 .modalOverlay {
@@ -179,9 +179,9 @@
 }
 
 .modal {
-  background: #0a1628;
+  background: var(--color-bg-modal);
 
-  border: 1px solid #1e3a52;
+  border: 1px solid var(--color-border-modal);
   border-radius: 0.75rem;
 
   padding: 2rem;
@@ -198,7 +198,7 @@
   font-size: 1.25rem;
   font-weight: 700;
 
-  color: #e6f1f7;
+  color: var(--color-text-modal-title);
 }
 
 .modalMessage {
@@ -206,7 +206,7 @@
 
   font-size: 0.95rem;
 
-  color: #b0c4d4;
+  color: var(--color-text-modal-body);
 }
 
 .modalActions {
@@ -219,11 +219,11 @@
 .buttonCancel {
   padding: 0.65rem 1.5rem;
 
-  border: 1px solid #1e3a52;
+  border: 1px solid var(--color-border-modal);
 
   background: transparent;
 
-  color: #b0c4d4;
+  color: var(--color-text-modal-body);
 
   border-radius: 0.5rem;
 
@@ -235,8 +235,8 @@
 }
 
 .buttonCancel:hover {
-  background: rgba(30, 58, 82, 0.5);
-  color: #e6f1f7;
+  background: color-mix(in srgb, var(--color-border-modal) 50%, transparent);
+  color: var(--color-text-modal-title);
 }
 
 .buttonConfirm {
@@ -244,9 +244,9 @@
 
   border: none;
 
-  background: #dc2626;
+  background: var(--color-danger);
 
-  color: #fff;
+  color: var(--color-text-primary);
 
   border-radius: 0.5rem;
 
@@ -258,5 +258,5 @@
 }
 
 .buttonConfirm:hover {
-  background: #b91c1c;
+  background: var(--color-danger-hover);
 }

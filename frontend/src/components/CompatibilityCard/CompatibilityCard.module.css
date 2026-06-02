@@ -6,8 +6,12 @@
   min-height: 4.4rem;
   padding: 1rem 1.2rem;
   border-radius: 1rem;
-  background: linear-gradient(180deg, rgba(6, 54, 82, 0.96), rgba(4, 36, 56, 0.96));
-  border: 1px solid rgba(95, 214, 255, 0.42);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-bg-info-pane) 96%, transparent),
+    color-mix(in srgb, var(--color-bg-form-pane) 96%, transparent)
+  );
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 42%, transparent);
   flex: 1;
 }
 
@@ -26,9 +30,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 0.85rem;
-  background: rgba(34, 121, 170, 0.95);
-  border: 1px solid rgba(95, 214, 255, 0.28);
-  color: #effcff;
+  background: color-mix(in srgb, var(--color-brand-primary) 95%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 28%, transparent);
+  color: var(--color-text-primary);
   flex-shrink: 0;
 }
 
@@ -46,7 +50,7 @@
 }
 
 .subtitle {
-  color: rgba(232, 246, 255, 0.72);
+  color: color-mix(in srgb, var(--color-text-muted) 72%, transparent);
   font-size: 0.8rem;
 }
 
@@ -60,12 +64,12 @@
 .percentage {
   font-size: 1.2rem;
   font-weight: 800;
-  color: #63d6ff;
+  color: var(--color-text-accent);
   line-height: 1;
 }
 
 .label {
-  color: rgba(232, 246, 255, 0.72);
+  color: color-mix(in srgb, var(--color-text-muted) 72%, transparent);
   font-size: 0.8rem;
   line-height: 1;
 }

@@ -105,11 +105,88 @@
      9. ESPAÇAMENTO
   ========================================== */
   --page-pad-block: 1.7rem;
+
   --page-pad-inline: 1.7rem;
   --page-container-max-width: 64rem;
   --page-container-max-width-expanded: 84rem;
   --page-header-title-size: clamp(1.9rem, 3.5vw, 2.4rem);
   --page-header-description-width: 42rem;
+
+  /* ==========================================
+     10. STATUS DE FORMULÁRIO
+  ========================================== */
+  --color-status-error-border: #8f3e4c;
+  --color-status-error-bg: rgba(117, 31, 45, 0.35);
+  --color-status-error-text: #ffd7de;
+  --color-status-success-border: #2f7f72;
+  --color-status-success-bg: rgba(10, 82, 71, 0.35);
+  --color-status-success-text: #d9fff7;
+
+  /* ==========================================
+     11. FEEDBACK SEMÂNTICO (compatibilidade)
+  ========================================== */
+  --color-semantic-success: #00d37f;
+  --color-semantic-success-on: #002a1a;
+  --color-semantic-warning: #ffcc24;
+  --color-semantic-warning-on: #082031;
+  --color-semantic-error: #ff4d4d;
+  --color-semantic-error-on: #fff7f7;
+  --color-semantic-error-muted: #ff7b7b;
+  --color-semantic-success-check: #b6f7c9;
+
+  /* ==========================================
+     12. PRIORIDADE (badges plano de estudos)
+  ========================================== */
+  --color-priority-high: #ef4444;
+  --color-priority-high-text: #ffd7d7;
+  --color-priority-medium: #fbbf24;
+  --color-priority-medium-text: #fff0c2;
+  --color-priority-low: #38bdf8;
+  --color-priority-low-text: #c7f5ff;
+
+  /* ==========================================
+     13. SIDEBAR
+  ========================================== */
+  --color-bg-sidebar: #0a2538;
+  --color-bg-sidebar-hover: #12394d;
+  --color-bg-sidebar-active: #1fa3c6;
+  --color-text-sidebar-muted: #c7d3dd;
+  --color-bg-danger-hover: #b83434;
+
+  /* ==========================================
+     14. MODAL / DIÁLOGO
+  ========================================== */
+  --color-bg-modal: #0a1628;
+  --color-border-modal: #1e3a52;
+  --color-text-modal-title: #e6f1f7;
+  --color-text-modal-body: #b0c4d4;
+
+  /* ==========================================
+     15. PERIGO (botão destruitivo)
+  ========================================== */
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+
+  /* ==========================================
+     16. BARRA DE PROGRESSO
+  ========================================== */
+  --color-progress-start: #4bc5ff;
+  --color-progress-end: #1d8cff;
+  --color-progress-done-start: #22c55e;
+  --color-progress-done-end: #15803d;
+
+  /* ==========================================
+     17. TEXTO ADICIONAL
+  ========================================== */
+  --color-text-accent: #63d6ff;
+  --color-text-accent-light: #baf3ff;
+
+  /* ==========================================
+     18. SUPERFÍCIES ADICIONAIS
+  ========================================== */
+  --color-bg-surface-dark: rgba(2, 17, 27, 0.52);
+  --color-bg-card-dark: rgba(0, 11, 20, 0.65);
+  --color-border-panel: #1c3c50;
 }
 
 /* ==========================================

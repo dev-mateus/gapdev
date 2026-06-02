@@ -12,8 +12,8 @@
 }
 
 .modal {
-  background: #0a1628;
-  border: 1px solid #1e3a52;
+  background: var(--color-bg-modal);
+  border: 1px solid var(--color-border-modal);
   border-radius: 0.75rem;
   padding: 2rem;
   max-width: 400px;
@@ -25,13 +25,13 @@
   margin: 0 0 0.75rem 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #e6f1f7;
+  color: var(--color-text-modal-title);
 }
 
 .modalMessage {
   margin: 0 0 1.5rem 0;
   font-size: 0.95rem;
-  color: #b0c4d4;
+  color: var(--color-text-modal-body);
 }
 
 .modalActions {
@@ -42,9 +42,9 @@
 
 .buttonCancel {
   padding: 0.65rem 1.5rem;
-  border: 1px solid #1e3a52;
+  border: 1px solid var(--color-border-modal);
   background: transparent;
-  color: #b0c4d4;
+  color: var(--color-text-modal-body);
   border-radius: 0.5rem;
   font-weight: 600;
   cursor: pointer;
@@ -52,15 +52,15 @@
 }
 
 .buttonCancel:hover {
-  background: rgba(30, 58, 82, 0.5);
-  color: #e6f1f7;
+  background: color-mix(in srgb, var(--color-border-modal) 50%, transparent);
+  color: var(--color-text-modal-title);
 }
 
 .buttonConfirm {
   padding: 0.65rem 1.5rem;
   border: none;
-  background: #dc2626;
-  color: #fff;
+  background: var(--color-danger);
+  color: var(--color-text-primary);
   border-radius: 0.5rem;
   font-weight: 600;
   cursor: pointer;
@@ -68,5 +68,5 @@
 }
 
 .buttonConfirm:hover {
-  background: #b91c1c;
+  background: var(--color-danger-hover);
 }

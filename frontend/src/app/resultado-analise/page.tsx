@@ -16,6 +16,7 @@ import SectionCard from '../../components/SectionCard/SectionCard'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import Button from '../../components/Button/Button'
 import { apiPatch, apiPost } from '../../services/api'
+import LoadingState from '../../components/LoadingState/LoadingState'
 import styles from './resultado-analise.module.css'
 import type { AnalysisResult } from './types'
 
@@ -102,7 +103,7 @@ export default function ResultadoAnalisePage() {
     return (
       <div className={styles.content}>
         <PageContainer className={styles.expandedContainer}>
-          <div className={styles.loadingState}>Carregando análise...</div>
+          <LoadingState message="Carregando análise" />
         </PageContainer>
       </div>
     )
@@ -258,15 +259,17 @@ export default function ResultadoAnalisePage() {
             <Button
               onClick={handleSaveJob}
               variant="secondary"
+              loading={isSaving}
               disabled={isSaving || isGeneratingPlan}
             >
-              {isSaving ? 'Salvando...' : 'Salvar Vaga'}
+              {isSaving ? 'Salvando' : 'Salvar Vaga'}
             </Button>
             <PrimaryButton
               onClick={handleGeneratePlan}
+              loading={isGeneratingPlan}
               disabled={isGeneratingPlan || isSaving}
             >
-              {isGeneratingPlan ? 'Gerando plano...' : 'Gerar plano de estudo'}
+              {isGeneratingPlan ? 'Gerando plano' : 'Gerar plano de estudo'}
             </PrimaryButton>
           </div>
           {saveError ? <p className={styles.saveError}>{saveError}</p> : null}

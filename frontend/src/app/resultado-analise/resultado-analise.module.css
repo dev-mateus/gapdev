@@ -48,7 +48,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgba(95, 214, 255, 0.28);
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 28%, transparent);
   border-radius: var(--radius-control);
   background: var(--color-brand-primary);
   color: var(--color-text-primary);
@@ -122,15 +122,15 @@
 }
 
 .fill-high {
-  stroke: #00d37f;
+  stroke: var(--color-semantic-success);
 }
 
 .fill-medium {
-  stroke: #ffcc24;
+  stroke: var(--color-semantic-warning);
 }
 
 .fill-low {
-  stroke: #ff4d4d;
+  stroke: var(--color-semantic-error);
 }
 
 .progressText {
@@ -174,18 +174,18 @@
 }
 
 .badge-high {
-  background: #00d37f;
-  color: #002a1a;
+  background: var(--color-semantic-success);
+  color: var(--color-semantic-success-on);
 }
 
 .badge-medium {
-  background: #ffcc24;
-  color: #082031;
+  background: var(--color-semantic-warning);
+  color: var(--color-semantic-warning-on);
 }
 
 .badge-low {
-  background: #ff4d4d;
-  color: #fff7f7;
+  background: var(--color-semantic-error);
+  color: var(--color-semantic-error-on);
 }
 
 .compatibilityDescription {
@@ -264,20 +264,20 @@
 }
 
 .hasSkillCard {
-  border-color: rgba(0, 211, 127, 0.72);
+  border-color: color-mix(in srgb, var(--color-semantic-success) 72%, transparent);
 }
 
 .hasSkillCard header span {
-  background: #00d37f;
-  color: #002a1a;
+  background: var(--color-semantic-success);
+  color: var(--color-semantic-success-on);
 }
 
 .needSkillCard {
-  border-color: rgba(255, 77, 77, 0.72);
+  border-color: color-mix(in srgb, var(--color-semantic-error) 72%, transparent);
 }
 
 .needSkillCard header span {
-  background: #ff4d4d;
+  background: var(--color-semantic-error);
   color: var(--color-text-primary);
 }
 
@@ -306,11 +306,11 @@
 }
 
 .checkmarkIcon {
-  color: #00d37f;
+  color: var(--color-semantic-success);
 }
 
 .xmarkIcon {
-  color: #ff4d4d;
+  color: var(--color-semantic-error);
 }
 
 .recommendationCard {
@@ -330,7 +330,7 @@
   grid-row: 1 / span 2;
   width: 3.25rem;
   height: 3.25rem;
-  border-color: rgba(95, 214, 255, 0.32);
+  border-color: color-mix(in srgb, var(--color-ring-focus) 32%, transparent);
   background: var(--color-brand-accent);
   color: var(--color-text-primary);
 }
@@ -356,7 +356,7 @@
 
 .saveError {
   margin: 0;
-  color: #ff7b7b;
+  color: var(--color-semantic-error-muted);
   font-size: 0.84rem;
   line-height: 1.4;
 }

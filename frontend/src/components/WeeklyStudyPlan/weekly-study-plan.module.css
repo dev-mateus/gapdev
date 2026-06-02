@@ -5,7 +5,7 @@
   margin: 0 auto;
 }
 
-/* Summary Cards - importados de plano-estudos */
+/* Summary Cards */
 .summaryCards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -25,9 +25,9 @@
 }
 
 .cardGlass {
-  background: var(--color-bg-shell, rgba(2, 17, 27, 0.52));
-  border: 1px solid rgba(88, 224, 255, 0.12);
-  box-shadow: var(--shadow-feature, none);
+  background: var(--color-bg-shell);
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 12%, transparent);
+  box-shadow: var(--shadow-feature);
   backdrop-filter: blur(12px);
   background-clip: border-box;
 }
@@ -38,9 +38,9 @@
   border-radius: 14px;
   display: grid;
   place-items: center;
-  background: rgba(88, 224, 255, 0.12);
-  border: 1px solid rgba(88, 224, 255, 0.28);
-  color: #baf3ff;
+  background: color-mix(in srgb, var(--color-ring-focus) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 28%, transparent);
+  color: var(--color-text-accent-light);
   flex-shrink: 0;
 }
 
@@ -54,7 +54,7 @@
   font-weight: 900;
   letter-spacing: -0.02em;
   font-size: 2rem;
-  color: #f8fbff;
+  color: var(--color-text-primary);
 }
 
 .summarySmall {
@@ -65,9 +65,9 @@
 /* Skills Shell */
 .skillsShell {
   margin-top: 1.2rem;
-  border-radius: var(--radius-shell, 1.7rem);
-  background: rgba(2, 17, 27, 0.52);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-shell);
+  background: var(--color-bg-surface-dark);
+  border: 1px solid var(--color-border-shell-inner);
   padding: 1.5rem;
 }
 
@@ -79,16 +79,16 @@
 .skillPlanCard {
   padding: 1.25rem;
   border-radius: 1.25rem;
-  background: rgba(0, 11, 20, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-bg-card-dark);
+  border: 1px solid var(--color-border-shell-inner);
   display: grid;
   gap: 1rem;
   transition: background 180ms ease, border-color 180ms ease;
 }
 
 .skillPlanCard:hover {
-  background: rgba(0, 11, 20, 0.85);
-  border-color: rgba(88, 224, 255, 0.2);
+  background: color-mix(in srgb, var(--color-bg-card-dark) 85%, transparent);
+  border-color: color-mix(in srgb, var(--color-ring-focus) 20%, transparent);
 }
 
 .skillPlanHeader {
@@ -119,29 +119,29 @@
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
-  color: #ffffff;
+  color: var(--color-text-primary);
   width: fit-content;
 }
 
 .priorityalta {
-  background: rgba(239, 68, 68, 0.18);
-  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: color-mix(in srgb, var(--color-priority-high) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-priority-high) 35%, transparent);
 }
 
 .priorityMedia {
-  background: rgba(251, 191, 36, 0.18);
-  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: color-mix(in srgb, var(--color-priority-medium) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-priority-medium) 35%, transparent);
 }
 
 .prioritybaixa {
-  background: rgba(56, 189, 248, 0.16);
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: color-mix(in srgb, var(--color-priority-low) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-priority-low) 35%, transparent);
 }
 
 .skillPlanTitle {
   font-size: 1rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--color-text-primary);
 }
 
 .skillPlanMeta {
@@ -176,18 +176,18 @@
   height: 100%;
   width: 0;
   border-radius: 999px;
-  background: linear-gradient(90deg, #4bc5ff 0%, #1d8cff 100%);
-  box-shadow: 0 0 14px rgba(28, 154, 255, 0.3);
+  background: linear-gradient(90deg, var(--color-progress-start) 0%, var(--color-progress-end) 100%);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--color-progress-end) 30%, transparent);
   transition: width 420ms ease;
 }
 
 .progressFill[data-status='concluída'] {
-  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
-  box-shadow: 0 0 14px rgba(34, 197, 94, 0.3);
+  background: linear-gradient(90deg, var(--color-progress-done-start) 0%, var(--color-progress-done-end) 100%);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--color-progress-done-start) 30%, transparent);
 }
 
 .progressFill[data-status='futura'] {
-  background: linear-gradient(90deg, rgba(88, 224, 255, 0.4) 0%, rgba(29, 140, 255, 0.4) 100%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-progress-start) 40%, transparent) 0%, color-mix(in srgb, var(--color-progress-end) 40%, transparent) 100%);
   box-shadow: none;
   opacity: 0.5;
 }
@@ -196,34 +196,34 @@
 .weekDetails {
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
-  background: rgba(88, 224, 255, 0.08);
-  border: 1px solid rgba(88, 224, 255, 0.2);
+  background: color-mix(in srgb, var(--color-ring-focus) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 20%, transparent);
 }
 
 .weekDetailsText {
   margin: 0;
   font-size: 0.9rem;
-  color: #e7f9ff;
+  color: var(--color-text-primary);
   line-height: 1.4;
 }
 
 .weekDetailsText strong {
   font-weight: 800;
-  color: #4bc5ff;
+  color: var(--color-progress-start);
 }
 
 /* Week Complete Message */
 .weekCompleteMessage {
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
-  background: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: color-mix(in srgb, var(--color-progress-done-start) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-progress-done-start) 30%, transparent);
 }
 
 .weekCompleteText {
   margin: 0;
   font-size: 0.9rem;
-  color: #b6f7c9;
+  color: var(--color-semantic-success-check);
   font-weight: 700;
 }
 

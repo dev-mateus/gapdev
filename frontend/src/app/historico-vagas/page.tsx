@@ -6,6 +6,7 @@ import PageHeader from '../../components/PageHeader/PageHeader'
 import TabSwitcher, { type TabSwitcherItem } from '../../components/TabSwitcher/TabSwitcher'
 import { fetchJobs, type JobItem } from './services/jobsService'
 
+import LoadingState from '../../components/LoadingState/LoadingState'
 import styles from './historicoVagas.module.css'
 
 const tabs: TabSwitcherItem[] = [
@@ -92,7 +93,7 @@ function HistoricoPage() {
             onTabChange={handleTabChange}
           />
 
-          {isLoading ? <p className={styles.emptyState}>Carregando vagas...</p> : null}
+          {isLoading ? <LoadingState message="Carregando vagas" /> : null}
 
           {errorMessage ? <p className={styles.emptyState}>{errorMessage}</p> : null}
 

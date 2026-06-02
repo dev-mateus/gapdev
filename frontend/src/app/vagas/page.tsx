@@ -117,8 +117,8 @@ function VagasPage() {
                 ) : null}
 
                 <div className={styles.actions}>
-                  <PrimaryButton type="submit" icon={<Plus />} className={styles.submitButton} disabled={isSubmitting}>
-                    {isSubmitting ? 'Analisando vaga...' : 'Analisar vaga'}
+                  <PrimaryButton type="submit" icon={<Plus />} className={styles.submitButton} loading={isSubmitting}>
+                    {isSubmitting ? 'Analisando vaga' : 'Analisar vaga'}
                   </PrimaryButton>
                 </div>
               </form>
