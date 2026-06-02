@@ -249,15 +249,15 @@
 }
 
 .formMessageError {
-  border: 0.062500rem solid #8f3e4c;
-  background: rgba(117, 31, 45, 0.35);
-  color: #ffd7de;
+  border: 0.062500rem solid var(--color-status-error-border);
+  background: var(--color-status-error-bg);
+  color: var(--color-status-error-text);
 }
 
 .formMessageSuccess {
-  border: 0.062500rem solid #2f7f72;
-  background: rgba(10, 82, 71, 0.35);
-  color: #d9fff7;
+  border: 0.062500rem solid var(--color-status-success-border);
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
 }
 
 .googleButton {

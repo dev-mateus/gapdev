@@ -34,7 +34,7 @@
 .subtitle {
   margin: 0;
   max-width: 50rem;
-  color: rgba(232, 246, 255, 0.82);
+  color: color-mix(in srgb, var(--color-text-muted) 82%, transparent);
   font-size: 1rem;
   line-height: 1.55;
 }
@@ -46,9 +46,9 @@
   align-items: center;
   padding: 0.95rem 1rem;
   border-radius: 0.95rem;
-  background: rgba(3, 33, 52, 0.95);
-  border: 1px solid rgba(95, 214, 255, 0.35);
-  color: rgba(240, 249, 255, 0.9);
+  background: color-mix(in srgb, var(--color-bg-info-pane) 95%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
+  color: color-mix(in srgb, var(--color-text-primary) 90%, transparent);
 }
 
 .infoBanner p {
@@ -64,9 +64,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  border: 1px solid rgba(95, 214, 255, 0.35);
-  background: rgba(22, 95, 138, 0.85);
-  color: #7adfff;
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
+  background: color-mix(in srgb, var(--color-brand-primary) 85%, transparent);
+  color: var(--color-ring-focus);
 }
 
 .skillsSection {
@@ -87,9 +87,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 0.85rem;
-  background: rgba(37, 111, 159, 0.9);
-  border: 1px solid rgba(95, 214, 255, 0.35);
-  color: #7adfff;
+  background: color-mix(in srgb, var(--color-brand-primary) 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
+  color: var(--color-ring-focus);
 }
 
 .sectionTitle {
@@ -104,21 +104,13 @@
   gap: 1.8rem;
 }
 
-.loadingState {
-  min-height: 24rem;
-  display: grid;
-  place-items: center;
-  color: rgba(232, 246, 255, 0.82);
-  font-size: 1rem;
-}
-
 .actionContainer {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(95, 214, 255, 0.15);
+  border-top: 1px solid color-mix(in srgb, var(--color-ring-focus) 15%, transparent);
 }
 
 .actionContainer button {
