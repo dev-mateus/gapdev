@@ -19,3 +19,4 @@ class User(Base):
 	password = Column(String(255), nullable=False)
 	jobs = relationship("Job", back_populates="user", cascade="all, delete-orphan")
 	skills = relationship("UserSkill", back_populates="user", cascade="all, delete-orphan")
+	study_plans = relationship("StudyPlan", back_populates="user", cascade="all, delete-orphan")

@@ -100,13 +100,66 @@ def _normalize_job_skill_payload(db: Session, skill: dict) -> dict | None:
     if not resolved_skill:
         return None
 
+    canonical_name = resolved_skill.canonical_name
     return {
         "skill_id": str(resolved_skill.id),
-        "skill_name": resolved_skill.canonical_name,
-        "raw_name": raw_name_text.strip() if raw_name_text and raw_name_text.strip() else resolved_skill.canonical_name,
+        "skill_name": canonical_name,
+        "raw_name": canonical_name,
         "required_level": _map_skill_level(skill.get("required_level")),
         "priority": _map_skill_priority(skill.get("priority", skill.get("importance"))),
     }
+
+
+def _serialize_existing_job_skill(skill) -> dict:
+    """Serialize a stored job skill using the canonical catalog name."""
+
+    canonical_name = skill.skill.canonical_name
+    return {
+        "skill_id": skill.skill_id,
+        "skill_name": canonical_name,
+        "raw_name": canonical_name,
+        "required_level": _reverse_map_level(skill.required_level),
+        "priority": _reverse_map_importance(skill.priority),
+    }
+
+
+def _canonicalize_parsed_job_skills(db: Session, parsed: dict) -> dict:
+    """Normalize all returned skills to canonical catalog names and deduplicate them."""
+
+    job_skills = parsed.get("job_skills")
+    if not isinstance(job_skills, list):
+        return parsed
+
+    normalized_job_skills: list[dict] = []
+    seen_skill_ids: set[str] = set()
+
+    for skill in job_skills:
+        if not isinstance(skill, dict):
+            continue
+
+        normalized_skill = _normalize_job_skill_payload(db, skill)
+        if not normalized_skill:
+            continue
+
+        skill_id = normalized_skill["skill_id"]
+        if skill_id in seen_skill_ids:
+            continue
+
+        seen_skill_ids.add(skill_id)
+        normalized_job_skills.append(normalized_skill)
+
+    normalized_parsed = dict(parsed)
+    normalized_parsed["job_skills"] = normalized_job_skills
+    normalized_parsed["skills"] = [
+        {
+            "skill_id": skill["skill_id"],
+            "name": skill["skill_name"],
+            "required_level": skill["required_level"],
+            "importance": skill["priority"],
+        }
+        for skill in normalized_job_skills
+    ]
+    return normalized_parsed
 
 
 def _collect_catalog_skill_names(db: Session) -> list[str]:
@@ -141,16 +194,7 @@ def analisar_vaga_route(
             # Return already analyzed skills
             return {
                 "summary": "Análise já realizada anteriormente",
-                "job_skills": [
-                    {
-                        "skill_id": skill.skill_id,
-                        "skill_name": skill.skill.canonical_name,
-                        "raw_name": skill.raw_name or skill.skill.canonical_name,
-                        "required_level": _reverse_map_level(skill.required_level),
-                        "priority": _reverse_map_importance(skill.priority),
-                    }
-                    for skill in existing_skills
-                ],
+                "job_skills": [_serialize_existing_job_skill(skill) for skill in existing_skills],
                 "skills": [
                     {
                         "skill_id": skill.skill_id,
@@ -171,28 +215,22 @@ def analisar_vaga_route(
         parsed = {"summary": str(exc), "job_skills": [], "skills": []}
 
     parsed = dict(parsed)
+    parsed = _canonicalize_parsed_job_skills(db, parsed)
 
     # Save skills to database only if job_id is provided
     if payload.job_id and parsed.get("job_skills"):
         normalized_job_skills = []
         for skill in parsed["job_skills"]:
             try:
-                if not isinstance(skill, dict):
-                    continue
-
-                normalized_skill = _normalize_job_skill_payload(db, skill)
-                if not normalized_skill:
-                    continue
-
                 skill_create = JobSkillCreate(
                     job_id=payload.job_id,
-                    skill_id=normalized_skill["skill_id"],
-                    raw_name=normalized_skill["raw_name"],
-                    required_level=normalized_skill["required_level"],
-                    priority=normalized_skill["priority"],
+                    skill_id=skill["skill_id"],
+                    raw_name=skill["raw_name"],
+                    required_level=skill["required_level"],
+                    priority=skill["priority"],
                 )
                 create_job_skill(db, user_email, skill_create)
-                normalized_job_skills.append(normalized_skill)
+                normalized_job_skills.append(skill)
             except Exception as e:
                 # Log error but continue saving other skills
                 print(f"Error saving skill: {e}")

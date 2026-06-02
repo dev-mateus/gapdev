@@ -46,6 +46,16 @@ export default function CompatibilityPage() {
   const handleConcluir = () => {
     const analysisContext = getAnalysisContext(jobId)
 
+    const hasSkills = uniqueSkills([
+      ...getSelectedSkills(compat.selections.selectedRequired),
+      ...getSelectedSkills(compat.selections.selectedOptional),
+    ])
+
+    const needSkills = uniqueSkills([
+      ...getSelectedSkills(compat.selections.selectedRequired, false),
+      ...getSelectedSkills(compat.selections.selectedOptional, false),
+    ]).filter((skill) => !hasSkills.some((selectedSkill) => normalizeSkillKey(selectedSkill) === normalizeSkillKey(skill)))
+
     const analysisData = {
       jobId,
       jobTitle: compat.title,
@@ -53,14 +63,8 @@ export default function CompatibilityPage() {
       compatibility: compat.recalculatedCompatibility,
       userLevel: getUserLevelLabel(compat.recalculatedCompatibility),
       jobLevel: getJobLevelLabel(compat.title),
-      hasSkills: [
-        ...getSelectedSkills(compat.selections.selectedRequired),
-        ...getSelectedSkills(compat.selections.selectedOptional),
-      ],
-      needSkills: [
-        ...getSelectedSkills(compat.selections.selectedRequired, false),
-        ...getSelectedSkills(compat.selections.selectedOptional, false),
-      ],
+      hasSkills,
+      needSkills,
       recommendation: buildRecommendation(compat.selections.selectedRequired, compat.selections.selectedOptional),
     }
 
@@ -198,6 +202,30 @@ function getAnalysisContext(jobId?: string): { title?: string; company?: string;
 
 function getSelectedSkills(selectionMap: Record<string, boolean>, selected = true): string[] {
   return Object.keys(selectionMap).filter((skill) => selectionMap[skill] === selected)
+}
+
+function normalizeSkillKey(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+function uniqueSkills(skills: string[]): string[] {
+  const seen = new Set<string>()
+
+  return skills.filter((skill) => {
+    const key = normalizeSkillKey(skill)
+    if (!key || seen.has(key)) {
+      return false
+    }
+
+    seen.add(key)
+    return true
+  })
 }
 
 function getUserLevelLabel(compatibility: number): string {

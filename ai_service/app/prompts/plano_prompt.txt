@@ -1,1 +1,20 @@
-Gere um plano de estudo personalizado com foco em lacunas de conhecimento e prioridades.
+You are generating a study plan for GapDev.
+Return only valid JSON in this exact shape:
+{"items":[{"skill_id":"string","current_level":"Beginner|Basic|Intermediate|Advanced|Specialist|null","target_level":"Basic|Intermediate|Advanced|Specialist","priority":"required|desirable","reason":"string"}]}
+
+Rules:
+- Use only skill_id values present in the job_skills list.
+- Include only skills where the user is missing the skill or current_level is lower than target_level.
+- target_level must be at least the job required_level for that skill.
+- priority must be "required" for mandatory skills and "desirable" for optional skills.
+- reason must be concise, practical, and written in Brazilian Portuguese.
+- Return at most 10 items.
+
+Job:
+{job_context}
+
+Job skills:
+{job_skills}
+
+User skills:
+{user_skills}

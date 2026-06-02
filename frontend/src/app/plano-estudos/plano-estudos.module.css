@@ -69,6 +69,23 @@
   text-align: center;
 }
 
+.loadingState,
+.emptyState,
+.pageError {
+  border-radius: 1rem;
+  border: 1px solid var(--color-border-shell-inner);
+  background: rgba(2, 17, 27, 0.52);
+  color: var(--color-text-primary);
+  padding: 1rem 1.1rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.pageError {
+  border-color: rgba(239, 68, 68, 0.38);
+  color: #ffd7d7;
+}
+
 
 .cardGlass {
   background: var(--color-bg-shell, rgba(2, 17, 27, 0.52));

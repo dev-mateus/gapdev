@@ -15,7 +15,7 @@ import PageHeader from '../../components/PageHeader/PageHeader'
 import SectionCard from '../../components/SectionCard/SectionCard'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import Button from '../../components/Button/Button'
-import { apiPatch } from '../../services/api'
+import { apiPatch, apiPost } from '../../services/api'
 import styles from './resultado-analise.module.css'
 import type { AnalysisResult } from './types'
 
@@ -36,6 +36,7 @@ export default function ResultadoAnalisePage() {
   const [data, setData] = useState<AnalysisResult | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false)
   const [saveError, setSaveError] = useState('')
 
   useEffect(() => {
@@ -76,9 +77,25 @@ export default function ResultadoAnalisePage() {
     }
   }
 
-  const handleGeneratePlan = () => {
-    // Navegar para plano de estudos
-    navigate('/plano-estudos')
+  const handleGeneratePlan = async () => {
+    if (!data?.jobId) {
+      setSaveError('Não foi possível localizar a vaga para gerar o plano.')
+      return
+    }
+
+    setIsGeneratingPlan(true)
+    setSaveError('')
+
+    try {
+      await apiPost('/study-plans/generate', {
+        job_id: data.jobId,
+      })
+      navigate(`/plano-estudos?jobId=${data.jobId}`)
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Não foi possível gerar o plano de estudos.')
+    } finally {
+      setIsGeneratingPlan(false)
+    }
   }
 
   if (isLoading) {
@@ -241,14 +258,15 @@ export default function ResultadoAnalisePage() {
             <Button
               onClick={handleSaveJob}
               variant="secondary"
-              disabled={isSaving}
+              disabled={isSaving || isGeneratingPlan}
             >
               {isSaving ? 'Salvando...' : 'Salvar Vaga'}
             </Button>
             <PrimaryButton
               onClick={handleGeneratePlan}
+              disabled={isGeneratingPlan || isSaving}
             >
-              Gerar plano de estudo
+              {isGeneratingPlan ? 'Gerando plano...' : 'Gerar plano de estudo'}
             </PrimaryButton>
           </div>
           {saveError ? <p className={styles.saveError}>{saveError}</p> : null}
