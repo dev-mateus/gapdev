@@ -25,7 +25,7 @@
 }
 
 .searchBox {
-  height: 50px;
+  height: 60px;
   border: 2px solid #1fc7ef;
   border-radius: 18px;
   padding: 0 24px;
@@ -59,8 +59,8 @@
 }
 
 .techCard {
-  min-height: 74px;
-  padding: 0 18px;
+  min-height: 62px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -74,13 +74,13 @@
 .techInfo {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
 }
 
 .techIcon,
 .categoryIcon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -99,12 +99,12 @@
   display: block;
   margin-bottom: 5px;
   color: #ffffff;
-  font-size: 19px;
+  font-size: 16px;
 }
 
 .techInfo span {
   color: #c7d6e2;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .addButton {
@@ -185,7 +185,7 @@
 }
 
 .tag {
-  height: 52px;
+  height: 36px;
   border: 1px solid #8ea6b7;
   border-radius: 18px;
   padding: 0 18px;
