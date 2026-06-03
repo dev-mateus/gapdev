@@ -516,7 +516,7 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
                 className={styles.googleButton}
                 onClick={() => loginWithGoogle()}
               >
-                Entrar com Google(em manutencao)
+                Entrar com Google
               </Button>
 
 
