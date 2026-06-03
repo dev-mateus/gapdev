@@ -18,6 +18,147 @@
   z-index: 100;
 }
 
+/* ==========================
+   MOBILE DRAWER
+========================== */
+
+.mobileDrawerOverlay {
+  display: none;
+}
+
+.mobileDrawer {
+  display: none;
+}
+
+.mobileDrawerClose {
+  display: none;
+}
+
+.mobileDrawerNav {
+  display: none;
+}
+
+.mobileDrawerFooter {
+  display: none;
+}
+
+.mobileLogoutButton {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .mobileDrawerOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease;
+  }
+
+  .mobileDrawer {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: min(80vw, 340px);
+    background-color: #0a2538;
+    color: #fff;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 200ms ease;
+    padding: 16px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+  }
+
+  /* o parent controla via classe adicionada */
+  .mobileDrawerOverlay[data-open='true'] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobileDrawer[data-open='true'] {
+    transform: translateX(0);
+  }
+
+  .mobileDrawerClose {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: transparent;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .mobileDrawerNav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 16px;
+  }
+
+  .mobileDrawerItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+    background: transparent;
+  }
+
+  .mobileDrawerItem:hover {
+    background: rgba(31, 163, 198, 0.12);
+  }
+
+  .mobileDrawerActive {
+    background-color: #1fa3c6;
+  }
+
+  .mobileDrawerFooter {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+  }
+
+  .mobileLogoutButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: #c7d3dd;
+    cursor: pointer;
+  }
+
+  .mobileLogoutButton:hover {
+    background-color: #b83434;
+    color: #fff;
+  }
+}
+
+
 .expanded {
   width: 240px;
   padding: 16px;

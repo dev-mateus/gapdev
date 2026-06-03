@@ -12,4 +12,12 @@
 
 .app-content.sidebar-collapsed {
   margin-left: 104px;
-} 
+}
+
+@media (max-width: 768px) {
+  .app-content {
+    margin-left: 0;
+    padding: 16px;
+  }
+}
+

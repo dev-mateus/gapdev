@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Perfil from './app/Perfil/perfil'
 import CadastroPage from './app/cadastro/page'
 import LoginPage from './app/login/page'
+import EsqueciSenhaPage from './app/esqueci-senha/page'
+
 import VagasPage from './app/vagas/page'
 import PlanoEstudosPage from './app/plano-estudos/page'
 import CompatibilityPage from './app/compatibility/page'
@@ -81,6 +83,12 @@ function App(): ReactElement {
           />
 
           <Route
+            path="/esqueci-senha"
+            element={<EsqueciSenhaPage />}
+          />
+
+          <Route
+
             path="/cadastro"
             element={<CadastroPage isBackendConnected={isBackendConnected} />}
           />

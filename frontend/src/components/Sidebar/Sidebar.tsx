@@ -16,7 +16,10 @@ import LogoutModal from '../logout/LogoutModal'
 type SidebarProps = {
   isCollapsed: boolean
   onToggle: () => void
+  onOpenDrawer?: () => void
+  onCloseDrawer?: () => void
 }
+
 
 const menuItems = [
   { label: 'Perfil', path: '/perfil', icon: UserRoundCog },
@@ -36,7 +39,11 @@ function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
 
   return (
     <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : styles.expanded}`}>
-      <button className={styles.sidebarToggleButton} onClick={onToggle} title={isCollapsed ? 'Expandir' : 'Retrair'}>
+      <button
+        className={styles.sidebarToggleButton}
+        onClick={onToggle}
+        title={isCollapsed ? 'Expandir' : 'Retrair'}
+      >
         <ChevronLeft size={22} className={isCollapsed ? styles.chevronCollapsed : ''} />
       </button>
 
@@ -61,9 +68,7 @@ function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             <NavLink
               key={item.path}
               to={item.path}
-              className={({ isActive }) =>
-                `${styles.sidebarItem} ${isActive ? styles.active : ''}`
-              }
+              className={({ isActive }) => `${styles.sidebarItem} ${isActive ? styles.active : ''}`}
               title={isCollapsed ? item.label : ''}
             >
               <Icon size={22} />

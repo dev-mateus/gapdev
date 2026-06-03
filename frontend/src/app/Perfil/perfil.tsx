@@ -41,8 +41,10 @@ const profileTabs: TabSwitcherItem[] = [
 function Perfil() {
   const [activeTab, setActiveTab] = useState('dados-pessoais')
   const [editando, setEditando] = useState(true)
-
   const [mostrarSenhaAtual, setMostrarSenhaAtual] = useState(false)
+
+
+
   const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false)
   const [definindoSenha, setDefinindoSenha] = useState(false)
 
@@ -92,10 +94,26 @@ function Perfil() {
     <div className={styles.content}>
       <PageContainer className={styles.expandedContainer}>
         <div className={styles.pageStack}>
-          <PageHeader
-            title="Perfil do usuário"
-            description="Configure seu perfil técnico para receber recomendações personalizadas de estudo."
-          />
+          <div className={styles.mobileTopBar}>
+            <button
+              type="button"
+              className={styles.mobileMenuButton}
+              aria-label="Abrir menu"
+              onClick={() => {
+                // Drawer mobile control no momento é feito via CSS/Sidebar; manter ação sem estado.
+              }}
+
+            >
+              ☰
+            </button>
+
+            <PageHeader
+              title="Perfil do usuário"
+              description="Configure seu perfil técnico para receber recomendações personalizadas de estudo."
+            />
+          </div>
+
+
 
           <TabSwitcher
             tabs={profileTabs}

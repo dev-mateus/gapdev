@@ -161,23 +161,35 @@ export default function ProgressoPage() {
                 <p className={styles.panelSubtitle}>Semanas calculadas a partir das tarefas do plano de estudos</p>
               </div>
 
-              <div className={styles.bars} role="img" aria-label="Gráfico de barras semanal">
-                {weeklyData.map((week) => {
-                  const heightPercent = week.total > 0 ? (week.completed / week.total) * 100 : 0
+              <div className={styles.atrium} role="img" aria-label="Instalação holográfica de progresso semanal">
+                <div className={styles.atriumCopy}>
+                  
+                 
+                </div>
 
-                  return (
-                    <div key={week.label} className={styles.barCol}>
-                      <div className={styles.barWrap}>
+                <div className={styles.pillarsRow}>
+                  {weeklyData.map((week) => {
+                    const heightPercent = week.total > 0 ? (week.completed / week.total) * 100 : 0
+                    const weekShort = week.label.replace('Semana ', '')
+
+                    return (
+                      <div key={week.label} className={styles.pillar}>
                         <div
-                          className={styles.bar}
-                          style={{ height: `${heightPercent}%`, ['--bar-value' as any]: week.completed }}
-                        />
-                        <div className={styles.barValue}>{week.completed}/{week.total}</div>
+                          className={styles.pillarBeam}
+                          style={{ ['--pillar-progress' as unknown as string]: `${heightPercent}%` }}
+                        >
+                          <div className={styles.pillarValueHolo}>
+                            {week.completed}/{week.total}
+                          </div>
+                        </div>
+
+                        <div className={styles.pillarBasePanel}>
+                          <div className={styles.pillarBaseLabel}>Semana {weekShort}</div>
+                        </div>
                       </div>
-                      <div className={styles.barLabel}>{week.label}</div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
             </section>
 

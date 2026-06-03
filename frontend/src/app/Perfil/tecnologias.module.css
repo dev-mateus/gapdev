@@ -235,6 +235,86 @@
   width: 58%;
 }
 
+/* =========================
+   Responsividade (mobile)
+========================= */
+@media (max-width: 1100px) {
+  .searchWrapper {
+    width: 100%;
+  }
+
+  .footer {
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .backButton,
+  .saveButton {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    gap: 18px;
+  }
+
+  .searchContent {
+    padding: 20px;
+  }
+
+  .searchContent h2 {
+    font-size: 20px;
+  }
+
+  .searchContent p {
+    font-size: 15px;
+    margin-bottom: 18px;
+  }
+
+  .searchBox {
+    padding: 0 16px;
+    gap: 14px;
+  }
+
+  .searchBox input {
+    font-size: 16px;
+  }
+
+  .techCard {
+    padding: 0 14px;
+  }
+
+  .categoryRow {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .categoryInfo {
+    justify-content: space-between;
+  }
+
+  .selectedArea {
+    justify-content: flex-start;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .backButton {
+    width: 100% !important;
+  }
+
+  .saveButton {
+    width: 100% !important;
+  }
+}
+
+
 .categoryIcon[data-category='Linguagens'],
 .techIcon[data-category='Linguagens'] {
   color: #60a5fa;
