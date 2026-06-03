@@ -1,114 +1,196 @@
-
 # GapDev
 
-Uma plataforma de referência com três componentes principais: backend (FastAPI), um serviço auxiliar de IA e um frontend em React + Vite.
+Plataforma que analisa descrições de vagas de emprego com IA, identifica as skills exigidas, compara com o perfil do desenvolvedor e gera um plano de estudos personalizado para fechar os gaps.
 
-## Sumário
+## Como funciona
 
-- **Sobre:** visão geral do projeto.
-- **Estrutura:** pastas e arquivos principais.
-- **Pré-requisitos:** software necessário.
-- **Instalação & Execução:** passos para backend, ai-service e frontend.
-- **Execução integrada:** rodar todos os serviços localmente.
-- **Contribuição & Licença.**
+```
+Usuário cola a descrição de uma vaga
+        ↓
+IA analisa e identifica as skills exigidas
+        ↓
+Sistema compara com as skills do usuário
+        ↓
+Usuário vê sua compatibilidade com a vaga
+        ↓
+Sistema gera um plano de estudos para as skills que faltam
+        ↓
+Usuário acompanha o progresso no painel
+```
 
-## Sobre
+## Tecnologias
 
-Este repositório reúne um backend em Python (FastAPI), um micro-serviço de IA (agentes e prompts) e um frontend em React com Vite. Foi pensado para facilitar o desenvolvimento local e a integração entre serviços.
+### Backend
+- **Python 3.13+** com **FastAPI**
+- **SQLAlchemy** como ORM
+- **PostgreSQL** em produção / **SQLite** em desenvolvimento
+- **PyJWT** para autenticação via tokens JWT
+- **Google OAuth** para login social
+
+### AI Service
+- **Modelo:** Qwen/Qwen2.5-7B-Instruct via Together AI
+- **Infraestrutura:** HuggingFace Inference API (`InferenceClient`)
+- **Token necessário:** `HF_TOKEN` (obtenha em https://huggingface.co/settings/tokens)
+- **Agentes:** `analise_vaga.py` (extração de skills), `plano_estudo.py` (geração de plano)
+
+### Frontend
+- **React 19** + **TypeScript**
+- **Vite** como bundler
+- **TailwindCSS 4**
+- **React Router 7**
 
 ## Estrutura do repositório
 
-- `backend/` — API, modelos, repositórios e serviços (FastAPI).
-- `ai-service/` — agentes, prompts e cliente LLM (micro-serviço Python).
-- `frontend/` — aplicação React + Vite.
-- `prisma/` — esquema Prisma e migrations.
-- `LICENSE` — licença do projeto.
+```
+gapdev/
+├── backend/                  # API REST (FastAPI)
+│   ├── app/
+│   │   ├── api/routes/       # Endpoints: auth, user, job, analise, study_plan...
+│   │   ├── models/           # Modelos SQLAlchemy
+│   │   ├── repositories/     # Acesso ao banco de dados
+│   │   ├── services/         # Lógica de negócio
+│   │   └── schemas/          # Schemas Pydantic
+│   └── requirements.txt
+├── ai_service/               # Micro-serviço de IA
+│   ├── app/
+│   │   ├── agents/           # analise_vaga.py, plano_estudo.py
+│   │   ├── prompts/          # Templates de prompt
+│   │   └── tools/            # llm_client.py (HuggingFace)
+│   └── requirements.txt
+└── frontend/                 # SPA React
+    └── src/
+        ├── app/              # Páginas
+        ├── components/       # Componentes reutilizáveis
+        ├── contexts/         # StudyPlanContext
+        └── services/         # api.ts e serviços por domínio
+```
 
-Arquivos/folders relevantes:
+## Variáveis de ambiente
 
-- `backend/app/main.py`
-- `ai-service/app/main.py`
-- `frontend/package.json`
+### Backend (`backend/.env`)
 
-## Pré-requisitos
+```env
+# Banco de dados
+DATABASE_URL=sqlite:///./app.db
+# Em produção (PostgreSQL):
+# DATABASE_URL=postgresql+psycopg://user:password@host:5432/gapdev
 
-- Python 3.10+
-- Node.js 18+ (ou 20+)
-- npm ou yarn
-- (Opcional) Docker
+# Segurança JWT — gere com: python -c "import secrets; print(secrets.token_hex(32))"
+SECRET_KEY=troque-esta-chave-em-producao
 
-## Instalação e execução (local)
+# Expiração do token em minutos (padrão: 1440 = 24h)
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
+```
 
-Siga as instruções por componente.
+### AI Service (`ai_service/.env`)
 
-### Backend
+```env
+# Token do HuggingFace — obtenha em: https://huggingface.co/settings/tokens
+HF_TOKEN=hf_sua_chave_aqui
+```
 
-1. Entre na pasta `backend`, crie e ative o ambiente:
+## Instalação e execução local
+
+### Pré-requisitos
+
+- Python 3.13+
+- Node.js 20+
+- npm
+
+### 1. Backend
 
 ```powershell
 cd backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-2. Configure variáveis de ambiente (ex.: `DATABASE_URL`, `SECRET_KEY`, `VITE_API_URL`).
-
-3. Rode a aplicação em desenvolvimento:
+Crie o arquivo `backend/.env` com as variáveis acima e rode:
 
 ```powershell
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-API: `http://localhost:8000` — Docs: `http://localhost:8000/docs`.
+API disponível em `http://localhost:8000`  
+Documentação interativa em `http://localhost:8000/docs`
 
-### ai-service
-
-O `ai-service` contém agentes e integrações com LLMs. Existem duas opções:
-
-- Executar como FastMCP (se já houver entrypoint):
+### 2. AI Service
 
 ```powershell
-cd ai-service
+cd ai_service
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-python -m fastmcp app.main
 ```
 
-- Ou adaptar para um pacote Python sem hífen (`ai_service`) e expor um entrypoint ASGI caso queira rodar via Uvicorn.
+Crie o arquivo `ai_service/.env` com o `HF_TOKEN` e rode:
 
-Configure chaves de provedores de LLM em `.env` (ex.: `OPENAI_API_KEY`).
+```powershell
+python -m fastmcp run app/main.py --transport streamable-http --port 8001 --host 0.0.0.0
+```
 
-### Frontend
+### 3. Frontend
 
-1. Instale dependências e rode em dev:
-
-```bash
+```powershell
 cd frontend
 npm ci
 npm run dev
 ```
 
-O Vite normalmente serve em `http://localhost:5173`.
+Frontend disponível em `http://localhost:5173`
 
-## Executando tudo junto
+## Rodando tudo junto
 
-Abra terminais separados e rode os serviços necessários:
+Abra três terminais separados e rode um serviço em cada um:
 
-- Backend: `uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`
-- AI Service: execute conforme a opção escolhida (FastMCP ou ASGI)
-- Frontend: `npm run dev` em `frontend`
+```
+Terminal 1 → backend:     uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+Terminal 2 → ai_service:  python -m fastmcp run app/main.py --transport streamable-http --port 8001
+Terminal 3 → frontend:    npm run dev
+```
 
-## Desenvolvimento e contribuição
+## Endpoints principais da API
 
-- Siga a arquitetura: models → repositories → services → routes.
-- Adicione testes quando implementar novas features.
-- Abra branches e PRs com descrições claras.
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/auth/login` | Login com email e senha |
+| POST | `/auth/google` | Login com Google OAuth |
+| GET | `/user` | Dados do usuário logado |
+| GET | `/skills` | Skills do usuário |
+| POST | `/skills` | Adicionar skill ao perfil |
+| POST | `/jobs` | Criar vaga para análise |
+| POST | `/analise` | Analisar descrição de vaga com IA |
+| GET | `/study-plans` | Listar planos de estudos |
+| GET | `/study-plans/{job_id}` | Plano de estudos de uma vaga |
+| POST | `/study-plans` | Criar plano de estudos |
+| PATCH | `/study-plans/items/{item_id}` | Atualizar status de tarefa |
+
+## Padrão de desenvolvimento
+
+A arquitetura do backend segue o fluxo:
+
+```
+models → repositories → services → routes
+```
+
+- `models/` — define as tabelas do banco (SQLAlchemy)
+- `repositories/` — funções de acesso ao banco (queries)
+- `services/` — lógica de negócio e validações
+- `routes/` — endpoints HTTP (FastAPI)
+
+Ao implementar uma nova feature, criar um arquivo em cada camada seguindo esse padrão.
+
+## Contribuição
+
+1. Crie uma branch a partir da `main`:
+   ```bash
+   git checkout -b minha-feature
+   ```
+2. Faça as alterações e commit com mensagem descritiva
+3. Abra um Pull Request descrevendo o que foi feito
+4. Aguarde revisão antes de mergear
 
 ## Licença
 
 Consulte o arquivo `LICENSE` na raiz do repositório.
-
-
