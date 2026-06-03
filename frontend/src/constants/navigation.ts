@@ -2,9 +2,9 @@
 ///Altere aqui para modificar os links de navegação, ícones ou outras propriedades relacionadas à estrutura de navegação do aplicativo.
 /// Livre para alterações, mas mantenha a consistência dos tipos e estruturas para evitar erros de navegação.
 export const SIDEBAR_BRAND = {
-	name: 'Skill Progress',
+	name: 'GapDev',
 	iconKey: 'brandChart',
-	href: '/dashboard',
+	href: '/perfil',
 } as const
 
 export const SIDEBAR_NAV_LINKS = [
