@@ -23,6 +23,7 @@ export default function CompatibilityPage() {
   const navigate = useNavigate()
   const [data, setData] = useState<CompatibilityResponse | null>(null)
   const [jobId, setJobId] = useState<string | undefined>()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
@@ -35,7 +36,10 @@ export default function CompatibilityPage() {
     const title = analysisContext?.title ?? params.get('title') ?? undefined
 
     fetchCompatibility(description ?? undefined, title ?? undefined, currentJobId ?? undefined).then(res => {
-      if (mounted) setData(res)
+      if (mounted) {
+        setData(res)
+        setLoading(false)
+      }
     })
     return () => {
       mounted = false
@@ -81,11 +85,28 @@ export default function CompatibilityPage() {
     navigate('/analise', { replace: true })
   }
 
-  if (!data) {
+  if (loading) {
     return (
       <div className={styles.content}>
         <PageContainer className={styles.expandedContainer}>
           <LoadingState message="Gerando análise da vaga" />
+        </PageContainer>
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div className={styles.content}>
+        <PageContainer className={styles.expandedContainer}>
+          <div className={styles.emptyState}>
+            <p className={styles.emptyStateText}>
+              Nenhuma vaga foi analisada ainda. Analise uma vaga para ver sua compatibilidade.
+            </p>
+            <PrimaryButton onClick={() => navigate('/vagas')}>
+              Analisar uma vaga
+            </PrimaryButton>
+          </div>
         </PageContainer>
       </div>
     )

@@ -242,7 +242,6 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
               />
 
               <div className={styles.formRow}>
-                <Checkbox label="Lembrar de mim" />
                 <a className={styles.inlineLink} href="#forgot-password">
                   Esqueci minha senha
                 </a>
