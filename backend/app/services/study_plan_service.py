@@ -4,19 +4,22 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from ai_service.app.agents.plano_estudo import generate_study_plan
-from app.models.enums import SkillLevel
+from app.models.enums import SkillLevel, StudyPlanItemStatus
 from app.repositories.job_repository import get_job_by_id
-from app.repositories.job_skill_repository import list_job_skills_by_job
+from app.repositories.job_skill_repository import list_job_skills_by_job, resolve_or_create_subtopic_skill
 from app.repositories.study_plan_repository import (
 	create_or_replace_study_plan,
+	get_item_skill_for_user,
 	get_study_plan_by_user_and_job,
 	get_study_plan_item_for_user,
 	list_study_plans_by_user,
+	set_item_skill_status,
 	update_study_plan_item_status,
 )
 from app.repositories.user_repo import get_user_by_email
-from app.repositories.user_skill_repository import list_skills_by_user
-from app.schemas.study_plan import StudyPlanItemRead, StudyPlanRead
+from app.repositories.user_skill_repository import create_user_skill as create_user_skill_record, list_skills_by_user
+from app.schemas.study_plan import StudyPlanItemRead, StudyPlanItemSkillRead, StudyPlanRead
+from app.schemas.user_skill import UserSkillCreate
 
 
 LEVEL_ORDER = ["Beginner", "Basic", "Intermediate", "Advanced", "Specialist"]
@@ -56,10 +59,30 @@ def _resolve_job_for_user(db: Session, user_id: str, job_id: str):
 	return job
 
 
+def _item_skill_to_read(subskill: object) -> StudyPlanItemSkillRead:
+	"""Convert a module sub-skill into the public response schema."""
+
+	skill = getattr(subskill, "skill", None)
+	return StudyPlanItemSkillRead(
+		id=str(getattr(subskill, "id")),
+		study_plan_item_id=str(getattr(subskill, "study_plan_item_id")),
+		skill_id=str(getattr(subskill, "skill_id")),
+		skill_name=str(getattr(skill, "canonical_name", "")),
+		reason=getattr(subskill, "reason", None),
+		status=str(_enum_value(getattr(subskill, "status", "pending"))),
+		created_at=getattr(subskill, "created_at"),
+		updated_at=getattr(subskill, "updated_at"),
+	)
+
+
 def _item_to_read(item: object) -> StudyPlanItemRead:
 	"""Convert a study plan item into the public response schema."""
 
 	skill = getattr(item, "skill", None)
+	subskills = sorted(
+		list(getattr(item, "subskills", []) or []),
+		key=lambda sub: str(getattr(sub, "created_at", "")),
+	)
 	return StudyPlanItemRead(
 		id=str(getattr(item, "id")),
 		study_plan_id=str(getattr(item, "study_plan_id")),
@@ -72,6 +95,7 @@ def _item_to_read(item: object) -> StudyPlanItemRead:
 		status=str(_enum_value(getattr(item, "status", "pending"))),
 		created_at=getattr(item, "created_at"),
 		updated_at=getattr(item, "updated_at"),
+		subskills=[_item_skill_to_read(sub) for sub in subskills],
 	)
 
 
@@ -131,11 +155,84 @@ def _user_skills_for_ai(user_skills: list[object]) -> list[dict]:
 	return items
 
 
-def _normalize_generated_items(generated_items: list[dict], job_skills: list[object], user_skills: list[object]) -> list[dict]:
+def _fallback_subskill_names(module_name: str) -> list[dict]:
+	"""Generic learning topics used when the model omits a module breakdown."""
+
+	return [
+		{"name": f"Fundamentos de {module_name}", "reason": f"Dominar os conceitos basicos de {module_name}."},
+		{"name": f"Pratica guiada de {module_name}", "reason": f"Aplicar {module_name} em exercicios praticos."},
+		{"name": f"Projeto com {module_name}", "reason": f"Consolidar o aprendizado de {module_name} em um projeto."},
+	]
+
+
+def _resolve_subskills(db: Session, subskills: object, module_skill_id: str, module_name: str) -> list[dict]:
+	"""Resolve generated learning topics into freshly created subtopic skills."""
+
+	module_key = module_name.strip().lower()
+	candidates: list[dict] = []
+	seen_names: set[str] = {module_key} if module_key else set()
+	for subskill in subskills or []:
+		if isinstance(subskill, dict):
+			name = str(subskill.get("name") or subskill.get("skill_name") or "").strip()
+			reason = subskill.get("reason")
+		else:
+			name = str(subskill or "").strip()
+			reason = None
+
+		if not name:
+			continue
+
+		key = name.lower()
+		if key in seen_names:
+			continue
+		seen_names.add(key)
+		candidates.append({"name": name, "reason": reason})
+
+	if not candidates:
+		candidates = _fallback_subskill_names(module_name)
+
+	resolved: list[dict] = []
+	for candidate in candidates[:5]:
+		catalog_skill = resolve_or_create_subtopic_skill(db, candidate["name"], module_name)
+		if not catalog_skill:
+			continue
+		if str(catalog_skill.id) == module_skill_id:
+			continue
+		resolved.append(
+			{
+				"skill_id": str(catalog_skill.id),
+				"reason": candidate.get("reason"),
+				"status": "pending",
+			}
+		)
+
+	return resolved
+
+
+def _filter_missing_job_skills(job_skills: list[object], user_skills: list[object]) -> list[object]:
+	"""Keep only job skills the user has NOT added to their profile.
+
+	The study plan must contain exclusively the skills the user does not know
+	yet (i.e. never selected). Any job skill already present in the user's
+	profile, regardless of level, is ignored.
+	"""
+
+	known_skill_ids = {str(getattr(us, "skill_id")) for us in user_skills}
+
+	missing: list[object] = []
+	for job_skill in job_skills:
+		skill_key = str(getattr(job_skill, "skill_id"))
+		if skill_key in known_skill_ids:
+			continue
+		missing.append(job_skill)
+	return missing
+
+
+def _normalize_generated_items(db: Session, generated_items: list[dict], job_skills: list[object], user_skills: list[object]) -> list[dict]:
 	"""Keep generated items valid for the selected job and current user levels."""
 
 	job_skill_by_id = {str(getattr(skill, "skill_id")): skill for skill in job_skills}
-	user_skill_by_id = {str(getattr(skill, "skill_id")): skill for skill in user_skills}
+	known_skill_ids = {str(getattr(us, "skill_id")) for us in user_skills}
 
 	normalized: list[dict] = []
 	seen: set[str] = set()
@@ -152,12 +249,18 @@ def _normalize_generated_items(generated_items: list[dict], job_skills: list[obj
 		if not job_skill or skill_key in seen:
 			continue
 
-		user_skill = user_skill_by_id.get(skill_key)
-		current_level = item.get("current_level") or _enum_value(getattr(user_skill, "level", None))
+		# Hard gate: only skills the user does NOT know belong in the plan.
+		if skill_key in known_skill_ids:
+			continue
+
+		current_level = None
 		target_level = item.get("target_level") or _enum_value(getattr(job_skill, "required_level", SkillLevel.Basic))
 
-		if _level_index(current_level) >= _level_index(target_level):
-			continue
+		module_name = (
+			str(getattr(getattr(job_skill, "skill", None), "canonical_name", ""))
+			or str(getattr(job_skill, "raw_name", ""))
+			or "esta habilidade"
+		)
 
 		normalized.append(
 			{
@@ -167,11 +270,38 @@ def _normalize_generated_items(generated_items: list[dict], job_skills: list[obj
 				"priority": item.get("priority") or _enum_value(getattr(job_skill, "priority", "desirable")),
 				"reason": item.get("reason"),
 				"status": "pending",
+				"subskills": _resolve_subskills(db, item.get("subskills"), skill_key, module_name),
 			}
 		)
 		seen.add(skill_key)
 
 	return normalized
+
+
+def _items_from_missing_skills(db: Session, missing_job_skills: list[object]) -> list[dict]:
+	"""Backstop plan built directly from the gap, when the AI returns nothing."""
+
+	items: list[dict] = []
+	for job_skill in missing_job_skills:
+		skill_key = str(getattr(job_skill, "skill_id"))
+		module_name = (
+			str(getattr(getattr(job_skill, "skill", None), "canonical_name", ""))
+			or str(getattr(job_skill, "raw_name", ""))
+			or "esta habilidade"
+		)
+		target_level = _enum_value(getattr(job_skill, "required_level", SkillLevel.Basic))
+		items.append(
+			{
+				"skill_id": skill_key,
+				"current_level": None,
+				"target_level": target_level,
+				"priority": _enum_value(getattr(job_skill, "priority", "desirable")),
+				"reason": f"Desenvolver {module_name} para atender o nivel {target_level} exigido pela vaga.",
+				"status": "pending",
+				"subskills": _resolve_subskills(db, None, skill_key, module_name),
+			}
+		)
+	return items
 
 
 def generate_plan_for_job(db: Session, user_email: str, job_id: str, force_regenerate: bool = False) -> StudyPlanRead:
@@ -192,6 +322,14 @@ def generate_plan_for_job(db: Session, user_email: str, job_id: str, force_regen
 		)
 
 	user_skills = list_skills_by_user(db, user_id)
+
+	# Only ask the AI about the actual gap so it can't waste tokens on
+	# skills the user already meets at or above the required level.
+	missing_job_skills = _filter_missing_job_skills(job_skills, user_skills)
+	if not missing_job_skills:
+		plan = create_or_replace_study_plan(db, user_id, job_id, [], "completed")
+		return _plan_to_read(plan)
+
 	ai_payload = generate_study_plan(
 		job_context={
 			"job_id": str(job.id),
@@ -199,12 +337,18 @@ def generate_plan_for_job(db: Session, user_email: str, job_id: str, force_regen
 			"company": str(job.company_name),
 			"level": _enum_value(getattr(job, "level", None)),
 		},
-		job_skills=_job_skills_for_ai(job_skills),
+		job_skills=_job_skills_for_ai(missing_job_skills),
 		user_skills=_user_skills_for_ai(user_skills),
 	)
 
 	generated_items = ai_payload.get("items", []) if isinstance(ai_payload, dict) else []
-	items = _normalize_generated_items(generated_items, job_skills, user_skills)
+	items = _normalize_generated_items(db, generated_items, missing_job_skills, user_skills)
+
+	# Backstop: if the model returned nothing usable, build the plan
+	# directly from the gap so the user is never left without modules.
+	if not items:
+		items = _items_from_missing_skills(db, missing_job_skills)
+
 	plan_status = "active" if items else "completed"
 	plan = create_or_replace_study_plan(db, user_id, job_id, items, plan_status)
 	return _plan_to_read(plan)
@@ -240,5 +384,41 @@ def update_item_status(db: Session, user_email: str, item_id: str, item_status: 
 	if not updated:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item do plano nao encontrado.")
 
+	if getattr(updated, "status", None) == StudyPlanItemStatus.completed:
+		_mark_module_skill_as_known(db, user_id, updated)
+
 	updated = get_study_plan_item_for_user(db, user_id, item_id)
 	return _item_to_read(updated)
+
+
+def _mark_module_skill_as_known(db: Session, user_id: str, module: object) -> None:
+	"""Persist the completed module skill into the user's known skills."""
+
+	skill_id = str(getattr(module, "skill_id", "") or "")
+	if not skill_id:
+		return
+
+	target_level = _enum_value(getattr(module, "target_level", None)) or SkillLevel.Basic.value
+	create_user_skill_record(db, user_id, skill_id, UserSkillCreate(skill_id=skill_id, level=target_level))
+
+
+def update_item_skill_status(db: Session, user_email: str, item_skill_id: str, item_status: str) -> StudyPlanItemSkillRead:
+	"""Update a module sub-skill status for the authenticated user.
+
+	When every sub-skill of the module is completed, the module skill is saved
+	as a known user skill so future job analyses score a higher compatibility.
+	"""
+
+	user_id = _resolve_user_id(db, user_email)
+	item_skill = get_item_skill_for_user(db, user_id, item_skill_id)
+	if not item_skill:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item do plano nao encontrado.")
+
+	updated = set_item_skill_status(db, item_skill, item_status)
+
+	module = updated.study_plan_item
+	if getattr(module, "status", None) == StudyPlanItemStatus.completed:
+		_mark_module_skill_as_known(db, user_id, module)
+
+	refreshed = get_item_skill_for_user(db, user_id, item_skill_id)
+	return _item_skill_to_read(refreshed)

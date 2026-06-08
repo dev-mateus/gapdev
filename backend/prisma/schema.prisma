@@ -68,10 +68,11 @@ model Skill {
   active        Boolean         @default(true)
   createdAt     DateTime        @default(now()) @map("created_at")
   updatedAt     DateTime        @default(now()) @updatedAt @map("updated_at")
-  aliases       SkillAlias[]
-  userSkills    UserSkill[]
-  jobSkills     JobSkill[]
-  studyItems    StudyPlanItem[]
+  aliases        SkillAlias[]
+  userSkills     UserSkill[]
+  jobSkills      JobSkill[]
+  studyItems     StudyPlanItem[]
+  studyItemSkills StudyPlanItemSkill[]
 
   @@map("skills")
   @@index([category])
@@ -169,9 +170,27 @@ model StudyPlanItem {
   updatedAt     DateTime            @default(now()) @updatedAt @map("updated_at")
   studyPlan     StudyPlan           @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
   skill         Skill               @relation(fields: [skillId], references: [id], onDelete: Restrict)
+  subskills     StudyPlanItemSkill[]
 
   @@map("study_plan_items")
   @@index([studyPlanId])
   @@index([skillId])
   @@unique([studyPlanId, skillId])
+}
+
+model StudyPlanItemSkill {
+  id              String              @id @default(uuid())
+  studyPlanItemId String              @map("study_plan_item_id")
+  skillId         String              @map("skill_id")
+  reason          String?
+  status          StudyPlanItemStatus @default(pending)
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @default(now()) @updatedAt @map("updated_at")
+  studyPlanItem   StudyPlanItem       @relation(fields: [studyPlanItemId], references: [id], onDelete: Cascade)
+  skill           Skill               @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@map("study_plan_item_skills")
+  @@index([studyPlanItemId])
+  @@index([skillId])
+  @@unique([studyPlanItemId, skillId])
 }

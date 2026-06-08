@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.models.enums import SkillLevel, SkillPriority, StudyPlanItemStatus, StudyPlanStatus
-from app.models.study_plan import StudyPlan, StudyPlanItem
+from app.models.study_plan import StudyPlan, StudyPlanItem, StudyPlanItemSkill
 
 
 def _map_level(level_name: str | None) -> SkillLevel | None:
@@ -53,6 +53,9 @@ def _map_item_status(status_name: str | None) -> StudyPlanItemStatus:
 def _plan_load_options():
 	return (
 		selectinload(StudyPlan.items).joinedload(StudyPlanItem.skill),
+		selectinload(StudyPlan.items)
+		.selectinload(StudyPlanItem.subskills)
+		.joinedload(StudyPlanItemSkill.skill),
 		joinedload(StudyPlan.job),
 	)
 
@@ -124,6 +127,21 @@ def create_or_replace_study_plan(
 			reason=item.get("reason"),
 			status=_map_item_status(item.get("status")),
 		)
+
+		seen_subskills: set[str] = set()
+		for subskill in item.get("subskills") or []:
+			subskill_id = subskill.get("skill_id")
+			if not subskill_id or str(subskill_id) in seen_subskills:
+				continue
+			study_item.subskills.append(
+				StudyPlanItemSkill(
+					skill_id=str(subskill_id),
+					reason=subskill.get("reason"),
+					status=_map_item_status(subskill.get("status")),
+				)
+			)
+			seen_subskills.add(str(subskill_id))
+
 		plan.items.append(study_item)
 
 	db.commit()
@@ -153,3 +171,43 @@ def update_study_plan_item_status(db: Session, item_id: str, status: str) -> Stu
 	db.commit()
 	db.refresh(item)
 	return item
+
+
+def get_item_skill_for_user(db: Session, user_id: str, item_skill_id: str) -> StudyPlanItemSkill | None:
+	"""Return a module sub-skill only when it belongs to the user."""
+
+	statement = (
+		select(StudyPlanItemSkill)
+		.join(StudyPlanItem, StudyPlanItem.id == StudyPlanItemSkill.study_plan_item_id)
+		.join(StudyPlan, StudyPlan.id == StudyPlanItem.study_plan_id)
+		.where(StudyPlanItemSkill.id == item_skill_id, StudyPlan.user_id == user_id)
+		.options(
+			joinedload(StudyPlanItemSkill.skill),
+			joinedload(StudyPlanItemSkill.study_plan_item).selectinload(StudyPlanItem.subskills),
+		)
+	)
+	return db.scalars(statement).unique().first()
+
+
+def set_item_skill_status(db: Session, item_skill: StudyPlanItemSkill, status: str) -> StudyPlanItemSkill:
+	"""Persist a sub-skill status and keep the parent module status in sync."""
+
+	item_skill.status = _map_item_status(status)
+	db.flush()
+
+	module = item_skill.study_plan_item
+	subskills = list(module.subskills)
+	all_completed = bool(subskills) and all(
+		sub.status == StudyPlanItemStatus.completed for sub in subskills
+	)
+
+	if all_completed:
+		module.status = StudyPlanItemStatus.completed
+	elif any(sub.status == StudyPlanItemStatus.completed for sub in subskills):
+		module.status = StudyPlanItemStatus.in_progress
+	else:
+		module.status = StudyPlanItemStatus.pending
+
+	db.commit()
+	db.refresh(item_skill)
+	return item_skill

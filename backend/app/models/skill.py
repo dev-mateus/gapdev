@@ -26,3 +26,4 @@ class Skill(Base):
 	user_skills = relationship("UserSkill", back_populates="skill")
 	job_skills = relationship("JobSkill", back_populates="skill")
 	study_items = relationship("StudyPlanItem", back_populates="skill")
+	study_item_skills = relationship("StudyPlanItemSkill", back_populates="skill")

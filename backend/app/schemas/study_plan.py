@@ -14,13 +14,28 @@ class StudyPlanGenerateRequest(BaseModel):
 
 
 class StudyPlanItemStatusUpdate(BaseModel):
-	"""Payload used to update a plan item status."""
+	"""Payload used to update a plan item or sub-skill status."""
 
 	status: str
 
 
+class StudyPlanItemSkillRead(BaseModel):
+	"""Sub-skill (learning topic) inside a study plan module."""
+
+	id: str
+	study_plan_item_id: str
+	skill_id: str
+	skill_name: str
+	reason: Optional[str] = None
+	status: str
+	created_at: datetime
+	updated_at: datetime
+
+	model_config = {"from_attributes": True}
+
+
 class StudyPlanItemRead(BaseModel):
-	"""Study plan item response."""
+	"""Study plan item (module) response."""
 
 	id: str
 	study_plan_id: str
@@ -33,6 +48,7 @@ class StudyPlanItemRead(BaseModel):
 	status: str
 	created_at: datetime
 	updated_at: datetime
+	subskills: list[StudyPlanItemSkillRead] = []
 
 	model_config = {"from_attributes": True}
 

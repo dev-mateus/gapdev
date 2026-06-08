@@ -1,11 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { apiGet, apiPatch } from '../services/api'
 
+type TaskKind = 'subskill' | 'module'
+
 type StudyTask = {
   id: string
   title: string
   done: boolean
   doneAt?: string
+  kind: TaskKind
 }
 
 type SkillPlan = {
@@ -13,6 +16,13 @@ type SkillPlan = {
   name: string
   priority: 'alta' | 'media' | 'baixa'
   tasks: StudyTask[]
+}
+
+type StudyPlanItemSkillResponse = {
+  id: string
+  skill_name: string
+  reason?: string | null
+  status: 'pending' | 'in_progress' | 'completed' | 'skipped'
 }
 
 type StudyPlanItemResponse = {
@@ -23,6 +33,7 @@ type StudyPlanItemResponse = {
   priority: 'required' | 'desirable'
   reason?: string | null
   status: 'pending' | 'in_progress' | 'completed' | 'skipped'
+  subskills?: StudyPlanItemSkillResponse[]
 }
 
 type StudyPlanResponse = {
@@ -46,7 +57,15 @@ function mapPriority(priority: StudyPlanItemResponse['priority']): SkillPlan['pr
   return priority === 'required' ? 'alta' : 'media'
 }
 
-function buildTaskTitle(item: StudyPlanItemResponse): string {
+function buildSubskillTitle(subskill: StudyPlanItemSkillResponse): string {
+  if (subskill.reason?.trim()) {
+    return `${subskill.skill_name}: ${subskill.reason.trim()}`
+  }
+
+  return subskill.skill_name
+}
+
+function buildModuleTitle(item: StudyPlanItemResponse): string {
   if (item.reason?.trim()) {
     return item.reason.trim()
   }
@@ -55,19 +74,34 @@ function buildTaskTitle(item: StudyPlanItemResponse): string {
   return `Evoluir de ${current} para ${item.target_level}`
 }
 
+function mapItemTasks(item: StudyPlanItemResponse): StudyTask[] {
+  const subskills = item.subskills ?? []
+  if (subskills.length > 0) {
+    return subskills.map((subskill) => ({
+      id: subskill.id,
+      title: buildSubskillTitle(subskill),
+      done: subskill.status === 'completed',
+      kind: 'subskill' as const,
+    }))
+  }
+
+  return [
+    {
+      id: item.id,
+      title: buildModuleTitle(item),
+      done: item.status === 'completed',
+      kind: 'module' as const,
+    },
+  ]
+}
+
 function mapApiPlans(apiPlans: StudyPlanResponse[]): SkillPlan[] {
   return apiPlans.flatMap((plan) =>
     plan.items.map((item) => ({
       id: item.id,
       name: item.skill_name,
       priority: mapPriority(item.priority),
-      tasks: [
-        {
-          id: item.id,
-          title: buildTaskTitle(item),
-          done: item.status === 'completed',
-        },
-      ],
+      tasks: mapItemTasks(item),
     })),
   )
 }
@@ -143,11 +177,22 @@ export function StudyPlanProvider({ children }: { children: React.ReactNode }) {
       ),
     )
 
-    void apiPatch(`/study-plans/items/${taskId}/status`, {
+    const endpoint =
+      task.kind === 'subskill'
+        ? `/study-plans/item-skills/${taskId}/status`
+        : `/study-plans/items/${taskId}/status`
+
+    void apiPatch(endpoint, {
       status: nextDone ? 'completed' : 'pending',
-    }).catch(() => {
-      void reloadPlans()
     })
+      .then(() => {
+        // Completing every topic marks the module skill as known, so refresh
+        // to reflect the updated module/skill state coming from the backend.
+        void reloadPlans()
+      })
+      .catch(() => {
+        void reloadPlans()
+      })
   }, [plans, reloadPlans])
 
   const value = useMemo(
