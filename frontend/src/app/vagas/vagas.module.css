@@ -43,15 +43,15 @@
 }
 
 .formMessageError {
-  border: 1px solid #8f3e4c;
-  background: rgba(117, 31, 45, 0.35);
-  color: #ffd7de;
+  border: 1px solid var(--color-status-error-border);
+  background: var(--color-status-error-bg);
+  color: var(--color-status-error-text);
 }
 
 .formMessageSuccess {
-  border: 1px solid #2f7f72;
-  background: rgba(10, 82, 71, 0.35);
-  color: #d9fff7;
+  border: 1px solid var(--color-status-success-border);
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
 }
 
 @media (min-width: 768px) {
@@ -78,7 +78,7 @@
 }
 
 .seniorityLabel {
-  color: var(--text);
+  color: var(--color-text-primary);
   font-size: 0.88rem;
   font-weight: 600;
   line-height: 1.2;
@@ -99,7 +99,7 @@
   border-radius: 0.9rem;
 
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--color-text-muted);
 
   font-size: 0.92rem;
   font-weight: 600;
@@ -113,12 +113,12 @@
 }
 
 .seniorityOption:hover {
-  border-color: var(--primary);
-  color: var(--text);
+  border-color: var(--color-brand-primary);
+  color: var(--color-text-primary);
 }
 
 .seniorityOptionActive {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: rgb(18, 201, 241);
+  background: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+  color: var(--color-ring-focus);
 }

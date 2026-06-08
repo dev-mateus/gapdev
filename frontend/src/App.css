@@ -5,7 +5,7 @@
 
 .app-content {
   padding: 32px;
-  color: #E6F1F7;
+  color: var(--color-text-modal-title);
   margin-left: 260px;
   transition: margin-left 0.3s ease;
 }

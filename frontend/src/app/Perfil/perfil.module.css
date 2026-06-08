@@ -24,23 +24,22 @@
     background-color var(--transition-default),
     transform var(--transition-default);
 
-  /* alinhamento do conteúdo */
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 
-  padding: 0 18px;
+  padding: 0 18 px;
   line-height: 1;
 }
 
 .activeTab {
-  background: #1f6f96;
-  color: white;
+  background: var(--color-brand-primary);
+  color: var(--color-text-primary);
 }
 
 .tab:hover {
-  background: rgba(31, 111, 150, 0.12);
+  background: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
 }
 
 .tab svg,
@@ -59,7 +58,7 @@
   min-height: 100dvh;
   padding-block: 1rem;
 
-  color: #fff;
+  color: var(--color-text-primary);
 }
 
 .expandedContainer {
@@ -104,7 +103,7 @@
 }
 
 .passwordArea {
-  border-left: 1px solid #24465a;
+  border-left: 1px solid var(--color-border-panel);
 
   padding-left: 28px;
 
@@ -116,7 +115,7 @@
   width: 100%;
   min-height: 100%;
 
-  border: 1px solid #2a4456;
+  border: 1px solid color-mix(in srgb, var(--color-border-panel) 80%, transparent);
   border-radius: 18px;
 
   padding: 30px 28px;
@@ -124,8 +123,8 @@
   background:
     linear-gradient(
       180deg,
-      rgba(10, 28, 43, 0.96) 0%,
-      rgba(6, 21, 34, 0.98) 100%
+      color-mix(in srgb, var(--color-bg-form-pane) 96%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg-shell) 98%, transparent) 100%
     );
 
   display: flex;
@@ -135,7 +134,7 @@
   gap: 18px;
 
   box-shadow:
-    inset 0 0 40px rgba(31, 163, 198, 0.03),
+    inset 0 0 40px color-mix(in srgb, var(--color-brand-primary) 3%, transparent),
     0 0 0 1px rgba(255,255,255,0.015);
 }
 
@@ -156,11 +155,11 @@
   background:
     radial-gradient(
       circle at top,
-      rgba(31,163,198,0.28),
-      rgba(31,163,198,0.12)
+      color-mix(in srgb, var(--color-bg-sidebar-active) 28%, transparent),
+      color-mix(in srgb, var(--color-bg-sidebar-active) 12%, transparent)
     );
 
-  border: 1px solid rgba(31,163,198,0.18);
+  border: 1px solid color-mix(in srgb, var(--color-bg-sidebar-active) 18%, transparent);
 
   display: flex;
   align-items: center;
@@ -175,7 +174,7 @@
   font-size: 20px;
   font-weight: 700;
 
-  color: #ffffff;
+  color: var(--color-text-primary);
 }
 
 .eyeButton {
@@ -212,7 +211,7 @@
 
 
 .passwordButton:hover {
-  background: rgba(31,163,198,0.08) !important;
+  background: color-mix(in srgb, var(--color-bg-sidebar-active) 8%, transparent) !important;
 
   transform: translateY(-1px);
 }
@@ -236,7 +235,7 @@
 }
 
 .footerActions {
-  border-top: 1px solid #24465a;
+  border-top: 1px solid var(--color-border-panel);
 
   padding-top: 22px;
 
@@ -304,7 +303,7 @@
 }
 
 .profileBottom {
-  border-top: 1px solid #1c3c50;
+  border-top: 1px solid var(--color-border-panel);
 
   padding-top: 1.85rem;
 
@@ -336,7 +335,7 @@
 .selectGroup span {
   font-size: 14px;
   font-weight: 600;
-  color: #f4f7fa;
+  color: var(--color-text-primary);
 }
 
 .selectWrapper {
@@ -350,11 +349,11 @@
 
   padding: 0 52px 0 18px;
 
-  border: 1px solid #345468;
+  border: 1px solid color-mix(in srgb, var(--color-border-panel) 90%, transparent);
   border-radius: 16px;
 
-  background-color: #061b2a;
-  color: #ffffff;
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
 
   font-size: 15px;
   font-weight: 500;
@@ -386,7 +385,7 @@
 
 .selectWrapper select:focus {
   border-color: var(--color-brand-primary);
-  box-shadow: 0 0 0 3px rgba(31, 163, 198, 0.2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-bg-sidebar-active) 20%, transparent);
 }
 
 
@@ -412,7 +411,7 @@
 }
 
 .cancelPasswordButton:hover {
-  color: #ffffff;
+  color: var(--color-text-primary);
 }
 
 
@@ -446,7 +445,7 @@
 
 .googleConnectedText strong {
   font-size: 16px;
-  color: #ffffff;
+  color: var(--color-text-primary);
 }
 
 .googleConnectedText span {
@@ -469,7 +468,7 @@
 }
 
 .cancelPasswordButton:hover {
-  color: #ffffff;
+  color: var(--color-text-primary);
 }
 
 .characterCount {

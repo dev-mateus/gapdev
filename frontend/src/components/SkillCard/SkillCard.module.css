@@ -6,8 +6,12 @@
   min-height: 3.9rem;
   padding: 0.95rem 1rem;
   border-radius: 0.9rem;
-  background: linear-gradient(180deg, rgba(4, 27, 44, 0.96), rgba(3, 20, 33, 0.92));
-  border: 1px solid rgba(71, 196, 235, 0.45);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-bg-shell) 96%, transparent),
+    color-mix(in srgb, var(--color-bg-shell) 92%, transparent)
+  );
+  border: 1px solid color-mix(in srgb, var(--color-brand-accent) 45%, transparent);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   cursor: pointer;
 
@@ -21,7 +25,7 @@
 
 /* foco visível acessível (se o elemento for focável) */
 .card:focus-visible {
-  outline: 2px solid rgba(83, 214, 255, 0.8);
+  outline: 2px solid color-mix(in srgb, var(--color-ring-focus) 80%, transparent);
   outline-offset: 3px;
 }
 
@@ -39,9 +43,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  border: 1px solid rgba(71, 196, 235, 0.85);
-  background: rgba(10, 35, 52, 0.92);
-  color: #63d6ff;
+  border: 1px solid color-mix(in srgb, var(--color-brand-accent) 85%, transparent);
+  background: color-mix(in srgb, var(--color-bg-info-pane) 92%, transparent);
+  color: var(--color-text-accent);
   flex-shrink: 0;
 }
 
@@ -49,8 +53,8 @@
   width: 0.8rem;
   height: 0.8rem;
   border-radius: 999px;
-  border: 1px solid rgba(99, 214, 255, 0.55);
-  background: rgba(99, 214, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 55%, transparent);
+  background: color-mix(in srgb, var(--color-ring-focus) 8%, transparent);
 }
 
 .text {
@@ -67,7 +71,7 @@
 }
 
 .description {
-  color: rgba(232, 246, 255, 0.72);
+  color: color-mix(in srgb, var(--color-text-muted) 72%, transparent);
   font-size: 0.74rem;
   line-height: 1.1;
 }
@@ -80,7 +84,7 @@
 .sync {
   margin-left: 0.5rem;
   font-size: 0.85rem;
-  color: rgba(232, 246, 255, 0.85);
+  color: color-mix(in srgb, var(--color-text-muted) 85%, transparent);
 }
 
 /* evita que o foco do input force um scroll em alguns navegadores e dispositivos */

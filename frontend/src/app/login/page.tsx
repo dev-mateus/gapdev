@@ -51,6 +51,7 @@ type LoginResponse = {
 
 function LoginPage({ isBackendConnected }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [formMessage, setFormMessage] = useState('')
@@ -72,7 +73,6 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
         })
 
         localStorage.setItem('access_token', data.access_token)
-        
 
         localStorage.setItem(
           'usuarioLogado',
@@ -84,7 +84,6 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
         )
 
         localStorage.removeItem('usuarioEmail')
-
         window.dispatchEvent(new Event('auth-changed'))
 
         setFormMessageType('success')
@@ -93,7 +92,6 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
         navigate('/perfil')
       } catch (error) {
         setFormMessageType('error')
-
         setFormMessage(
           error instanceof Error
             ? error.message
@@ -109,60 +107,62 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
   })
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-  e.preventDefault()
+    e.preventDefault()
 
-  const trimmedEmail = email.trim()
+    const trimmedEmail = email.trim()
 
-  if (!trimmedEmail || !password) {
-    setFormMessageType('error')
-    setFormMessage('Preencha e-mail e senha.')
-    return
-  }
+    if (!trimmedEmail || !password) {
+      setFormMessageType('error')
+      setFormMessage('Preencha e-mail e senha.')
+      return
+    }
 
-  if (!validateEmail(trimmedEmail)) {
-    setFormMessageType('error')
-    setFormMessage('Por favor, insira um e-mail válido.')
-    return
-  }
+    if (!validateEmail(trimmedEmail)) {
+      setFormMessageType('error')
+      setFormMessage('Por favor, insira um e-mail válido.')
+      return
+    }
 
-  const passwordValidation = validatePassword(password)
-  if (!passwordValidation.isValid) {
-    setFormMessageType('error')
-    setFormMessage(`Senha inválida. Requisitos: ${passwordValidation.errors.join(', ')}`)
-    return
-  }
+    const passwordValidation = validatePassword(password)
+    if (!passwordValidation.isValid) {
+      setFormMessageType('error')
+      setFormMessage(`Senha inválida. Requisitos: ${passwordValidation.errors.join(', ')}`)
+      return
+    }
 
-  try {
-    const data = await apiPost<LoginResponse>('/auth/login', {
-      email: trimmedEmail,
-      password,
-    })
+    setIsSubmitting(true)
+    setFormMessage('')
+    setFormMessageType('')
 
-    localStorage.setItem('access_token', data.access_token)
-
-
-    const usuarioCadastrado = localStorage.getItem(`usuario_${trimmedEmail}`)
-    const usuario = usuarioCadastrado ? JSON.parse(usuarioCadastrado) : null
-
-    localStorage.setItem(
-      'usuarioLogado',
-      JSON.stringify({
-        nome: usuario?.nome || '',
+    try {
+      const data = await apiPost<LoginResponse>('/auth/login', {
         email: trimmedEmail,
-        authProvider: 'credentials',
+        password,
       })
-    )
 
-    localStorage.removeItem('usuarioEmail')
-    window.dispatchEvent(new Event('auth-changed'))
-    navigate('/perfil')
-  } catch (error) {
-    setFormMessageType('error')
-    setFormMessage(error instanceof Error ? error.message : 'Erro ao fazer login.')
+      localStorage.setItem('access_token', data.access_token)
+
+      const usuarioCadastrado = localStorage.getItem(`usuario_${trimmedEmail}`)
+      const usuario = usuarioCadastrado ? JSON.parse(usuarioCadastrado) : null
+
+      localStorage.setItem(
+        'usuarioLogado',
+        JSON.stringify({
+          nome: usuario?.nome || '',
+          email: trimmedEmail,
+        })
+      )
+
+      localStorage.removeItem('usuarioEmail')
+      window.dispatchEvent(new Event('auth-changed'))
+      navigate('/perfil')
+    } catch (error) {
+      setFormMessageType('error')
+      setFormMessage(error instanceof Error ? error.message : 'Erro ao fazer login.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
-}
-
-
 
   return (
     <main className={styles.page}>
@@ -212,7 +212,7 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
               <p className={styles.formSubtitle}>
                 Faça login para continuar sua jornada
                 {' · '}
-                Backend: {isBackendConnected ? 'conectado' : 'desconectado'}
+                Backend: {isBackendConnected ? 'conectado' : 'conectando...'}
               </p>
             </header>
 
@@ -260,8 +260,18 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
                 </p>
               ) : null}
 
-              <Button type="submit" variant="primary" className={styles.submitButton}>
-                Entrar
+              {/* ↓ MUDANÇA: disabled enquanto backend não conectou ou está submetendo */}
+              <Button
+                type="submit"
+                variant="primary"
+                className={styles.submitButton}
+                disabled={isSubmitting || !isBackendConnected}
+              >
+                {isSubmitting
+                  ? 'Entrando...'
+                  : !isBackendConnected
+                    ? 'Conectando ao servidor...'
+                    : 'Entrar'}
               </Button>
 
               <div className={styles.divider}>
@@ -270,14 +280,16 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
                 <span />
               </div>
 
-              <Button 
+              {/* ↓ MUDANÇA: disabled enquanto backend não conectou */}
+              <Button
                 type="button"
                 variant="secondary"
                 icon={<FaGoogle />}
                 className={styles.googleButton}
                 onClick={() => loginWithGoogle()}
+                disabled={!isBackendConnected}
               >
-                Entrar com Google(em manutencao)
+                {!isBackendConnected ? 'Aguarde...' : 'Entrar com Google'}
               </Button>
 
               <p className={styles.footerText}>
@@ -292,4 +304,3 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
 }
 
 export default LoginPage
-

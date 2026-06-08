@@ -26,7 +26,7 @@
   padding: 1.25rem;
   border: 1px solid var(--color-border-shell);
   border-radius: var(--radius-control);
-  background: rgba(1, 30, 47, 0.82);
+  background: var(--color-surface-panel);
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -73,8 +73,8 @@
 .tag {
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
-  background: rgba(62, 193, 224, 0.15);
-  color: #dff7ff;
+  background: color-mix(in srgb, var(--color-brand-accent) 15%, transparent);
+  color: var(--color-text-brand);
 
   font-size: 0.75rem;
   font-weight: 600;

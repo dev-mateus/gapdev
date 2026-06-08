@@ -5,6 +5,7 @@ import { useStudyPlan } from '../../contexts/StudyPlanContext'
 import PageContainer from '../../components/PageContainer/PageContainer'
 import PageHeader from '../../components/PageHeader/PageHeader'
 
+import LoadingState from '../../components/LoadingState/LoadingState'
 import styles from './plano-estudos.module.css'
 
 export default function PlanoEstudosPage() {
@@ -35,7 +36,7 @@ export default function PlanoEstudosPage() {
             description="Plano personalizado baseado nas vagas que você analisou"
           />
 
-          {isLoading ? <div className={styles.loadingState}>Carregando plano de estudos...</div> : null}
+          {isLoading ? <LoadingState message="Carregando plano de estudos" /> : null}
           {error ? <div className={styles.pageError}>{error}</div> : null}
 
           <section className={styles.summaryCards} aria-label="Resumo">
