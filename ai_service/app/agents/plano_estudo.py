@@ -120,8 +120,8 @@ def _fallback_subskills(skill_name: str, target_level: str) -> list[dict]:
 
 
 def _fallback_items(job_skills: Iterable[dict], user_skills: Iterable[dict]) -> list[dict]:
-	user_levels = {
-		str(skill.get("skill_id")): _normalize_level(skill.get("level"))
+	known_skill_ids = {
+		str(skill.get("skill_id"))
 		for skill in user_skills
 		if isinstance(skill, dict) and skill.get("skill_id")
 	}
@@ -135,10 +135,12 @@ def _fallback_items(job_skills: Iterable[dict], user_skills: Iterable[dict]) -> 
 		if not skill_id:
 			continue
 
-		target_level = _normalize_level(skill.get("required_level"), "Basic")
-		current_level = user_levels.get(str(skill_id))
-		if _level_index(current_level) >= _level_index(target_level):
+		# Only skills the user does not know belong in the plan.
+		if str(skill_id) in known_skill_ids:
 			continue
+
+		target_level = _normalize_level(skill.get("required_level"), "Basic")
+		current_level = None
 
 		skill_name = skill.get("skill_name") or skill.get("raw_name") or "esta habilidade"
 		items.append(
@@ -170,8 +172,8 @@ def _normalize_ai_items(parsed: dict, job_skills: list[dict], user_skills: list[
 		for skill in job_skills
 		if isinstance(skill, dict) and skill.get("skill_id")
 	}
-	user_levels = {
-		str(skill.get("skill_id")): _normalize_level(skill.get("level"))
+	known_skill_ids = {
+		str(skill.get("skill_id"))
 		for skill in user_skills
 		if isinstance(skill, dict) and skill.get("skill_id")
 	}
@@ -191,14 +193,12 @@ def _normalize_ai_items(parsed: dict, job_skills: list[dict], user_skills: list[
 		if not job_skill or skill_key in seen:
 			continue
 
-		# Trust the user-provided level over whatever the model guesses.
-		current_level = user_levels.get(skill_key)
+		# Only skills the user does not know belong in the plan.
+		if skill_key in known_skill_ids:
+			continue
+
+		current_level = None
 		target_level = _normalize_level(item.get("target_level"), _normalize_level(job_skill.get("required_level"), "Basic"))
-		required_level = _normalize_level(job_skill.get("required_level"), "Basic")
-		if _level_index(current_level) >= _level_index(required_level):
-			continue
-		if _level_index(current_level) >= _level_index(target_level):
-			continue
 
 		skill_name = job_skill.get("skill_name") or job_skill.get("raw_name") or "esta habilidade"
 		reason = str(item.get("reason") or "").strip()
