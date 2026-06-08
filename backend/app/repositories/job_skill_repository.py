@@ -116,26 +116,38 @@ def get_or_create_skill(db: Session, raw_name: str) -> Skill:
 SUBTOPIC_CATEGORY = "Subtopico"
 
 
-def resolve_or_create_subtopic_skill(db: Session, raw_name: str) -> Skill | None:
-	"""Resolve a learning topic to a catalog skill, creating it when needed.
+def _unique_subtopic_slug(db: Session, base_slug: str) -> str:
+	"""Return a slug guaranteed to be free in the skills table."""
 
-	Reuses an existing canonical skill when the name matches the catalog
-	(by name, slug or alias). Otherwise registers a new granular study topic
-	flagged as inactive and categorized as a subtopic, so it keeps the skill
-	pattern without polluting the user-facing catalog or the job matching.
+	import secrets
+
+	candidate = f"{base_slug}-sub"
+	while get_skill_by_slug(db, candidate) is not None:
+		candidate = f"{base_slug}-sub-{secrets.token_hex(3)}"
+	return candidate
+
+
+def resolve_or_create_subtopic_skill(db: Session, raw_name: str, module_name: str | None = None) -> Skill | None:
+	"""Register a granular learning topic as a catalog skill.
+
+	Each call creates a brand new inactive subtopic entry (category
+	"Subtopico"). Subtopics are study-scoped granular topics — reusing
+	canonical catalog skills would pollute the user-facing catalog and break
+	the per-module learning context, so we always materialize a new row.
 	"""
 
 	clean_name = (raw_name or "").strip()
 	if not clean_name:
 		return None
 
-	existing = resolve_catalog_skill(db, None, clean_name)
-	if existing:
-		return existing
+	canonical_name = clean_name
+	base_slug = _normalize_skill_slug(clean_name)
+	if module_name:
+		base_slug = f"{_normalize_skill_slug(module_name)}-{base_slug}"
 
 	skill = Skill(
-		canonical_name=clean_name,
-		slug=_normalize_skill_slug(clean_name),
+		canonical_name=canonical_name,
+		slug=_unique_subtopic_slug(db, base_slug),
 		category=SUBTOPIC_CATEGORY,
 		active=False,
 	)
@@ -145,12 +157,16 @@ def resolve_or_create_subtopic_skill(db: Session, raw_name: str) -> Skill | None
 	return skill
 
 
+def _is_subtopic(skill: Skill | None) -> bool:
+	return bool(skill) and getattr(skill, "category", None) == SUBTOPIC_CATEGORY
+
+
 def resolve_catalog_skill(db: Session, skill_id: str | None = None, raw_name: str | None = None) -> Skill | None:
-	"""Resolve a catalog skill without creating new records."""
+	"""Resolve a public catalog skill (subtopics are ignored on purpose)."""
 
 	if skill_id:
 		skill = get_skill_by_id(db, skill_id)
-		if skill:
+		if skill and not _is_subtopic(skill):
 			return skill
 
 	if not raw_name:
@@ -161,14 +177,18 @@ def resolve_catalog_skill(db: Session, skill_id: str | None = None, raw_name: st
 		return None
 
 	skill = get_skill_by_canonical_name(db, clean_name)
-	if skill:
+	if skill and not _is_subtopic(skill):
 		return skill
 
 	skill = get_skill_by_slug(db, _normalize_skill_slug(clean_name))
-	if skill:
+	if skill and not _is_subtopic(skill):
 		return skill
 
-	return get_skill_by_normalized_alias(db, normalize_skill_alias_key(clean_name))
+	skill = get_skill_by_normalized_alias(db, normalize_skill_alias_key(clean_name))
+	if skill and not _is_subtopic(skill):
+		return skill
+
+	return None
 
 def list_active_skills(db: Session) -> list[Skill]:
 	"""Return active catalog skills sorted by category and name."""

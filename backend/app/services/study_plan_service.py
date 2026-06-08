@@ -155,38 +155,77 @@ def _user_skills_for_ai(user_skills: list[object]) -> list[dict]:
 	return items
 
 
-def _resolve_subskills(db: Session, subskills: object, module_skill_id: str) -> list[dict]:
-	"""Resolve generated learning topics into catalog-backed sub-skill rows."""
+def _fallback_subskill_names(module_name: str) -> list[dict]:
+	"""Generic learning topics used when the model omits a module breakdown."""
 
-	resolved: list[dict] = []
-	seen: set[str] = set()
+	return [
+		{"name": f"Fundamentos de {module_name}", "reason": f"Dominar os conceitos basicos de {module_name}."},
+		{"name": f"Pratica guiada de {module_name}", "reason": f"Aplicar {module_name} em exercicios praticos."},
+		{"name": f"Projeto com {module_name}", "reason": f"Consolidar o aprendizado de {module_name} em um projeto."},
+	]
+
+
+def _resolve_subskills(db: Session, subskills: object, module_skill_id: str, module_name: str) -> list[dict]:
+	"""Resolve generated learning topics into freshly created subtopic skills."""
+
+	module_key = module_name.strip().lower()
+	candidates: list[dict] = []
+	seen_names: set[str] = {module_key} if module_key else set()
 	for subskill in subskills or []:
-		if not isinstance(subskill, dict):
-			continue
+		if isinstance(subskill, dict):
+			name = str(subskill.get("name") or subskill.get("skill_name") or "").strip()
+			reason = subskill.get("reason")
+		else:
+			name = str(subskill or "").strip()
+			reason = None
 
-		name = str(subskill.get("name") or "").strip()
 		if not name:
 			continue
 
-		catalog_skill = resolve_or_create_subtopic_skill(db, name)
+		key = name.lower()
+		if key in seen_names:
+			continue
+		seen_names.add(key)
+		candidates.append({"name": name, "reason": reason})
+
+	if not candidates:
+		candidates = _fallback_subskill_names(module_name)
+
+	resolved: list[dict] = []
+	for candidate in candidates[:5]:
+		catalog_skill = resolve_or_create_subtopic_skill(db, candidate["name"], module_name)
 		if not catalog_skill:
 			continue
-
-		skill_key = str(catalog_skill.id)
-		# A sub-skill must not duplicate the module skill nor a sibling topic.
-		if skill_key == module_skill_id or skill_key in seen:
+		if str(catalog_skill.id) == module_skill_id:
 			continue
-
 		resolved.append(
 			{
-				"skill_id": skill_key,
-				"reason": subskill.get("reason"),
+				"skill_id": str(catalog_skill.id),
+				"reason": candidate.get("reason"),
 				"status": "pending",
 			}
 		)
-		seen.add(skill_key)
 
 	return resolved
+
+
+def _filter_missing_job_skills(job_skills: list[object], user_skills: list[object]) -> list[object]:
+	"""Drop job skills the user already meets at or above the required level."""
+
+	user_level_by_skill_id = {
+		str(getattr(us, "skill_id")): _enum_value(getattr(us, "level", None))
+		for us in user_skills
+	}
+
+	missing: list[object] = []
+	for job_skill in job_skills:
+		skill_key = str(getattr(job_skill, "skill_id"))
+		required = _enum_value(getattr(job_skill, "required_level", SkillLevel.Basic))
+		current = user_level_by_skill_id.get(skill_key)
+		if _level_index(current) >= _level_index(required):
+			continue
+		missing.append(job_skill)
+	return missing
 
 
 def _normalize_generated_items(db: Session, generated_items: list[dict], job_skills: list[object], user_skills: list[object]) -> list[dict]:
@@ -210,12 +249,23 @@ def _normalize_generated_items(db: Session, generated_items: list[dict], job_ski
 		if not job_skill or skill_key in seen:
 			continue
 
+		# Always trust the user's recorded level over what the AI claims.
 		user_skill = user_skill_by_id.get(skill_key)
-		current_level = item.get("current_level") or _enum_value(getattr(user_skill, "level", None))
+		current_level = _enum_value(getattr(user_skill, "level", None))
 		target_level = item.get("target_level") or _enum_value(getattr(job_skill, "required_level", SkillLevel.Basic))
 
+		# Hard gate: user already meets/exceeds the required level.
+		required_level = _enum_value(getattr(job_skill, "required_level", SkillLevel.Basic))
+		if _level_index(current_level) >= _level_index(required_level):
+			continue
 		if _level_index(current_level) >= _level_index(target_level):
 			continue
+
+		module_name = (
+			str(getattr(getattr(job_skill, "skill", None), "canonical_name", ""))
+			or str(getattr(job_skill, "raw_name", ""))
+			or "esta habilidade"
+		)
 
 		normalized.append(
 			{
@@ -225,12 +275,38 @@ def _normalize_generated_items(db: Session, generated_items: list[dict], job_ski
 				"priority": item.get("priority") or _enum_value(getattr(job_skill, "priority", "desirable")),
 				"reason": item.get("reason"),
 				"status": "pending",
-				"subskills": _resolve_subskills(db, item.get("subskills"), skill_key),
+				"subskills": _resolve_subskills(db, item.get("subskills"), skill_key, module_name),
 			}
 		)
 		seen.add(skill_key)
 
 	return normalized
+
+
+def _items_from_missing_skills(db: Session, missing_job_skills: list[object]) -> list[dict]:
+	"""Backstop plan built directly from the gap, when the AI returns nothing."""
+
+	items: list[dict] = []
+	for job_skill in missing_job_skills:
+		skill_key = str(getattr(job_skill, "skill_id"))
+		module_name = (
+			str(getattr(getattr(job_skill, "skill", None), "canonical_name", ""))
+			or str(getattr(job_skill, "raw_name", ""))
+			or "esta habilidade"
+		)
+		target_level = _enum_value(getattr(job_skill, "required_level", SkillLevel.Basic))
+		items.append(
+			{
+				"skill_id": skill_key,
+				"current_level": None,
+				"target_level": target_level,
+				"priority": _enum_value(getattr(job_skill, "priority", "desirable")),
+				"reason": f"Desenvolver {module_name} para atender o nivel {target_level} exigido pela vaga.",
+				"status": "pending",
+				"subskills": _resolve_subskills(db, None, skill_key, module_name),
+			}
+		)
+	return items
 
 
 def generate_plan_for_job(db: Session, user_email: str, job_id: str, force_regenerate: bool = False) -> StudyPlanRead:
@@ -251,6 +327,14 @@ def generate_plan_for_job(db: Session, user_email: str, job_id: str, force_regen
 		)
 
 	user_skills = list_skills_by_user(db, user_id)
+
+	# Only ask the AI about the actual gap so it can't waste tokens on
+	# skills the user already meets at or above the required level.
+	missing_job_skills = _filter_missing_job_skills(job_skills, user_skills)
+	if not missing_job_skills:
+		plan = create_or_replace_study_plan(db, user_id, job_id, [], "completed")
+		return _plan_to_read(plan)
+
 	ai_payload = generate_study_plan(
 		job_context={
 			"job_id": str(job.id),
@@ -258,12 +342,18 @@ def generate_plan_for_job(db: Session, user_email: str, job_id: str, force_regen
 			"company": str(job.company_name),
 			"level": _enum_value(getattr(job, "level", None)),
 		},
-		job_skills=_job_skills_for_ai(job_skills),
+		job_skills=_job_skills_for_ai(missing_job_skills),
 		user_skills=_user_skills_for_ai(user_skills),
 	)
 
 	generated_items = ai_payload.get("items", []) if isinstance(ai_payload, dict) else []
-	items = _normalize_generated_items(db, generated_items, job_skills, user_skills)
+	items = _normalize_generated_items(db, generated_items, missing_job_skills, user_skills)
+
+	# Backstop: if the model returned nothing usable, build the plan
+	# directly from the gap so the user is never left without modules.
+	if not items:
+		items = _items_from_missing_skills(db, missing_job_skills)
+
 	plan_status = "active" if items else "completed"
 	plan = create_or_replace_study_plan(db, user_id, job_id, items, plan_status)
 	return _plan_to_read(plan)
