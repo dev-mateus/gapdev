@@ -210,19 +210,19 @@ def _resolve_subskills(db: Session, subskills: object, module_skill_id: str, mod
 
 
 def _filter_missing_job_skills(job_skills: list[object], user_skills: list[object]) -> list[object]:
-	"""Drop job skills the user already meets at or above the required level."""
+	"""Keep only job skills the user has NOT added to their profile.
 
-	user_level_by_skill_id = {
-		str(getattr(us, "skill_id")): _enum_value(getattr(us, "level", None))
-		for us in user_skills
-	}
+	The study plan must contain exclusively the skills the user does not know
+	yet (i.e. never selected). Any job skill already present in the user's
+	profile, regardless of level, is ignored.
+	"""
+
+	known_skill_ids = {str(getattr(us, "skill_id")) for us in user_skills}
 
 	missing: list[object] = []
 	for job_skill in job_skills:
 		skill_key = str(getattr(job_skill, "skill_id"))
-		required = _enum_value(getattr(job_skill, "required_level", SkillLevel.Basic))
-		current = user_level_by_skill_id.get(skill_key)
-		if _level_index(current) >= _level_index(required):
+		if skill_key in known_skill_ids:
 			continue
 		missing.append(job_skill)
 	return missing
@@ -232,7 +232,7 @@ def _normalize_generated_items(db: Session, generated_items: list[dict], job_ski
 	"""Keep generated items valid for the selected job and current user levels."""
 
 	job_skill_by_id = {str(getattr(skill, "skill_id")): skill for skill in job_skills}
-	user_skill_by_id = {str(getattr(skill, "skill_id")): skill for skill in user_skills}
+	known_skill_ids = {str(getattr(us, "skill_id")) for us in user_skills}
 
 	normalized: list[dict] = []
 	seen: set[str] = set()
@@ -249,17 +249,12 @@ def _normalize_generated_items(db: Session, generated_items: list[dict], job_ski
 		if not job_skill or skill_key in seen:
 			continue
 
-		# Always trust the user's recorded level over what the AI claims.
-		user_skill = user_skill_by_id.get(skill_key)
-		current_level = _enum_value(getattr(user_skill, "level", None))
-		target_level = item.get("target_level") or _enum_value(getattr(job_skill, "required_level", SkillLevel.Basic))
+		# Hard gate: only skills the user does NOT know belong in the plan.
+		if skill_key in known_skill_ids:
+			continue
 
-		# Hard gate: user already meets/exceeds the required level.
-		required_level = _enum_value(getattr(job_skill, "required_level", SkillLevel.Basic))
-		if _level_index(current_level) >= _level_index(required_level):
-			continue
-		if _level_index(current_level) >= _level_index(target_level):
-			continue
+		current_level = None
+		target_level = item.get("target_level") or _enum_value(getattr(job_skill, "required_level", SkillLevel.Basic))
 
 		module_name = (
 			str(getattr(getattr(job_skill, "skill", None), "canonical_name", ""))

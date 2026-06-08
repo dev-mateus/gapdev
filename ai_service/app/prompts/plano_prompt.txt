@@ -4,10 +4,10 @@ requires that the user is still missing. Inside each module you must break
 that skill down into the concrete sub-skills (learning topics) the user must
 learn so the module skill can be considered mastered.
 
-The "Job skills" payload below ONLY contains the skills the user does NOT
-already meet. The "User skills" payload is provided as background only — never
-emit a module for any skill the user already has at or above the required
-level. If "Job skills" is empty, return {"items":[]}.
+The "Job skills" payload below ONLY contains skills the user does NOT have in
+their profile yet. The "User skills" payload is provided as background only —
+never emit a module for any skill already present in the user's profile,
+regardless of level. If "Job skills" is empty, return {"items":[]}.
 
 Return only valid JSON in this exact shape:
 {"items":[{"skill_id":"string","current_level":"Beginner|Basic|Intermediate|Advanced|Specialist|null","target_level":"Basic|Intermediate|Advanced|Specialist","priority":"required|desirable","reason":"string","subskills":[{"name":"string","reason":"string"}]}]}
