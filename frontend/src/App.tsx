@@ -10,7 +10,9 @@ import ResultadoAnalisePage from './app/resultado-analise/page'
 import Sidebar from './components/Sidebar/Sidebar'
 import HistoricoPage from './app/historico-vagas/page'
 import ProgressoPage from './app/progresso/page'
+import EsqueciSenhaPage from './app/esqueci-senha/page'
 import { StudyPlanProvider } from './contexts/StudyPlanContext'
+
 
 import './App.css'
 
@@ -80,10 +82,13 @@ function App(): ReactElement {
             element={<LoginPage isBackendConnected={isBackendConnected} />}
           />
 
+          <Route path="/esqueci-senha" element={<EsqueciSenhaPage />} />
+
           <Route
             path="/cadastro"
             element={<CadastroPage isBackendConnected={isBackendConnected} />}
           />
+
 
           <Route
             path="/perfil"
