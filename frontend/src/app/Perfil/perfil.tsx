@@ -19,6 +19,7 @@ import TabSwitcher, { type TabSwitcherItem } from '../../components/TabSwitcher/
 
 import Tecnologias from './tecnologias'
 import styles from './perfil.module.css'
+import { apiPost } from '../../services/api'
 
 type PerfilUsuario = {
   nome: string
@@ -26,6 +27,8 @@ type PerfilUsuario = {
   area: string
   objetivo: string
 }
+
+type AuthProvider = 'google' | 'credentials'
 
 const profileTabs: TabSwitcherItem[] = [
   {
@@ -45,6 +48,12 @@ function Perfil() {
   const [mostrarSenhaAtual, setMostrarSenhaAtual] = useState(false)
   const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false)
   const [definindoSenha, setDefinindoSenha] = useState(false)
+  const [senhaAtual, setSenhaAtual] = useState('')
+  const [novaSenha, setNovaSenha] = useState('')
+  const [confirmarSenha, setConfirmarSenha] = useState('')
+  const [mensagemSenha, setMensagemSenha] = useState('')
+  const [erroSenha, setErroSenha] = useState('')
+  const [salvandoSenha, setSalvandoSenha] = useState(false)
 
   const [perfil, setPerfil] = useState<PerfilUsuario>({
     nome: '',
@@ -52,6 +61,9 @@ function Perfil() {
     area: 'Desenvolvimento Backend',
     objetivo: '',
   })
+
+  const [authProvider, setAuthProvider] =
+    useState<AuthProvider>('credentials')
 
 
   useEffect(() => {
@@ -67,11 +79,17 @@ function Perfil() {
     }))
 
     setEditando(false)
-    return
+  
   }
 
   if (usuarioLogado) {
     const usuario = JSON.parse(usuarioLogado)
+
+    setAuthProvider(
+      usuario.authProvider === 'google'
+        ? 'google'
+        : 'credentials'
+    )
 
     setPerfil((prev) => ({
       ...prev,
@@ -113,6 +131,53 @@ function Perfil() {
   setEditando(false)
 }
 
+async function handleChangePassword() {
+  setMensagemSenha('')
+  setErroSenha('')
+
+  if (authProvider === 'credentials' && !senhaAtual.trim()) {
+    setErroSenha('Informe a senha atual.')
+    return
+  }
+
+  if (!novaSenha.trim()) {
+    setErroSenha('Informe a nova senha.')
+    return
+  }
+
+  if (authProvider === 'google' && novaSenha !== confirmarSenha) {
+    setErroSenha('As senhas não conferem.')
+    return
+  }
+
+  try {
+    setSalvandoSenha(true)
+
+    const response = await apiPost<{ message: string }>(
+      '/auth/change-password',
+      {
+        current_password:
+          authProvider === 'credentials' ? senhaAtual : undefined,
+        new_password: novaSenha,
+      }
+    )
+
+    setMensagemSenha(response.message)
+    setSenhaAtual('')
+    setNovaSenha('')
+    setConfirmarSenha('')
+    setDefinindoSenha(false)
+  } catch (error) {
+    setErroSenha(
+      error instanceof Error
+        ? error.message
+        : 'Erro ao alterar senha.'
+    )
+  } finally {
+    setSalvandoSenha(false)
+  }
+}
+
   return (
     <div className={styles.content}>
       <PageContainer className={styles.expandedContainer}>
@@ -140,6 +205,7 @@ function Perfil() {
                     <div className={styles.formContent}>
                       <div className={styles.leftForm}>
                         <div className={styles.topFields}>
+                          
                           <Input
                             label="Nome completo"
                             type="text"
@@ -230,15 +296,20 @@ function Perfil() {
                                   <Lock size={20} />
                                 </div>
 
-                                <h3>Autenticação Google</h3>
+                                <h3>
+                                  {authProvider === 'google'
+                                    ? 'Autenticação Google'
+                                    : 'Senha de acesso'}
+                                </h3>
                               </div>
 
                               <div className={styles.authDivider} />
 
+
                               <p className={styles.authMessage}>
-                                Esta conta utiliza autenticação via Google. Você
-                                também pode definir uma senha para acessar a
-                                plataforma com e-mail e senha.
+                                {authProvider === 'google'
+                                  ? 'Esta conta utiliza autenticação via Google. Você também pode definir uma senha para acessar a plataforma com e-mail e senha.'
+                                  : 'Esta conta utiliza login com e-mail e senha. Você pode alterar sua senha de acesso.'}
                               </p>
 
                               <PrimaryButton
@@ -246,7 +317,7 @@ function Perfil() {
                                 className={styles.passwordButton}
                                 onClick={() => setDefinindoSenha(true)}
                               >
-                                Definir senha
+                                {authProvider === 'google' ? 'Definir senha' : 'Alterar senha'}
                               </PrimaryButton>
                             </>
                           ) : (
@@ -256,14 +327,34 @@ function Perfil() {
                                   <Lock size={20} />
                                 </div>
 
-                                <h3>Definir senha</h3>
+                  
+                                <h3>{authProvider === 'google'
+                                  ? 'Definir senha'
+                                  : 'Alterar senha'} </h3>
+                                
                               </div>
 
                               <Input
-                                label="Senha:"
+                                label={
+                                  authProvider === 'google'
+                                    ? 'Nova Senha'
+                                    : 'Senha Atual'
+                                }
                                 type={mostrarSenhaAtual ? 'text' : 'password'}
-                                placeholder="Digite a senha"
+                                placeholder={
+                                  authProvider === 'google'
+                                    ? 'Digite a nova senha:'
+                                    : 'Digite a senha atual:'
+                                }
+
+                                value={authProvider === 'google' ? novaSenha : senhaAtual}
+                                  onChange={(event) =>
+                                    authProvider === 'google'
+                                      ? setNovaSenha(event.target.value)
+                                      : setSenhaAtual(event.target.value)
+                                  }
                                 endIcon={
+
                                   <button
                                     type="button"
                                     className={styles.eyeButton}
@@ -281,10 +372,28 @@ function Perfil() {
                               />
 
                               <Input
-                                label="Confirmar Senha:"
-                                type={mostrarNovaSenha ? 'text' : 'password'}
-                                placeholder="Confirme a senha"
+                                  label={
+                                    authProvider === 'google'
+                                      ? 'Confirmar Senha'
+                                      : 'Senha Nova'
+                                  }
+                                  type={mostrarNovaSenha ? 'text' : 'password'}
+                                  placeholder={
+                                    authProvider === 'google'
+                                      ? 'Confirme a senha:'
+                                      : 'Digite a senha nova:'
+                                      
+                                  }
+
+
+                                value={authProvider === 'google' ? confirmarSenha : novaSenha}
+                                onChange={(event) =>
+                                  authProvider === 'google'
+                                    ? setConfirmarSenha(event.target.value)
+                                    : setNovaSenha(event.target.value)
+                                }  
                                 endIcon={
+                                  
                                   <button
                                     type="button"
                                     className={styles.eyeButton}
@@ -304,37 +413,64 @@ function Perfil() {
                               <PrimaryButton
                                 type="button"
                                 className={styles.passwordButton}
+                                onClick={handleChangePassword}
                               >
-                                Salvar senha
+                                {salvandoSenha
+                                ? 'Salvando...'
+                                : authProvider === 'google'
+                                  ? 'Salvar senha'
+                                  : 'Alterar'}
                               </PrimaryButton>
 
                               <button
                                 type="button"
-                                className={styles.cancelPasswordButton}
-                                onClick={() => setDefinindoSenha(false)}
+                                className={styles.cancFelPasswordButton}
+                                onClick={() => {
+                                setDefinindoSenha(false)
+                                setSenhaAtual('')
+                                setNovaSenha('')
+                                setConfirmarSenha('')
+                                setErroSenha('')
+                                setMensagemSenha('')
+                              }}
                               >
                                 Cancelar
-                              </button>
+                              </button> 
                             </>
                           )}
 
-                          <div className={styles.authDivider} />
+                          {erroSenha && (
+                            <p className={styles.passwordError}>{erroSenha}</p>
+                          )}
 
-                          <div className={styles.googleConnected}>
-                            <img
-                              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                              alt="Google"
-                              width={38}
-                              height={38}
-                            />
+                          {mensagemSenha && (
+                            <p className={styles.passwordSuccess}>{mensagemSenha}</p>
+                          )}
+                            
 
-                            <div className={styles.googleConnectedText}>
-                              <strong>Conectado com Google</strong>
-                              <span>Conta autenticada com sucesso</span>
-                            </div>
-                          </div>
+                          {authProvider === 'google' && (
+                            <>
+                              <div className={styles.authDivider} />
+
+                              <div className={styles.googleConnected}>
+                                <img
+                                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                                  alt="Google"
+                                  width={38}
+                                  height={38}
+                                />
+
+                                <div className={styles.googleConnectedText}>
+                                  <strong>Conectado com Google</strong>
+                                  <span>Conta autenticada com sucesso</span>
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
+
+                      
 
                       <div className={styles.footerActions}>
                         <PrimaryButton
@@ -346,7 +482,9 @@ function Perfil() {
                       </div>
                     </div>
                   </form>
+
                 </SectionCard>
+                
               ) : (
                 <section className={styles.profileCard}>
                   <div className={styles.profileTop}>
