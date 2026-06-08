@@ -191,8 +191,12 @@ def _normalize_ai_items(parsed: dict, job_skills: list[dict], user_skills: list[
 		if not job_skill or skill_key in seen:
 			continue
 
-		current_level = _normalize_level(item.get("current_level"), user_levels.get(skill_key))
+		# Trust the user-provided level over whatever the model guesses.
+		current_level = user_levels.get(skill_key)
 		target_level = _normalize_level(item.get("target_level"), _normalize_level(job_skill.get("required_level"), "Basic"))
+		required_level = _normalize_level(job_skill.get("required_level"), "Basic")
+		if _level_index(current_level) >= _level_index(required_level):
+			continue
 		if _level_index(current_level) >= _level_index(target_level):
 			continue
 
@@ -228,8 +232,12 @@ def generate_study_plan(
 	prompt = prompt.replace("{job_skills}", _json_dumps(job_skills))
 	prompt = prompt.replace("{user_skills}", _json_dumps(user_skills))
 
+	# Bail out when the backend has already filtered the gap to nothing.
+	if not job_skills:
+		return {"items": []}
+
 	try:
-		response = ask_hf(prompt, max_tokens=1200)
+		response = ask_hf(prompt, max_tokens=2400)
 		parsed = _parse_model_response(response)
 		items = _normalize_ai_items(parsed, job_skills, user_skills)
 	except Exception:
