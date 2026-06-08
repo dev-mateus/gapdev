@@ -14,7 +14,6 @@ import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
 
 import Button from '../../components/Button/Button'
-import Checkbox from '../../components/Checkbox/Checkbox'
 import Input from '../../components/Input/Input'
 import { apiPost } from '../../services/api'
 import { validateEmail, validatePassword } from '../../utils/validators'
@@ -243,7 +242,6 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
               />
 
               <div className={styles.formRow}>
-                <Checkbox label="Lembrar de mim" />
                 <a className={styles.inlineLink} href="#forgot-password">
                   Esqueci minha senha
                 </a>
