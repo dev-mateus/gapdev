@@ -216,6 +216,24 @@
   transform: translateY(-1px);
 }
 
+
+.passwordSuccess {
+  color: #4ade80;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 8px;
+  text-align: center;
+}
+
+
+.passwordError {
+  color: #ef4444;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 8px;
+  text-align: center;
+}
+
 .footerActions {
   border-top: 1px solid var(--color-border-panel);
 

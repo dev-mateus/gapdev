@@ -50,3 +50,37 @@ class StudyPlanItem(Base):
 
 	study_plan = relationship("StudyPlan", back_populates="items")
 	skill = relationship("Skill", back_populates="study_items")
+	subskills = relationship(
+		"StudyPlanItemSkill",
+		back_populates="study_plan_item",
+		cascade="all, delete-orphan",
+	)
+
+
+class StudyPlanItemSkill(Base):
+	"""Granular skill the user must learn to complete a study plan module."""
+
+	__tablename__ = "study_plan_item_skills"
+	__table_args__ = (
+		UniqueConstraint(
+			"study_plan_item_id",
+			"skill_id",
+			name="study_plan_item_skills_item_skill_key",
+		),
+	)
+
+	id = Column(String(36), primary_key=True, default=lambda: str(uuid4()))
+	study_plan_item_id = Column(
+		String(36),
+		ForeignKey("study_plan_items.id", ondelete="CASCADE"),
+		nullable=False,
+		index=True,
+	)
+	skill_id = Column(String(36), ForeignKey("skills.id", ondelete="RESTRICT"), nullable=False, index=True)
+	reason = Column(Text, nullable=True)
+	status = Column(SQLEnum(StudyPlanItemStatus), nullable=False, default=StudyPlanItemStatus.pending)
+	created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+	updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+
+	study_plan_item = relationship("StudyPlanItem", back_populates="subskills")
+	skill = relationship("Skill", back_populates="study_item_skills")

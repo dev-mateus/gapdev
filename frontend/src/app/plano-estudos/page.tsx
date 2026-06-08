@@ -20,11 +20,10 @@ export default function PlanoEstudosPage() {
     return () => window.clearTimeout(timer)
   }, [reloadPlans])
 
-  const totalTasks = plans.reduce((sum, plan) => sum + plan.tasks.length, 0)
-  const completedTasks = plans.reduce(
-    (sum, plan) => sum + plan.tasks.filter((task) => task.done).length,
-    0,
-  )
+  const totalModules = plans.length
+  const completedModules = plans.filter(
+    (plan) => plan.tasks.length > 0 && plan.tasks.every((task) => task.done),
+  ).length
   const selectedOpenPlanId = openPlanId === undefined ? plans[0]?.id ?? '' : openPlanId
 
   return (
@@ -45,7 +44,7 @@ export default function PlanoEstudosPage() {
                 <ShieldCheck size={20} />
               </div>
               <div className={styles.summaryMeta}>
-                <div className={styles.summaryBig}>{completedTasks}/{totalTasks}</div>
+                <div className={styles.summaryBig}>{completedModules}/{totalModules}</div>
                 <div className={styles.summarySmall}>Módulos concluídos</div>
               </div>
             </div>

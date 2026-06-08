@@ -9,13 +9,14 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from app.schemas.user import UserCreate 
 
-from app.api.deps import get_database
+from app.api.deps import get_database, get_current_user
 from app.core.security import (
 	create_access_token,
 	verify_password,
 	hash_password,
 )
 from app.repositories import user_repo
+from app.models.user import User
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -32,6 +33,13 @@ class GoogleLoginRequest(BaseModel):
 	"""Google login payload."""
 
 	google_token: str
+
+
+class ChangePasswordRequest(BaseModel):
+	"""Change password payload."""
+
+	current_password: str | None = None
+	new_password: str
 
 
 @router.post("/login")
@@ -120,3 +128,39 @@ def google_login(
 		"access_token": create_access_token({"sub": str(user.id)}),
 		"token_type": "bearer",
 	}
+
+@router.post("/change-password")
+def change_password(
+	payload: ChangePasswordRequest,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_database),
+) -> dict[str, str]:
+	"""Change authenticated user password."""
+
+	if not payload.new_password or len(payload.new_password) < 6:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="A nova senha deve ter pelo menos 6 caracteres.",
+		)
+
+
+
+	if not payload.current_password:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="Informe a senha atual.",
+		)
+
+	if not verify_password(payload.current_password, str(current_user.password)):
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="Senha atual incorreta.",
+		)			
+
+	user_repo.update_user_password(
+		db=db,
+		user=current_user,
+		hashed_password=hash_password(payload.new_password),
+	)
+
+	return {"message": "Senha alterada com sucesso."}

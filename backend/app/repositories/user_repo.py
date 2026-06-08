@@ -36,3 +36,18 @@ def create_user(db: Session, payload: UserCreate) -> User:
 	db.commit()
 	db.refresh(user)
 	return user
+
+def update_user_password(
+	db: Session,
+	user: User,
+	hashed_password: str,
+) -> User:
+	"""Update user password."""
+
+	user.password = hashed_password
+
+	db.add(user)
+	db.commit()
+	db.refresh(user)
+
+	return user

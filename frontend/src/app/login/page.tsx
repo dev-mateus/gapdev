@@ -78,6 +78,7 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
           JSON.stringify({
             email: '',
             nome: '',
+            authProvider: 'google',
           })
         )
 
