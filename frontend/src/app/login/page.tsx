@@ -79,6 +79,7 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
           JSON.stringify({
             email: '',
             nome: '',
+            authProvider: 'google',
           })
         )
 
@@ -142,13 +143,13 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
 
     const usuarioCadastrado = localStorage.getItem(`usuario_${trimmedEmail}`)
     const usuario = usuarioCadastrado ? JSON.parse(usuarioCadastrado) : null
- 
 
     localStorage.setItem(
       'usuarioLogado',
       JSON.stringify({
         nome: usuario?.nome || '',
         email: trimmedEmail,
+        authProvider: 'credentials',
       })
     )
 
