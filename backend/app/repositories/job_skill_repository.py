@@ -113,6 +113,38 @@ def get_or_create_skill(db: Session, raw_name: str) -> Skill:
 	return skill
 
 
+SUBTOPIC_CATEGORY = "Subtopico"
+
+
+def resolve_or_create_subtopic_skill(db: Session, raw_name: str) -> Skill | None:
+	"""Resolve a learning topic to a catalog skill, creating it when needed.
+
+	Reuses an existing canonical skill when the name matches the catalog
+	(by name, slug or alias). Otherwise registers a new granular study topic
+	flagged as inactive and categorized as a subtopic, so it keeps the skill
+	pattern without polluting the user-facing catalog or the job matching.
+	"""
+
+	clean_name = (raw_name or "").strip()
+	if not clean_name:
+		return None
+
+	existing = resolve_catalog_skill(db, None, clean_name)
+	if existing:
+		return existing
+
+	skill = Skill(
+		canonical_name=clean_name,
+		slug=_normalize_skill_slug(clean_name),
+		category=SUBTOPIC_CATEGORY,
+		active=False,
+	)
+	db.add(skill)
+	db.commit()
+	db.refresh(skill)
+	return skill
+
+
 def resolve_catalog_skill(db: Session, skill_id: str | None = None, raw_name: str | None = None) -> Skill | None:
 	"""Resolve a catalog skill without creating new records."""
 

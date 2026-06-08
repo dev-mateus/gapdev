@@ -67,6 +67,58 @@ def _json_dumps(data: Any) -> str:
 	return json.dumps(data, ensure_ascii=False, indent=2)
 
 
+def _normalize_subskills(raw_subskills: Any, skill_name: str, target_level: str) -> list[dict]:
+	"""Keep only well-formed learning topics for a module."""
+
+	topics: list[dict] = []
+	seen: set[str] = set()
+	if isinstance(raw_subskills, list):
+		for topic in raw_subskills:
+			if isinstance(topic, dict):
+				name = str(topic.get("name") or topic.get("skill_name") or "").strip()
+				reason = str(topic.get("reason") or "").strip()
+			else:
+				name = str(topic or "").strip()
+				reason = ""
+
+			if not name:
+				continue
+
+			key = name.lower()
+			if key in seen:
+				continue
+
+			if not reason:
+				reason = f"Aprender {name} para dominar {skill_name}."
+
+			topics.append({"name": name[:255], "reason": reason[:500]})
+			seen.add(key)
+
+	if not topics:
+		topics = _fallback_subskills(skill_name, target_level)
+
+	return topics[:5]
+
+
+def _fallback_subskills(skill_name: str, target_level: str) -> list[dict]:
+	"""Generic learning topics used when the model omits a module breakdown."""
+
+	return [
+		{
+			"name": f"Fundamentos de {skill_name}",
+			"reason": f"Dominar os conceitos basicos de {skill_name}.",
+		},
+		{
+			"name": f"Pratica de {skill_name}",
+			"reason": f"Praticar {skill_name} ate o nivel {target_level} com exercicios reais.",
+		},
+		{
+			"name": f"Projeto com {skill_name}",
+			"reason": f"Aplicar {skill_name} em um projeto para consolidar o aprendizado.",
+		},
+	]
+
+
 def _fallback_items(job_skills: Iterable[dict], user_skills: Iterable[dict]) -> list[dict]:
 	user_levels = {
 		str(skill.get("skill_id")): _normalize_level(skill.get("level"))
@@ -96,10 +148,11 @@ def _fallback_items(job_skills: Iterable[dict], user_skills: Iterable[dict]) -> 
 				"target_level": target_level,
 				"priority": _normalize_priority(skill.get("priority")),
 				"reason": f"Desenvolver {skill_name} ate o nivel {target_level} para cobrir a lacuna desta vaga.",
+				"subskills": _fallback_subskills(skill_name, target_level),
 			}
 		)
 
-	return items[:10]
+	return items[:8]
 
 
 def _normalize_ai_items(parsed: dict, job_skills: list[dict], user_skills: list[dict]) -> list[dict]:
@@ -143,9 +196,9 @@ def _normalize_ai_items(parsed: dict, job_skills: list[dict], user_skills: list[
 		if _level_index(current_level) >= _level_index(target_level):
 			continue
 
+		skill_name = job_skill.get("skill_name") or job_skill.get("raw_name") or "esta habilidade"
 		reason = str(item.get("reason") or "").strip()
 		if not reason:
-			skill_name = job_skill.get("skill_name") or job_skill.get("raw_name") or "esta habilidade"
 			reason = f"Desenvolver {skill_name} ate o nivel {target_level} para atender melhor a vaga."
 
 		normalized.append(
@@ -155,11 +208,12 @@ def _normalize_ai_items(parsed: dict, job_skills: list[dict], user_skills: list[
 				"target_level": target_level,
 				"priority": _normalize_priority(item.get("priority"), _normalize_priority(job_skill.get("priority"))),
 				"reason": reason[:500],
+				"subskills": _normalize_subskills(item.get("subskills"), skill_name, target_level),
 			}
 		)
 		seen.add(skill_key)
 
-	return normalized[:10]
+	return normalized[:8]
 
 
 def generate_study_plan(

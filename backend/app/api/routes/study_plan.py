@@ -5,8 +5,20 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_database
 from app.models.user import User
-from app.schemas.study_plan import StudyPlanGenerateRequest, StudyPlanItemRead, StudyPlanItemStatusUpdate, StudyPlanRead
-from app.services.study_plan_service import generate_plan_for_job, get_plan_for_job, list_plans, update_item_status
+from app.schemas.study_plan import (
+	StudyPlanGenerateRequest,
+	StudyPlanItemRead,
+	StudyPlanItemSkillRead,
+	StudyPlanItemStatusUpdate,
+	StudyPlanRead,
+)
+from app.services.study_plan_service import (
+	generate_plan_for_job,
+	get_plan_for_job,
+	list_plans,
+	update_item_skill_status,
+	update_item_status,
+)
 
 router = APIRouter(prefix="/study-plans", tags=["study-plans"])
 
@@ -53,3 +65,15 @@ def update_study_plan_item_status_route(
 	"""Update the status of one study plan item."""
 
 	return update_item_status(db, str(current_user.email), item_id, payload.status)
+
+
+@router.patch("/item-skills/{item_skill_id}/status", response_model=StudyPlanItemSkillRead)
+def update_study_plan_item_skill_status_route(
+	item_skill_id: str,
+	payload: StudyPlanItemStatusUpdate,
+	db: Session = Depends(get_database),
+	current_user: User = Depends(get_current_user),
+) -> StudyPlanItemSkillRead:
+	"""Update the status of one module sub-skill (learning topic)."""
+
+	return update_item_skill_status(db, str(current_user.email), item_skill_id, payload.status)

@@ -1,14 +1,21 @@
 You are generating a study plan for GapDev.
+Each plan is made of modules. Each module corresponds to ONE skill the job
+requires that the user is missing or has below the required level. Inside each
+module you must break that skill down into the concrete sub-skills (learning
+topics) the user has to learn so the module skill can be considered mastered.
+
 Return only valid JSON in this exact shape:
-{"items":[{"skill_id":"string","current_level":"Beginner|Basic|Intermediate|Advanced|Specialist|null","target_level":"Basic|Intermediate|Advanced|Specialist","priority":"required|desirable","reason":"string"}]}
+{"items":[{"skill_id":"string","current_level":"Beginner|Basic|Intermediate|Advanced|Specialist|null","target_level":"Basic|Intermediate|Advanced|Specialist","priority":"required|desirable","reason":"string","subskills":[{"name":"string","reason":"string"}]}]}
 
 Rules:
-- Use only skill_id values present in the job_skills list.
-- Include only skills where the user is missing the skill or current_level is lower than target_level.
+- Use only skill_id values present in the job_skills list for the module skill_id.
+- Include only modules where the user is missing the skill or current_level is lower than target_level.
 - target_level must be at least the job required_level for that skill.
 - priority must be "required" for mandatory skills and "desirable" for optional skills.
-- reason must be concise, practical, and written in Brazilian Portuguese.
-- Return at most 10 items.
+- subskills must list 2 to 5 concrete learning topics needed to master the module skill.
+- subskills[].name is a short topic title (e.g. "Hooks no React", "Async/await em Python"). Do NOT invent skill_id values for subskills, only names.
+- Every text field (reason, subskills[].reason) must be concise, practical, and written in Brazilian Portuguese.
+- Return at most 8 modules.
 
 Job:
 {job_context}
