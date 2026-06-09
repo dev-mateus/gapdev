@@ -185,7 +185,11 @@ export function StudyPlanProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    const nextDone = !task.done
+    if (task.done) {
+      return
+    }
+
+    const nextDone = true
     setPlans((currentPlans) =>
       currentPlans.map((currentPlan) =>
         currentPlan.id !== planId

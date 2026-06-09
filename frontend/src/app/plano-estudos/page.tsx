@@ -1,7 +1,7 @@
-import { ArrowLeft, BookOpen, Briefcase, Calendar, Pencil, ShieldCheck, Trash2 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { ArrowLeft, BookOpen, Briefcase, Calendar, CheckCircle, Pencil, ShieldCheck, Trash2 } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useStudyPlan, type StudyPlan } from '../../contexts/StudyPlanContext'
+import { useStudyPlan, type StudyPlan, type StudyTask } from '../../contexts/StudyPlanContext'
 
 import PageContainer from '../../components/PageContainer/PageContainer'
 import PageHeader from '../../components/PageHeader/PageHeader'
@@ -265,6 +265,48 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
   const selectedOpenModuleId = openModuleId === undefined ? plan.modules[0]?.id ?? '' : openModuleId
   const jobLabel = [plan.jobTitle, plan.companyName].filter(Boolean).join(' · ')
 
+  const [confirmTarget, setConfirmTarget] = useState<{
+    moduleId: string
+    task: StudyTask
+    isLastTask: boolean
+    moduleName: string
+  } | null>(null)
+
+  const [toast, setToast] = useState<string | null>(null)
+
+  const dismissToast = useCallback(() => setToast(null), [])
+
+  useEffect(() => {
+    if (!toast) return
+    const timer = window.setTimeout(dismissToast, 4000)
+    return () => window.clearTimeout(timer)
+  }, [toast, dismissToast])
+
+  const handleTaskClick = (moduleId: string, task: StudyTask, moduleName: string, allTasks: StudyTask[]) => {
+    if (task.done) return
+
+    const pendingCount = allTasks.filter((t) => !t.done).length
+    const isLastTask = pendingCount === 1
+
+    setConfirmTarget({ moduleId, task, isLastTask, moduleName })
+  }
+
+  const handleConfirm = () => {
+    if (!confirmTarget) return
+
+    onToggleTask(plan.id, confirmTarget.moduleId, confirmTarget.task.id)
+
+    if (confirmTarget.isLastTask) {
+      setToast('Habilidade adicionada ao seu perfil')
+    }
+
+    setConfirmTarget(null)
+  }
+
+  const handleCancel = () => {
+    setConfirmTarget(null)
+  }
+
   return (
     <div className={styles.content}>
       <PageContainer className={styles.expandedContainer}>
@@ -353,8 +395,10 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
                               key={task.id}
                               type="button"
                               className={`${styles.skillTaskItem} ${task.done ? styles.taskDone : ''}`}
-                              onClick={() => onToggleTask(plan.id, moduleEntry.id, task.id)}
+                              onClick={() => handleTaskClick(moduleEntry.id, task, moduleEntry.name, moduleEntry.tasks)}
+                              disabled={task.done}
                             >
+                              {task.done ? <CheckCircle size={16} className={styles.taskDoneIcon} /> : null}
                               {task.title}
                             </button>
                           ))}
@@ -368,6 +412,41 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
           )}
         </div>
       </PageContainer>
+
+      {confirmTarget ? (
+        <div className={styles.confirmOverlay} onClick={handleCancel}>
+          <div className={styles.confirmCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.confirmIcon}>
+              <CheckCircle size={32} />
+            </div>
+            <h3 className={styles.confirmTitle}>
+              {confirmTarget.isLastTask
+                ? `Concluir módulo "${confirmTarget.moduleName}"?`
+                : 'Concluir subskill?'}
+            </h3>
+            <p className={styles.confirmDescription}>
+              {confirmTarget.isLastTask
+                ? 'Ao concluir este último item, o módulo será finalizado e a habilidade será adicionada ao seu perfil. Esta ação não pode ser desfeita.'
+                : `Deseja marcar "${confirmTarget.task.title}" como concluído? Esta ação não pode ser desfeita.`}
+            </p>
+            <div className={styles.confirmActions}>
+              <button type="button" className={styles.confirmButtonCancel} onClick={handleCancel}>
+                Cancelar
+              </button>
+              <button type="button" className={styles.confirmButtonConfirm} onClick={handleConfirm}>
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {toast ? (
+        <div className={styles.toast} onClick={dismissToast}>
+          <CheckCircle size={18} />
+          <span>{toast}</span>
+        </div>
+      ) : null}
     </div>
   )
 }
