@@ -297,3 +297,122 @@
     grid-template-columns: 1fr;
   }
 }
+
+.planGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.planCard {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+  background: var(--color-bg-card-dark);
+  border: 1px solid var(--color-border-shell-inner);
+  cursor: pointer;
+  transition: transform var(--transition-default), border-color var(--transition-default), background var(--transition-default);
+  outline: none;
+}
+
+.planCard:hover,
+.planCard:focus-visible {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
+  background: color-mix(in srgb, var(--color-bg-card-dark) 80%, transparent);
+}
+
+.planCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.planCardTitle {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.planCardActions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.iconButton {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border-shell-inner);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background var(--transition-default), color var(--transition-default);
+}
+
+.iconButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-primary);
+}
+
+.iconButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.iconButtonDanger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-priority-high) 22%, transparent);
+  color: var(--color-priority-high-text);
+}
+
+.planCardMetaLine {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.planCardProgressBlock {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.25rem;
+}
+
+.planCardProgressLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--color-border-shell-inner);
+  color: var(--color-text-primary);
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background var(--transition-default), border-color var(--transition-default);
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: color-mix(in srgb, var(--color-ring-focus) 30%, transparent);
+}

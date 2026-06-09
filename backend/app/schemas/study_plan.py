@@ -10,7 +10,14 @@ class StudyPlanGenerateRequest(BaseModel):
 	"""Payload used to generate a study plan for a job."""
 
 	job_id: str
+	title: Optional[str] = None
 	force_regenerate: bool = False
+
+
+class StudyPlanRenameRequest(BaseModel):
+	"""Payload used to rename a study plan."""
+
+	title: str
 
 
 class StudyPlanItemStatusUpdate(BaseModel):
@@ -59,6 +66,9 @@ class StudyPlanRead(BaseModel):
 	id: str
 	user_id: str
 	job_id: str
+	title: str
+	job_title: Optional[str] = None
+	company_name: Optional[str] = None
 	status: str
 	created_at: datetime
 	updated_at: datetime

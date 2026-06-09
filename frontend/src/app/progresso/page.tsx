@@ -29,27 +29,40 @@ function startOfDay(date: Date) {
 export default function ProgressoPage() {
   const { plans } = useStudyPlan()
 
-  const allTasks = plans.flatMap((plan) =>
-    plan.tasks.map((task) => ({
-      ...task,
+  const allModules = plans.flatMap((plan) =>
+    plan.modules.map((moduleEntry) => ({
+      ...moduleEntry,
       planId: plan.id,
-      planName: plan.name,
+      planTitle: plan.title,
+    })),
+  )
+
+  const allTasks = allModules.flatMap((moduleEntry) =>
+    moduleEntry.tasks.map((task) => ({
+      ...task,
+      planId: moduleEntry.planId,
+      moduleId: moduleEntry.id,
+      moduleName: moduleEntry.name,
     })),
   )
 
   const totalTasks = allTasks.length
   const completedTasks = allTasks.filter((task) => task.done).length
-  const totalSkills = plans.length
-  const dominatedSkills = plans.filter((plan) => plan.tasks.length > 0 && plan.tasks.every((task) => task.done)).length
+  const totalSkills = allModules.length
+  const dominatedSkills = allModules.filter(
+    (moduleEntry) => moduleEntry.tasks.length > 0 && moduleEntry.tasks.every((task) => task.done),
+  ).length
   const dominatedPercent = totalSkills > 0 ? Math.round((dominatedSkills / totalSkills) * 100) : 0
 
-  const skillProgress: SkillProgress[] = plans.map((plan) => {
-    const completedPlanTasks = plan.tasks.filter((task) => task.done).length
-    const percent = plan.tasks.length ? Math.round((completedPlanTasks / plan.tasks.length) * 100) : 0
+  const skillProgress: SkillProgress[] = allModules.map((moduleEntry) => {
+    const completedModuleTasks = moduleEntry.tasks.filter((task) => task.done).length
+    const percent = moduleEntry.tasks.length
+      ? Math.round((completedModuleTasks / moduleEntry.tasks.length) * 100)
+      : 0
     const status = percent >= 100 ? 'concluído' : percent >= 40 ? 'em andamento' : 'iniciando'
 
     return {
-      name: plan.name,
+      name: `${moduleEntry.name} · ${moduleEntry.planTitle}`,
       percent,
       status,
     }
