@@ -1,9 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { apiGet, apiPatch } from '../services/api'
+import { apiDelete, apiGet, apiPatch } from '../services/api'
 
 type TaskKind = 'subskill' | 'module'
 
-type StudyTask = {
+export type StudyTask = {
   id: string
   title: string
   done: boolean
@@ -11,11 +11,23 @@ type StudyTask = {
   kind: TaskKind
 }
 
-type SkillPlan = {
+export type SkillModule = {
   id: string
   name: string
   priority: 'alta' | 'media' | 'baixa'
   tasks: StudyTask[]
+}
+
+export type StudyPlan = {
+  id: string
+  title: string
+  jobId: string
+  jobTitle?: string
+  companyName?: string
+  createdAt: string
+  updatedAt: string
+  status: string
+  modules: SkillModule[]
 }
 
 type StudyPlanItemSkillResponse = {
@@ -39,21 +51,28 @@ type StudyPlanItemResponse = {
 type StudyPlanResponse = {
   id: string
   job_id: string
+  title: string
+  job_title?: string | null
+  company_name?: string | null
   status: string
+  created_at: string
+  updated_at: string
   items: StudyPlanItemResponse[]
 }
 
 interface StudyPlanContextValue {
-  plans: SkillPlan[]
+  plans: StudyPlan[]
   isLoading: boolean
   error: string
   reloadPlans: () => Promise<void>
-  toggleTask: (planId: string, taskId: string) => void
+  toggleTask: (planId: string, moduleId: string, taskId: string) => void
+  renamePlan: (planId: string, title: string) => Promise<void>
+  deletePlan: (planId: string) => Promise<void>
 }
 
 const StudyPlanContext = createContext<StudyPlanContextValue | undefined>(undefined)
 
-function mapPriority(priority: StudyPlanItemResponse['priority']): SkillPlan['priority'] {
+function mapPriority(priority: StudyPlanItemResponse['priority']): SkillModule['priority'] {
   return priority === 'required' ? 'alta' : 'media'
 }
 
@@ -95,19 +114,27 @@ function mapItemTasks(item: StudyPlanItemResponse): StudyTask[] {
   ]
 }
 
-function mapApiPlans(apiPlans: StudyPlanResponse[]): SkillPlan[] {
-  return apiPlans.flatMap((plan) =>
-    plan.items.map((item) => ({
+function mapApiPlans(apiPlans: StudyPlanResponse[]): StudyPlan[] {
+  return apiPlans.map((plan) => ({
+    id: plan.id,
+    title: plan.title,
+    jobId: plan.job_id,
+    jobTitle: plan.job_title ?? undefined,
+    companyName: plan.company_name ?? undefined,
+    createdAt: plan.created_at,
+    updatedAt: plan.updated_at,
+    status: plan.status,
+    modules: plan.items.map((item) => ({
       id: item.id,
       name: item.skill_name,
       priority: mapPriority(item.priority),
       tasks: mapItemTasks(item),
     })),
-  )
+  }))
 }
 
 export function StudyPlanProvider({ children }: { children: React.ReactNode }) {
-  const [plans, setPlans] = useState<SkillPlan[]>([])
+  const [plans, setPlans] = useState<StudyPlan[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -150,9 +177,10 @@ export function StudyPlanProvider({ children }: { children: React.ReactNode }) {
     }
   }, [reloadPlans])
 
-  const toggleTask = useCallback((planId: string, taskId: string) => {
+  const toggleTask = useCallback((planId: string, moduleId: string, taskId: string) => {
     const plan = plans.find((currentPlan) => currentPlan.id === planId)
-    const task = plan?.tasks.find((currentTask) => currentTask.id === taskId)
+    const moduleEntry = plan?.modules.find((currentModule) => currentModule.id === moduleId)
+    const task = moduleEntry?.tasks.find((currentTask) => currentTask.id === taskId)
     if (!task) {
       return
     }
@@ -164,13 +192,20 @@ export function StudyPlanProvider({ children }: { children: React.ReactNode }) {
           ? currentPlan
           : {
               ...currentPlan,
-              tasks: currentPlan.tasks.map((currentTask) =>
-                currentTask.id !== taskId
-                  ? currentTask
+              modules: currentPlan.modules.map((currentModule) =>
+                currentModule.id !== moduleId
+                  ? currentModule
                   : {
-                      ...currentTask,
-                      done: nextDone,
-                      doneAt: nextDone ? new Date().toISOString() : undefined,
+                      ...currentModule,
+                      tasks: currentModule.tasks.map((currentTask) =>
+                        currentTask.id !== taskId
+                          ? currentTask
+                          : {
+                              ...currentTask,
+                              done: nextDone,
+                              doneAt: nextDone ? new Date().toISOString() : undefined,
+                            },
+                      ),
                     },
               ),
             },
@@ -186,8 +221,8 @@ export function StudyPlanProvider({ children }: { children: React.ReactNode }) {
       status: nextDone ? 'completed' : 'pending',
     })
       .then(() => {
-        // Completing every topic marks the module skill as known, so refresh
-        // to reflect the updated module/skill state coming from the backend.
+        // Completing a module marks the skill as known across every plan, so
+        // refresh to surface the propagated state coming from the backend.
         void reloadPlans()
       })
       .catch(() => {
@@ -195,9 +230,19 @@ export function StudyPlanProvider({ children }: { children: React.ReactNode }) {
       })
   }, [plans, reloadPlans])
 
+  const renamePlan = useCallback(async (planId: string, title: string) => {
+    await apiPatch(`/study-plans/${planId}`, { title })
+    await reloadPlans()
+  }, [reloadPlans])
+
+  const deletePlan = useCallback(async (planId: string) => {
+    await apiDelete(`/study-plans/${planId}`)
+    await reloadPlans()
+  }, [reloadPlans])
+
   const value = useMemo(
-    () => ({ plans, isLoading, error, reloadPlans, toggleTask }),
-    [plans, isLoading, error, reloadPlans, toggleTask],
+    () => ({ plans, isLoading, error, reloadPlans, toggleTask, renamePlan, deletePlan }),
+    [plans, isLoading, error, reloadPlans, toggleTask, renamePlan, deletePlan],
   )
 
   return <StudyPlanContext.Provider value={value}>{children}</StudyPlanContext.Provider>

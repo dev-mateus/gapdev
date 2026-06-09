@@ -144,6 +144,7 @@ model StudyPlan {
   id        String              @id @default(uuid())
   userId    String              @map("user_id")
   jobId     String              @map("job_id")
+  title     String?
   status    StudyPlanStatus     @default(draft)
   createdAt DateTime            @default(now()) @map("created_at")
   updatedAt DateTime            @default(now()) @updatedAt @map("updated_at")

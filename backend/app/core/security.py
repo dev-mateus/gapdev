@@ -1,13 +1,15 @@
 """Security helpers."""
 
+import logging
 from datetime import datetime, timedelta
 
 import jwt
 from passlib.context import CryptContext
-from passlib.exc import UnknownHashError
 
 from app.core.config import settings
 
+
+logger = logging.getLogger(__name__)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -19,11 +21,16 @@ def hash_password(plain: str) -> str:
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-	"""Verify a plain password against a stored hash."""
+	"""Verify a plain password against a stored hash.
+
+	Returns False on any unexpected error so a corrupt or legacy hash never
+	turns into an HTTP 500 on /auth/login.
+	"""
 
 	try:
 		return pwd_context.verify(plain, hashed)
-	except (TypeError, ValueError, UnknownHashError):
+	except Exception:
+		logger.exception("Falha ao verificar hash de senha")
 		return False
 
 

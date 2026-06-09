@@ -100,6 +100,7 @@ def create_or_replace_study_plan(
 	job_id: str,
 	items: list[dict],
 	status: str = "active",
+	title: str | None = None,
 ) -> StudyPlan:
 	"""Create a plan or replace the items of the existing user/job plan."""
 
@@ -107,10 +108,13 @@ def create_or_replace_study_plan(
 	if plan:
 		plan.items.clear()
 		plan.status = _map_plan_status(status)
+		if title is not None:
+			plan.title = title
 	else:
 		plan = StudyPlan(
 			user_id=user_id,
 			job_id=job_id,
+			title=title,
 			status=_map_plan_status(status),
 		)
 		db.add(plan)
@@ -187,6 +191,47 @@ def get_item_skill_for_user(db: Session, user_id: str, item_skill_id: str) -> St
 		)
 	)
 	return db.scalars(statement).unique().first()
+
+
+def rename_study_plan(db: Session, plan: StudyPlan, title: str) -> StudyPlan:
+	"""Update the user-facing title of a study plan."""
+
+	plan.title = title
+	db.commit()
+	db.refresh(plan)
+	return plan
+
+
+def delete_study_plan(db: Session, plan: StudyPlan) -> None:
+	"""Remove a study plan and its cascaded children."""
+
+	db.delete(plan)
+	db.commit()
+
+
+def list_user_items_for_skill(
+	db: Session, user_id: str, skill_id: str, exclude_item_id: str | None = None
+) -> list[StudyPlanItem]:
+	"""Return every plan item for a user that targets the given skill."""
+
+	statement = (
+		select(StudyPlanItem)
+		.join(StudyPlan, StudyPlan.id == StudyPlanItem.study_plan_id)
+		.where(StudyPlan.user_id == user_id, StudyPlanItem.skill_id == skill_id)
+		.options(selectinload(StudyPlanItem.subskills))
+	)
+	if exclude_item_id:
+		statement = statement.where(StudyPlanItem.id != exclude_item_id)
+	return list(db.scalars(statement).unique().all())
+
+
+def mark_item_completed(db: Session, item: StudyPlanItem) -> None:
+	"""Mark a plan item and all of its sub-skills as completed."""
+
+	item.status = StudyPlanItemStatus.completed
+	for subskill in item.subskills:
+		subskill.status = StudyPlanItemStatus.completed
+	db.flush()
 
 
 def set_item_skill_status(db: Session, item_skill: StudyPlanItemSkill, status: str) -> StudyPlanItemSkill:

@@ -9,10 +9,15 @@ from app.repositories.job_repository import get_job_by_id
 from app.repositories.job_skill_repository import list_job_skills_by_job, resolve_or_create_subtopic_skill
 from app.repositories.study_plan_repository import (
 	create_or_replace_study_plan,
+	delete_study_plan,
 	get_item_skill_for_user,
+	get_study_plan_by_id_for_user,
 	get_study_plan_by_user_and_job,
 	get_study_plan_item_for_user,
 	list_study_plans_by_user,
+	list_user_items_for_skill,
+	mark_item_completed,
+	rename_study_plan,
 	set_item_skill_status,
 	update_study_plan_item_status,
 )
@@ -99,6 +104,18 @@ def _item_to_read(item: object) -> StudyPlanItemRead:
 	)
 
 
+def _default_plan_title(job: object) -> str:
+	"""Build the default plan title shown to the user."""
+
+	job_title = str(getattr(job, "job_title", "") or "").strip()
+	company = str(getattr(job, "company_name", "") or "").strip()
+	if job_title and company:
+		return f"Plano para {job_title} - {company}"
+	if job_title:
+		return f"Plano para {job_title}"
+	return "Plano de estudos"
+
+
 def _plan_to_read(plan: object) -> StudyPlanRead:
 	"""Convert a study plan into the public response schema."""
 
@@ -110,10 +127,16 @@ def _plan_to_read(plan: object) -> StudyPlanRead:
 		)
 	)
 
+	job = getattr(plan, "job", None)
+	title = str(getattr(plan, "title", "") or "").strip() or _default_plan_title(job)
+
 	return StudyPlanRead(
 		id=str(getattr(plan, "id")),
 		user_id=str(getattr(plan, "user_id")),
 		job_id=str(getattr(plan, "job_id")),
+		title=title,
+		job_title=str(getattr(job, "job_title", "") or "") or None,
+		company_name=str(getattr(job, "company_name", "") or "") or None,
 		status=str(_enum_value(getattr(plan, "status", "active"))),
 		created_at=getattr(plan, "created_at"),
 		updated_at=getattr(plan, "updated_at"),
@@ -304,14 +327,26 @@ def _items_from_missing_skills(db: Session, missing_job_skills: list[object]) ->
 	return items
 
 
-def generate_plan_for_job(db: Session, user_email: str, job_id: str, force_regenerate: bool = False) -> StudyPlanRead:
+def generate_plan_for_job(
+	db: Session,
+	user_email: str,
+	job_id: str,
+	force_regenerate: bool = False,
+	title: str | None = None,
+) -> StudyPlanRead:
 	"""Generate and persist a study plan for a job."""
 
 	user_id = _resolve_user_id(db, user_email)
 	job = _resolve_job_for_user(db, user_id, job_id)
 
+	plan_title = (title or "").strip() or _default_plan_title(job)
+
 	existing_plan = get_study_plan_by_user_and_job(db, user_id, job_id)
 	if existing_plan and not force_regenerate:
+		# Backfill the title for legacy plans that were generated before
+		# user-facing names existed.
+		if not getattr(existing_plan, "title", None):
+			rename_study_plan(db, existing_plan, plan_title)
 		return _plan_to_read(existing_plan)
 
 	job_skills = list_job_skills_by_job(db, job_id)
@@ -327,7 +362,7 @@ def generate_plan_for_job(db: Session, user_email: str, job_id: str, force_regen
 	# skills the user already meets at or above the required level.
 	missing_job_skills = _filter_missing_job_skills(job_skills, user_skills)
 	if not missing_job_skills:
-		plan = create_or_replace_study_plan(db, user_id, job_id, [], "completed")
+		plan = create_or_replace_study_plan(db, user_id, job_id, [], "completed", title=plan_title)
 		return _plan_to_read(plan)
 
 	ai_payload = generate_study_plan(
@@ -350,7 +385,7 @@ def generate_plan_for_job(db: Session, user_email: str, job_id: str, force_regen
 		items = _items_from_missing_skills(db, missing_job_skills)
 
 	plan_status = "active" if items else "completed"
-	plan = create_or_replace_study_plan(db, user_id, job_id, items, plan_status)
+	plan = create_or_replace_study_plan(db, user_id, job_id, items, plan_status, title=plan_title)
 	return _plan_to_read(plan)
 
 
@@ -372,6 +407,57 @@ def get_plan_for_job(db: Session, user_email: str, job_id: str) -> StudyPlanRead
 	return _plan_to_read(plan)
 
 
+def rename_plan(db: Session, user_email: str, plan_id: str, title: str) -> StudyPlanRead:
+	"""Rename a study plan owned by the authenticated user."""
+
+	clean_title = (title or "").strip()
+	if not clean_title:
+		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Informe um nome para o plano.")
+	if len(clean_title) > 200:
+		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="O nome do plano deve ter ate 200 caracteres.")
+
+	user_id = _resolve_user_id(db, user_email)
+	plan = get_study_plan_by_id_for_user(db, user_id, plan_id)
+	if not plan:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plano de estudos nao encontrado.")
+
+	rename_study_plan(db, plan, clean_title)
+	refreshed = get_study_plan_by_id_for_user(db, user_id, plan_id)
+	return _plan_to_read(refreshed)
+
+
+def delete_plan(db: Session, user_email: str, plan_id: str) -> None:
+	"""Delete a study plan owned by the authenticated user."""
+
+	user_id = _resolve_user_id(db, user_email)
+	plan = get_study_plan_by_id_for_user(db, user_id, plan_id)
+	if not plan:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plano de estudos nao encontrado.")
+	delete_study_plan(db, plan)
+
+
+def _sync_skill_completion_across_plans(db: Session, user_id: str, completed_item: object) -> None:
+	"""Mark the same skill as completed in every other plan of this user.
+
+	Rationale: once the user finishes a module (the skill is added to the
+	user's profile), seeing it as pending in another plan would be confusing.
+	"""
+
+	skill_id = str(getattr(completed_item, "skill_id", "") or "")
+	if not skill_id:
+		return
+
+	siblings = list_user_items_for_skill(db, user_id, skill_id, exclude_item_id=str(completed_item.id))
+	if not siblings:
+		return
+
+	for sibling in siblings:
+		if sibling.status == StudyPlanItemStatus.completed:
+			continue
+		mark_item_completed(db, sibling)
+	db.commit()
+
+
 def update_item_status(db: Session, user_email: str, item_id: str, item_status: str) -> StudyPlanItemRead:
 	"""Update an item status for the authenticated user."""
 
@@ -386,6 +472,7 @@ def update_item_status(db: Session, user_email: str, item_id: str, item_status: 
 
 	if getattr(updated, "status", None) == StudyPlanItemStatus.completed:
 		_mark_module_skill_as_known(db, user_id, updated)
+		_sync_skill_completion_across_plans(db, user_id, updated)
 
 	updated = get_study_plan_item_for_user(db, user_id, item_id)
 	return _item_to_read(updated)
@@ -419,6 +506,7 @@ def update_item_skill_status(db: Session, user_email: str, item_skill_id: str, i
 	module = updated.study_plan_item
 	if getattr(module, "status", None) == StudyPlanItemStatus.completed:
 		_mark_module_skill_as_known(db, user_id, module)
+		_sync_skill_completion_across_plans(db, user_id, module)
 
 	refreshed = get_item_skill_for_user(db, user_id, item_skill_id)
 	return _item_skill_to_read(refreshed)
