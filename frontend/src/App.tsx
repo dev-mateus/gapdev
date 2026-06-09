@@ -8,9 +8,11 @@ import PlanoEstudosPage from './app/plano-estudos/page'
 import CompatibilityPage from './app/compatibility/page'
 import ResultadoAnalisePage from './app/resultado-analise/page'
 import Sidebar from './components/Sidebar/Sidebar'
+import BottomNav from './components/BottomNav/BottomNav'
 import HistoricoPage from './app/historico-vagas/page'
 import ProgressoPage from './app/progresso/page'
 import { StudyPlanProvider } from './contexts/StudyPlanContext'
+
 
 import './App.css'
 
@@ -34,6 +36,7 @@ function PrivateLayout({ children }: { children: ReactElement }) {
   return (
     <div className="app-layout">
       <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
+      <BottomNav />
 
       <main className={`app-content ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>{children}</main>
     </div>

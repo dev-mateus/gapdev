@@ -5,6 +5,13 @@
   padding: 1.5rem;
 }
 
+/* Celulares: reduzir padding horizontal para eliminar “vazio” e maximizar área útil */
+@media (max-width: 767px) {
+  .pageContainer {
+    padding: 1rem 0.9rem;
+  }
+}
+
 @media (min-width: 768px) {
   .pageContainer {
     padding: 2rem;
@@ -16,3 +23,4 @@
     padding: 2.25rem;
   }
 }
+
