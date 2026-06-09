@@ -7,9 +7,70 @@
   padding: 32px;
   color: var(--color-text-modal-title);
   margin-left: 260px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   transition: margin-left 0.3s ease;
+
+  /* Contrato mobile-first: nunca exceder largura do viewport */
+  overflow-x: clip;
 }
 
 .app-content.sidebar-collapsed {
   margin-left: 104px;
-} 
+}
+
+/* Mobile-first: bottom nav fixa, então reservamos espaço no conteúdo */
+.app-content {
+  padding-bottom: 92px; /* ~68px nav + respiro */
+}
+
+@media (min-width: 769px) {
+  .app-content {
+    padding-bottom: 32px;
+  }
+}
+
+/* Celulares: evitar conteúdo “esmagado” pela sidebar fixa */
+@media (max-width: 767px) {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  .app-layout {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .app-content {
+    margin-left: 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+
+    padding-top: 16px;
+    padding-right: 16px;
+    padding-bottom: 92px;
+    padding-left: 16px;
+
+    overflow-x: clip;
+  }
+
+  /* Ajuda extra: evita overflow por flex/grid com conteúdo longo */
+  .app-content,
+  .app-content * {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+
+
+
+
+
+
+
