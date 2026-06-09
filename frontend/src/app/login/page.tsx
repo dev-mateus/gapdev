@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fa6'
 
 import { useGoogleLogin } from '@react-oauth/google'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import Button from '../../components/Button/Button'
 import Checkbox from '../../components/Checkbox/Checkbox'
@@ -292,7 +292,7 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
               </Button>
 
               <p className={styles.footerText}>
-                Ainda não tem uma conta? <a href="/cadastro">Cadastre-se</a>
+                Ainda não tem uma conta? <Link to="/cadastro">Cadastre-se</Link>
               </p>
             </form>
           </div>
