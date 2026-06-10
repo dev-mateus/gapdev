@@ -4,10 +4,10 @@ from uuid import uuid4
 
 import httpx
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
-from app.schemas.user import UserCreate 
+from app.schemas.user import UserCreate
 
 from app.api.deps import get_database, get_current_user
 from app.core.security import (
@@ -17,9 +17,12 @@ from app.core.security import (
 )
 from app.repositories import user_repo
 from app.models.user import User
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+limiter = Limiter(key_func=get_remote_address)
 
 
 class LoginRequest(BaseModel):
@@ -43,7 +46,9 @@ class ChangePasswordRequest(BaseModel):
 
 
 @router.post("/login")
+@limiter.limit("5/minute")
 def login(
+	request: Request,
 	payload: LoginRequest,
 	db: Session = Depends(get_database),
 ) -> dict[str, str]:
@@ -129,6 +134,7 @@ def google_login(
 		"token_type": "bearer",
 	}
 
+
 @router.post("/change-password")
 def change_password(
 	payload: ChangePasswordRequest,
@@ -143,8 +149,6 @@ def change_password(
 			detail="A nova senha deve ter pelo menos 6 caracteres.",
 		)
 
-
-
 	if not payload.current_password:
 		raise HTTPException(
 			status_code=status.HTTP_400_BAD_REQUEST,
@@ -155,7 +159,7 @@ def change_password(
 		raise HTTPException(
 			status_code=status.HTTP_400_BAD_REQUEST,
 			detail="Senha atual incorreta.",
-		)			
+		)
 
 	user_repo.update_user_password(
 		db=db,
