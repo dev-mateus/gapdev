@@ -398,22 +398,6 @@
   line-height: 1.8;
 }
 
-.cancelPasswordButton {
-  border: none;
-  background: transparent;
-
-  color: var(--color-text-icon);
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.cancelPasswordButton:hover {
-  color: var(--color-text-primary);
-}
-
 
 .authDivider {
   width: 100%;
