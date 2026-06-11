@@ -51,3 +51,21 @@ def update_user_password(
 	db.refresh(user)
 
 	return user
+
+
+def update_user_profile(
+	db: Session,
+	user: User,
+	data: dict,
+) -> User:
+	"""Update user profile fields."""
+
+	for key, value in data.items():
+		if value is not None:
+			setattr(user, key, value)
+
+	db.add(user)
+	db.commit()
+	db.refresh(user)
+
+	return user

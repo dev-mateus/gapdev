@@ -12,6 +12,14 @@ class SkillLevel(str, Enum):
 	Specialist = "Specialist"
 
 
+class SeniorityLevel(str, Enum):
+	"""User seniority level."""
+	Intern = "Intern"
+	Junior = "Junior"
+	MidLevel = "MidLevel"
+	Senior = "Senior"
+
+
 class SkillPriority(str, Enum):
 	"""Skill priority enum used by job skills."""
 	desirable = "desirable"

@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  name       String
-  email      String      @unique
-  password   String
-  skills     UserSkill[]
-  jobs       Job[]
-  studyPlans StudyPlan[]
+  id              String      @id @default(uuid())
+  name            String
+  email           String      @unique
+  password        String
+  seniority_level String?     @map("seniority_level")
+  skills          UserSkill[]
+  jobs            Job[]
+  studyPlans      StudyPlan[]
 
   @@map("users")
 }

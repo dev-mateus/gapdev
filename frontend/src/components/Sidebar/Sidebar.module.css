@@ -106,7 +106,7 @@
   text-decoration: none;
   color: var(--color-text-primary);
 
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.2s;
 }
 
 .expanded .sidebarItem {
@@ -119,10 +119,12 @@
 
 .sidebarItem:hover {
   background-color: var(--color-bg-sidebar-hover);
+  transform: translateX(2px);
 }
 
 .active {
   background-color: var(--color-bg-sidebar-active);
+  box-shadow: 0 2px 12px rgba(31, 163, 198, 0.3);
 }
 
 .sidebarFooter {
@@ -179,26 +181,47 @@
   bottom: 0;
 
   background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   z-index: 1000;
+
+  animation: overlayFadeIn 200ms ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal {
   background: var(--color-bg-modal);
 
   border: 1px solid var(--color-border-modal);
-  border-radius: 0.75rem;
+  border-radius: 1rem;
 
   padding: 2rem;
 
   max-width: 400px;
   width: 90%;
 
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+  animation: modalSlideIn 250ms ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .modalTitle {
@@ -234,7 +257,7 @@
 
   color: var(--color-text-modal-body);
 
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
 
   font-weight: 600;
 
@@ -257,7 +280,7 @@
 
   color: var(--color-text-primary);
 
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
 
   font-weight: 600;
 

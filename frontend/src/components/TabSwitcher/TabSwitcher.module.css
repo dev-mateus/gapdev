@@ -29,10 +29,16 @@
 .active {
   color: var(--color-text-primary);
   background: var(--color-brand-primary);
+  box-shadow: 0 2px 8px rgba(27, 120, 149, 0.35);
 }
 
 .active:hover {
   background: var(--color-brand-primary-hover);
+}
+
+.tab:active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
 }
 
 

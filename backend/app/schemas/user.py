@@ -17,5 +17,13 @@ class UserRead(BaseModel):
 	id: str
 	name: str
 	email: EmailStr
+	seniority_level: str | None = None
 
 	model_config = {"from_attributes": True}
+
+
+class UserUpdate(BaseModel):
+	"""Payload for user profile update."""
+
+	name: str | None = None
+	seniority_level: str | None = None

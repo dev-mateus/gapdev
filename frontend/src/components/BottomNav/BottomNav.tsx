@@ -48,7 +48,7 @@ export default function BottomNav() {
           <span className={styles.iconWrap}>
             <NavIcon iconKey={item.iconKey} />
           </span>
-          {/* ícones sem frase, como pedido */}
+          <span className={styles.label}>{item.label.split(' ')[0]}</span>
         </NavLink>
       ))}
     </nav>

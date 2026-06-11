@@ -21,6 +21,18 @@
   touch-action: manipulation;
   /* reduz a chance de mudanças de layout forçarem scroll */
   contain: layout;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.card:hover {
+  border-color: color-mix(in srgb, var(--color-brand-accent) 65%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-bg-shell) 100%, transparent),
+    color-mix(in srgb, var(--color-bg-shell) 96%, transparent)
+  );
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 /* foco visível acessível (se o elemento for focável) */
