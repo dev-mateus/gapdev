@@ -210,15 +210,8 @@
 
 .footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-}
-
-.backButton {
-  width: 155px !important;
-  height: 54px !important;
-  background: transparent !important;
-  border: 1px solid #8ea6b7 !important;
 }
 
 .saveButton {

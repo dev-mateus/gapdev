@@ -19,7 +19,8 @@ class User(Base):
 	password = Column(String(255), nullable=False)
 	auth_provider = Column(String(30), nullable=False, default="credentials")
 	has_password = Column(Boolean, nullable=False, default=True)
-	
+	seniority_level = Column(String(30), nullable=True)
+
 	jobs = relationship("Job", back_populates="user", cascade="all, delete-orphan")
 	skills = relationship("UserSkill", back_populates="user", cascade="all, delete-orphan")
 	study_plans = relationship("StudyPlan", back_populates="user", cascade="all, delete-orphan")
