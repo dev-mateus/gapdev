@@ -85,4 +85,9 @@
 
 .input::placeholder {
   color: var(--color-text-icon-placeholder);
+  transition: opacity 200ms ease;
+}
+
+.input:focus::placeholder {
+  opacity: 0.5;
 }

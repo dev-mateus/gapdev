@@ -5,6 +5,12 @@
   border-radius: var(--radius-control);
   background: var(--color-surface-panel);
   padding: 1.25rem;
+  transition: border-color 250ms ease, box-shadow 250ms ease;
+}
+
+.card:hover {
+  border-color: color-mix(in srgb, var(--color-brand-accent) 25%, transparent);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
 .header {
