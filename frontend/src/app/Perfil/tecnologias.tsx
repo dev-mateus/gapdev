@@ -38,6 +38,7 @@ type SkillCatalogItem = {
 
 type UserSkillItem = {
   skill_id: string
+  learned_from_module?: boolean
 }
 
 
@@ -69,6 +70,7 @@ function Tecnologias() {
   const [carregandoCatalogo, setCarregandoCatalogo] = useState(true)
   const [erroCatalogo, setErroCatalogo] = useState<string | null>(null)
   const [selecionadas, setSelecionadas] = useState<Tecnologia[]>([])
+  const [idsModulo, setIdsModulo] = useState<Set<string>>(new Set())
   const [salvando, setSalvando] = useState(false)
   const [mensagemSucesso, setMensagemSucesso] = useState<string | null>(null)
   const [erroSalvar, setErroSalvar] = useState<string | null>(null)
@@ -105,10 +107,17 @@ function Tecnologias() {
             .filter((value): value is string => Boolean(value)),
         )
 
+        const idsAprendidasEmModulo = new Set(
+          (userSkills ?? [])
+            .filter((item) => item.learned_from_module && item.skill_id)
+            .map((item) => item.skill_id),
+        )
+
         const preSelecionadas = tecnologias.filter((item) => idsUsuario.has(item.id))
 
         setTecnologiasCatalogo(tecnologias)
         setSelecionadas(preSelecionadas)
+        setIdsModulo(idsAprendidasEmModulo)
       } catch (error) {
         if (!ativo) return
 
@@ -351,23 +360,29 @@ function Tecnologias() {
                     </div>
 
                     <div className={styles.selectedArea}>
-                      {tecnologias.map((tech) => (
-                        <div
-                          key={tech.id}
-                          className={styles.tag}
-                        >
-                          <span>{tech.nome}</span>
+                      {tecnologias.map((tech) => {
+                        const novaTecnologia = idsModulo.has(tech.id)
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              removerTecnologia(tech.id)
-                            }
+                        return (
+                          <div
+                            key={tech.id}
+                            className={`${styles.tag} ${novaTecnologia ? styles.tagNova : ''}`}
+                            title={novaTecnologia ? 'Nova tecnologia aprendida ao concluir um módulo' : undefined}
                           >
-                            <X size={18} />
-                          </button>
-                        </div>
-                      ))}
+                            {novaTecnologia ? <span className={styles.novaBadge}>Nova</span> : null}
+                            <span>{tech.nome}</span>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removerTecnologia(tech.id)
+                              }
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 )

@@ -94,6 +94,20 @@ def list_study_plans_by_user(db: Session, user_id: str) -> list[StudyPlan]:
 	return list(db.scalars(statement).unique().all())
 
 
+def list_completed_module_skill_ids(db: Session, user_id: str) -> set[str]:
+	"""Return the catalog skill ids the user acquired by completing modules."""
+
+	statement = (
+		select(StudyPlanItem.skill_id)
+		.join(StudyPlan, StudyPlan.id == StudyPlanItem.study_plan_id)
+		.where(
+			StudyPlan.user_id == user_id,
+			StudyPlanItem.status == StudyPlanItemStatus.completed,
+		)
+	)
+	return {str(skill_id) for skill_id in db.scalars(statement).all() if skill_id}
+
+
 def create_or_replace_study_plan(
 	db: Session,
 	user_id: str,

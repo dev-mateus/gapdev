@@ -15,7 +15,7 @@ import PageHeader from '../../components/PageHeader/PageHeader'
 import SectionCard from '../../components/SectionCard/SectionCard'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import Button from '../../components/Button/Button'
-import { apiPatch, apiPost } from '../../services/api'
+import { apiGet, apiPatch, apiPost } from '../../services/api'
 import LoadingState from '../../components/LoadingState/LoadingState'
 import styles from './resultado-analise.module.css'
 import type { AnalysisResult } from './types'
@@ -48,6 +48,7 @@ export default function ResultadoAnalisePage() {
   const [isSaving, setIsSaving] = useState(false)
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [planExists, setPlanExists] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -65,6 +66,31 @@ export default function ResultadoAnalisePage() {
       clearTimeout(timer)
     }
   }, [])
+
+  // A job can only have a single study plan, so check whether one already
+  // exists to prevent the user from generating a duplicate.
+  useEffect(() => {
+    if (!data?.jobId) {
+      return
+    }
+
+    let mounted = true
+
+    apiGet<Array<{ job_id?: string }>>('/study-plans')
+      .then((plans) => {
+        if (mounted) {
+          setPlanExists(plans.some((plan) => plan.job_id === data.jobId))
+        }
+      })
+      .catch(() => {
+        // If the check fails, fall back to allowing generation; the backend
+        // still returns the existing plan instead of creating a duplicate.
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [data?.jobId])
 
   const handleSaveJob = async () => {
     if (!data?.jobId) {
@@ -273,14 +299,28 @@ export default function ResultadoAnalisePage() {
             >
               {isSaving ? 'Salvando' : 'Salvar Vaga'}
             </Button>
-            <PrimaryButton
-              onClick={handleGeneratePlan}
-              loading={isGeneratingPlan}
-              disabled={isGeneratingPlan || isSaving}
-            >
-              {isGeneratingPlan ? 'Gerando plano' : 'Gerar plano de estudo'}
-            </PrimaryButton>
+            {planExists ? (
+              <PrimaryButton
+                onClick={() => navigate(`/plano-estudos?jobId=${data.jobId}`)}
+                disabled={isSaving}
+              >
+                Ver plano de estudo
+              </PrimaryButton>
+            ) : (
+              <PrimaryButton
+                onClick={handleGeneratePlan}
+                loading={isGeneratingPlan}
+                disabled={isGeneratingPlan || isSaving}
+              >
+                {isGeneratingPlan ? 'Gerando plano' : 'Gerar plano de estudo'}
+              </PrimaryButton>
+            )}
           </div>
+          {planExists ? (
+            <p className={styles.planExistsHint}>
+              Você já criou um plano de estudos para esta vaga.
+            </p>
+          ) : null}
           {saveError ? <p className={styles.saveError}>{saveError}</p> : null}
         </div>
       </PageContainer>

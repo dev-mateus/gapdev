@@ -3,11 +3,44 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.models.enums import SkillPriority
 from app.repositories.job_repository import create_job as create_job_record
 from app.repositories.job_repository import get_job_by_id, update_job_compatibility
 from app.repositories.job_repository import list_jobs_by_user
 from app.repositories.user_repo import get_user_by_email
+from app.repositories.user_skill_repository import list_skills_by_user
 from app.schemas.job import JobCreate, JobRead, JobWithSkillsRead
+
+
+def _priority_value(priority: object) -> str:
+	"""Normalize a SkillPriority enum or string into its plain value."""
+
+	return priority.value if hasattr(priority, "value") else str(priority)
+
+
+def compute_job_compatibility(job: object, user_skill_ids: set[str]) -> int:
+	"""Compute compatibility from the user's current skills against the job's skills.
+
+	Required skills weigh twice as much as desirable ones so the score always
+	reflects how much of the job's gap the user already covers today.
+	"""
+
+	job_skills = getattr(job, "job_skills", []) or []
+	if not job_skills:
+		return int(getattr(job, "compatibility", 0) or 0)
+
+	total_weight = 0
+	matched_weight = 0
+	for job_skill in job_skills:
+		weight = 2 if _priority_value(getattr(job_skill, "priority", None)) == SkillPriority.required.value else 1
+		total_weight += weight
+		if str(getattr(job_skill, "skill_id", "")) in user_skill_ids:
+			matched_weight += weight
+
+	if total_weight == 0:
+		return int(getattr(job, "compatibility", 0) or 0)
+
+	return round(matched_weight / total_weight * 100)
 
 
 def _job_to_read(job: object) -> JobRead:
@@ -29,7 +62,7 @@ def _job_to_read(job: object) -> JobRead:
 	)
 
 
-def _job_to_read_with_skills(job: object) -> JobWithSkillsRead:
+def _job_to_read_with_skills(job: object, compatibility: int | None = None) -> JobWithSkillsRead:
 	"""Convert a SQLAlchemy job record with skills into the frontend response schema."""
 
 	level = getattr(job, "level", "Junior")
@@ -47,7 +80,7 @@ def _job_to_read_with_skills(job: object) -> JobWithSkillsRead:
 		job_title=str(getattr(job, "job_title")),
 		description=str(getattr(job, "description")),
 		level=level_str,
-		compatibility=int(getattr(job, "compatibility", 0)),
+		compatibility=int(compatibility if compatibility is not None else getattr(job, "compatibility", 0)),
 		tecnologias=skill_names,
 		created_at=getattr(job, "created_at"),
 	)
@@ -79,7 +112,11 @@ def list_jobs(db: Session, user_email: str) -> list[JobWithSkillsRead]:
 
 	user_id = _resolve_user_id(db, user_email)
 	jobs = list_jobs_by_user(db, user_id)
-	return [_job_to_read_with_skills(job) for job in jobs]
+	user_skill_ids = {str(getattr(skill, "skill_id", "")) for skill in list_skills_by_user(db, user_id)}
+	return [
+		_job_to_read_with_skills(job, compute_job_compatibility(job, user_skill_ids))
+		for job in jobs
+	]
 
 
 def set_job_compatibility(db: Session, user_email: str, job_id: str, compatibility: int) -> JobRead:

@@ -10,6 +10,7 @@ import { fetchCompatibility } from './compatibilityService'
 import type { CompatibilityResponse } from './types'
 import { useCompatibility } from './useCompatibility'
 import LoadingState from '../../components/LoadingState/LoadingState'
+import { jobLevelLabel } from '../../utils/jobLevel'
 import styles from './compatibility.module.css'
 
 const defaultData = {
@@ -67,7 +68,7 @@ export default function CompatibilityPage() {
       company: analysisContext?.company ?? '',
       compatibility: compat.recalculatedCompatibility,
       userLevel: getUserLevelLabel(compat.recalculatedCompatibility),
-      jobLevel: getJobLevelLabel(compat.title),
+      jobLevel: data?.level ? jobLevelLabel(data.level) : getJobLevelLabel(compat.title),
       hasSkills,
       needSkills,
       recommendation: buildRecommendation(compat.selections.selectedRequired, compat.selections.selectedOptional),

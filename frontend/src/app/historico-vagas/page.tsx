@@ -7,6 +7,7 @@ import TabSwitcher, { type TabSwitcherItem } from '../../components/TabSwitcher/
 import { fetchJobs, type JobItem } from './services/jobsService'
 
 import LoadingState from '../../components/LoadingState/LoadingState'
+import { jobLevelLabel } from '../../utils/jobLevel'
 import styles from './historicoVagas.module.css'
 
 const tabs: TabSwitcherItem[] = [
@@ -78,6 +79,21 @@ function HistoricoPage() {
     navigateTo(tab.href)
   }
 
+  function handleJobClick(job: JobItem) {
+    // Rebuild the analysis context so the compatibility page can re-run the
+    // analysis for this job against the user's current skills.
+    const analysisContext = JSON.stringify({
+      title: job.job_title,
+      company: job.company_name,
+      description: job.description,
+    })
+    window.sessionStorage.setItem(`analysis:${job.id}`, analysisContext)
+
+    const params = new URLSearchParams()
+    params.set('jobId', job.id)
+    navigateTo(`/compatibility?${params.toString()}`)
+  }
+
   return (
     <div className={styles.content}>
       <PageContainer className={styles.expandedContainer}>
@@ -103,7 +119,19 @@ function HistoricoPage() {
 
           <div className={styles.list}>
             {jobs.map((job) => (
-              <article key={job.id} className={styles.card}>
+              <article
+                key={job.id}
+                className={styles.card}
+                role="button"
+                tabIndex={0}
+                onClick={() => handleJobClick(job)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    handleJobClick(job)
+                  }
+                }}
+              >
                 <div className={styles.left}>
                   <h2 className={styles.jobTitle}>{job.job_title}</h2>
                   <p className={styles.companyName}>{job.company_name}</p>
@@ -121,6 +149,9 @@ function HistoricoPage() {
                 </div>
 
                 <div className={styles.right}>
+                  <div className={styles.levelBadge}>
+                    Nível: {jobLevelLabel(job.level)}
+                  </div>
                   <div className={styles.match}>
                     <div className={styles.matchValue}>
                       {getJobCompatibility(job) !== undefined ? `${getJobCompatibility(job)}%` : '-'}
