@@ -1,5 +1,4 @@
-
-  import {
+import {
   Braces,
   Cloud,
   Code2,
@@ -17,7 +16,6 @@
 } from 'lucide-react'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import { apiGet, apiPost } from '../../services/api'
@@ -66,7 +64,6 @@ const categoryIcons = {
 
 
 function Tecnologias() {
-  const navigate = useNavigate()
   const [busca, setBusca] = useState('')
   const [tecnologiasCatalogo, setTecnologiasCatalogo] = useState<Tecnologia[]>([])
   const [carregandoCatalogo, setCarregandoCatalogo] = useState(true)
@@ -163,7 +160,7 @@ function Tecnologias() {
     }, {})
   }, [selecionadas])
 
-  
+
 
   const deveMostrarSugestoes = busca.trim().length > 0
   const deveMostrarSelecionadas = selecionadas.length > 0
@@ -223,7 +220,6 @@ function Tecnologias() {
     }
 
     setSalvando(false)
-    navigate('/vagas')
   }
 
   const searchRef = useRef<HTMLDivElement | null>(null)
@@ -248,7 +244,7 @@ function Tecnologias() {
   return (
     <section className={styles.container}>
       <div className={styles.searchContent}>
-        <h2>Buscar e adicionar tecnologia</h2>
+        <h2>Minhas tecnologias</h2>
 
         <p>
           Selecione as tecnologias que você conhece. Essas informações serão
@@ -256,7 +252,7 @@ function Tecnologias() {
           recomendações de estudo personalizadas.
         </p>
       </div>
-      
+
      <div
         className={styles.searchWrapper}
         ref={searchRef}
@@ -296,14 +292,6 @@ function Tecnologias() {
                       </div>
 
                       <div>
-
-                      {erroSalvar ? (
-                        <p className={styles.errorMessage}>{erroSalvar}</p>
-                      ) : null}
-
-                      {mensagemSucesso ? (
-                        <p className={styles.successMessage}>{mensagemSucesso}</p>
-                      ) : null}
                         <strong>{tech.nome}</strong>
                         <span>{tech.descricao}</span>
                       </div>
@@ -327,7 +315,7 @@ function Tecnologias() {
           </div>
         )}
       </div>
-      
+
 
       {deveMostrarSelecionadas && (
         <div className={styles.selectedWrapper}>
@@ -389,23 +377,22 @@ function Tecnologias() {
         </div>
       )}
 
-      
+      {erroSalvar ? (
+        <p className={styles.errorMessage}>{erroSalvar}</p>
+      ) : null}
+
+      {mensagemSucesso ? (
+        <p className={styles.successMessage}>{mensagemSucesso}</p>
+      ) : null}
 
       <div className={styles.footer}>
-        <PrimaryButton
-          type="button"
-          className={styles.backButton}
-        >
-          Voltar
-        </PrimaryButton>
-
         <PrimaryButton
           type="button"
           className={styles.saveButton}
           disabled={!deveMostrarSelecionadas || salvando}
           onClick={salvarTecnologias}
         >
-          {salvando ? 'Salvando...' : 'Salvar e Continuar'}
+          {salvando ? 'Salvando...' : 'Salvar tecnologias'}
         </PrimaryButton>
       </div>
     </section>
