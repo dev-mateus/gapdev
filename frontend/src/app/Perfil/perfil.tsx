@@ -59,6 +59,7 @@ function Perfil() {
   const [senhaAtual, setSenhaAtual] = useState('')
   const [novaSenha, setNovaSenha] = useState('')
 
+  const [confirmarNovaSenha, setConfirmarNovaSenha] = useState('')
   const [mensagemSenha, setMensagemSenha] = useState('')
   const [erroSenha, setErroSenha] = useState('')
   const [salvandoSenha, setSalvandoSenha] = useState(false)
@@ -157,6 +158,26 @@ function Perfil() {
       return
     }
 
+    if (!confirmarNovaSenha.trim()) {
+      setErroSenha('Confirme a nova senha.')
+      return
+    }
+
+    if (novaSenha.length < 6) {
+      setErroSenha('A nova senha deve ter pelo menos 6 caracteres.')
+      return
+    }
+
+    if (senhaAtual === novaSenha) {
+      setErroSenha('A nova senha não pode ser igual à senha atual.')
+      return
+    }
+
+    if (novaSenha !== confirmarNovaSenha) {
+      setErroSenha('A confirmação da senha não coincide.')
+      return
+    }
+
     try {
       setSalvandoSenha(true)
 
@@ -171,6 +192,7 @@ function Perfil() {
       setMensagemSenha(response.message)
       setSenhaAtual('')
       setNovaSenha('')
+      setConfirmarNovaSenha('')
       setDefinindoSenha(false)
     } catch (error) {
       setErroSenha(
@@ -334,6 +356,28 @@ function Perfil() {
                               </button>
                             }
                           />
+                          
+                          <Input
+                            label="Confirmar nova senha"
+                            type={mostrarNovaSenha ? 'text' : 'password'}
+                            placeholder="Confirme a nova senha:"
+                            value={confirmarNovaSenha}
+                            onChange={(event) => setConfirmarNovaSenha(event.target.value)}
+                            endIcon={
+                              <button
+                                type="button"
+                                className={styles.eyeButton}
+                                onClick={() => setMostrarNovaSenha(!mostrarNovaSenha)}
+                              >
+                                {mostrarNovaSenha ? (
+                                  <EyeOff size={20} />
+                                ) : (
+                                  <Eye size={20} />
+                                )}
+                              </button>
+                            }
+                          />
+
 
                           <PrimaryButton
                             type="button"
@@ -350,6 +394,7 @@ function Perfil() {
                               setDefinindoSenha(false)
                               setSenhaAtual('')
                               setNovaSenha('')
+                              setConfirmarNovaSenha('')
                               setErroSenha('')
                               setMensagemSenha('')
                             }}
