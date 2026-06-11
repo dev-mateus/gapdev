@@ -266,6 +266,27 @@ select {
   color: inherit;
 }
 
+/* Mobile: evita auto-zoom do iOS/Android quando a fonte é < 16px */
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select,
+  button {
+    font-size: 16px;
+    line-height: 1.2;
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Segurança contra estouro de layout (sem afetar o responsivo) */
+html,
+body {
+  overflow-x: hidden;
+}
+#root {
+  overflow-x: hidden;
+}
+
 /* ==========================================
    GLASS SYSTEM
 ========================================== */

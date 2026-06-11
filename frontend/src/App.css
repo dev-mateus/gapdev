@@ -5,11 +5,52 @@
 
 .app-content {
   padding: 32px;
+  padding-bottom: 92px;
   color: var(--color-text-modal-title);
   margin-left: 260px;
+  width: calc(100% - 260px);
+  box-sizing: border-box;
   transition: margin-left 0.3s ease;
+  overflow-x: clip;
 }
 
 .app-content.sidebar-collapsed {
   margin-left: 104px;
-} 
+  width: calc(100% - 104px);
+}
+
+@media (min-width: 769px) {
+  .app-content {
+    padding-bottom: 32px;
+  }
+}
+
+@media (max-width: 767px) {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  .app-layout {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .app-content {
+    margin-left: 0;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding-top: 16px;
+    padding-right: 16px;
+    padding-bottom: 92px;
+    padding-left: 16px;
+    overflow-x: clip;
+  }
+
+  .app-content,
+  .app-content * {
+    min-width: 0;
+  }
+}

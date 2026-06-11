@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fa6'
 
 import { useGoogleLogin } from '@react-oauth/google'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import Button from '../../components/Button/Button'
 import Checkbox from '../../components/Checkbox/Checkbox'
@@ -523,9 +523,9 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
               <p className={styles.footerText}>
                 Já tem uma conta?
                 {' '}
-                <a href="/login">
+                <Link to="/login">
                   Entrar
-                </a>
+                </Link>
               </p>
 
             </form>

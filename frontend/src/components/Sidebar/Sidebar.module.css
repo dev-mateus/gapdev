@@ -28,6 +28,15 @@
   padding: 16px 12px;
 }
 
+/* Mobile-first: no celular usamos BottomNav.
+   Então a sidebar lateral deve desaparecer completamente. */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+
 .sidebarToggleButton {
   background: none;
   border: none;

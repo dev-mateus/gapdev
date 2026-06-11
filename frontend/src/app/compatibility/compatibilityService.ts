@@ -89,16 +89,9 @@ function mapAnaliseToCompatibility(data: unknown, title?: string): Compatibility
   }
 }
 
-export async function fetchCompatibility(description?: string, title?: string, jobId?: string): Promise<CompatibilityResponse> {
+export async function fetchCompatibility(description?: string, title?: string, jobId?: string): Promise<CompatibilityResponse | null> {
   if (!description) {
-    // fallback to mock when no description provided
-    await new Promise((r) => setTimeout(r, 150))
-    return {
-      title: title ?? 'Desenvolvedor Full Stack Pleno',
-      compatibility: 8,
-      requiredSkills: ['Node.js', 'TypeScript', 'PostgreSQL'],
-      optionalSkills: ['Docker', 'AWS', 'CI/CD'],
-    }
+    return null 
   }
 
   const payload: { description: string; job_id?: string } = { description }

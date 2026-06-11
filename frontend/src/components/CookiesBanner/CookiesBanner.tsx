@@ -1,6 +1,3 @@
-"use client";
-
-console.log("CookieBanner renderizou");
 import { useState, useEffect } from "react";
 import styles from "./CookiesBanner.module.css";
 
