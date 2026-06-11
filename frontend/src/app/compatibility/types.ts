@@ -3,6 +3,7 @@ export type CompatibilityResponse = {
   compatibility: number
   requiredSkills: string[]
   optionalSkills: string[]
+  level?: string
 }
 
 export type SkillSelectionState = {

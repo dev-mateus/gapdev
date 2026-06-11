@@ -208,6 +208,26 @@
   cursor: pointer;
 }
 
+.tagNova {
+  border-color: #46d39a;
+  background: #0f3a34;
+  box-shadow: 0 0 0 1px rgba(70, 211, 154, 0.35);
+}
+
+.novaBadge {
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: #46d39a;
+  color: #062019;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+}
+
 .footer {
   display: flex;
   justify-content: flex-end;

@@ -27,12 +27,29 @@
   border: 1px solid var(--color-border-shell);
   border-radius: var(--radius-control);
   background: var(--color-surface-panel);
+  cursor: pointer;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .card:hover {
   border-color: var(--color-border-input-hover);
   transform: translateY(-2px);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-ring-focus);
+  outline-offset: 2px;
+}
+
+.levelBadge {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-shell);
+  background: color-mix(in srgb, var(--color-brand-accent) 12%, transparent);
+  color: var(--color-text-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .left {

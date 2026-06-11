@@ -29,6 +29,7 @@ function uniqueSkills(skills: string[]): string[] {
 
 function mapAnaliseToCompatibility(data: unknown, title?: string): CompatibilityResponse {
   const d = (data ?? {}) as Record<string, unknown>
+  const level = typeof d.level === 'string' ? d.level : undefined
 
   // If the backend already returns compatibility-shaped response, use directly
   if (typeof d.title === 'string' && typeof d.compatibility === 'number') {
@@ -40,6 +41,7 @@ function mapAnaliseToCompatibility(data: unknown, title?: string): Compatibility
       compatibility: Math.max(0, Math.min(100, Math.round(d.compatibility))),
       requiredSkills: required,
       optionalSkills: optional,
+      level,
     }
   }
 
@@ -86,6 +88,7 @@ function mapAnaliseToCompatibility(data: unknown, title?: string): Compatibility
     compatibility: typeof d.compatibility === 'number' ? Math.max(0, Math.min(100, Math.round(d.compatibility))) : 0,
     requiredSkills: uniqueRequired,
     optionalSkills: uniqueOptional,
+    level,
   }
 }
 

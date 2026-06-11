@@ -20,6 +20,7 @@ class UserSkillRead(UserSkillCreate):
     user_id: str
     skill_id: str
     skill_name: str
+    learned_from_module: bool = False
 
     model_config = {"from_attributes": True}
 

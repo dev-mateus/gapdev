@@ -16,6 +16,7 @@ from app.repositories.job_skill_repository import (
 	resolve_catalog_skill,
 	list_active_skills,
 )
+from app.repositories.study_plan_repository import list_completed_module_skill_ids
 from app.repositories.user_repo import get_user_by_email
 from app.schemas.user_skill import (
 	SkillCatalogRead,
@@ -25,12 +26,12 @@ from app.schemas.user_skill import (
 )
 
 
-def _skill_to_read(skill: object) -> UserSkillRead:
+def _skill_to_read(skill: object, learned_from_module: bool = False) -> UserSkillRead:
 	"""Convert a SQLAlchemy skill record into the public response schema."""
 
 	level = getattr(skill, "level", "Beginner")
 	skill_relation = getattr(skill, "skill", None)
-	
+
 	# Handle enum or string
 	level_str = level.value if hasattr(level, "value") else str(level)
 	skill_id = getattr(skill, "skill_id", None)
@@ -42,6 +43,7 @@ def _skill_to_read(skill: object) -> UserSkillRead:
 		skill_id=str(skill_id) if skill_id is not None else "",
 		skill_name=str(skill_name),
 		level=level_str,
+		learned_from_module=learned_from_module,
 	)
 
 
@@ -109,7 +111,11 @@ def list_skills(db: Session, user_email: str) -> list[UserSkillRead]:
 
 	user_id = _resolve_user_id(db, user_email)
 	skills = list_skills_by_user(db, user_id)
-	return [_skill_to_read(skill) for skill in skills]
+	module_skill_ids = list_completed_module_skill_ids(db, user_id)
+	return [
+		_skill_to_read(skill, str(getattr(skill, "skill_id", "")) in module_skill_ids)
+		for skill in skills
+	]
 
 
 def list_skills_for_job(db: Session, user_email: str, job_id: str) -> list[UserSkillRead]:

@@ -12,6 +12,7 @@ from app.repositories.job_skill_repository import (
     resolve_catalog_skill,
 )
 from app.services.job_skill_service import create_job_skill, list_job_skills_for_job
+from app.repositories.job_repository import get_job_by_id
 from ai_service.app.agents.analise_vaga import analyze_vaga
 
 router = APIRouter(prefix="/analise", tags=["analise"])
@@ -187,6 +188,15 @@ def analisar_vaga_route(
 
     user_email = str(current_user.email)
 
+    # Resolve the job's stored level so every analysis view reflects the
+    # seniority the user picked when creating the job.
+    job_level = None
+    if payload.job_id:
+        job = get_job_by_id(db, payload.job_id)
+        if job is not None:
+            level = getattr(job, "level", None)
+            job_level = level.value if hasattr(level, "value") else (str(level) if level is not None else None)
+
     # Check if this job has already been analyzed (only if job_id provided)
     if payload.job_id:
         existing_skills = list_job_skills_for_job(db, user_email, payload.job_id)
@@ -194,6 +204,7 @@ def analisar_vaga_route(
             # Return already analyzed skills
             return {
                 "summary": "Análise já realizada anteriormente",
+                "level": job_level,
                 "job_skills": [_serialize_existing_job_skill(skill) for skill in existing_skills],
                 "skills": [
                     {
@@ -215,6 +226,7 @@ def analisar_vaga_route(
         parsed = {"summary": str(exc), "job_skills": [], "skills": []}
 
     parsed = dict(parsed)
+    parsed["level"] = job_level
     parsed = _canonicalize_parsed_job_skills(db, parsed)
 
     # Save skills to database only if job_id is provided

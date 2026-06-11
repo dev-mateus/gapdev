@@ -35,5 +35,6 @@ class AnaliseResponse(BaseModel):
     """Response payload from analysis."""
 
     summary: str
+    level: Optional[str] = None
     job_skills: List[JobSkillAnalysis] = Field(default_factory=list)
     skills: List[SkillAnalysis] = Field(default_factory=list)
