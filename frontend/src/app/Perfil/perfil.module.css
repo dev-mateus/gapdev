@@ -119,7 +119,7 @@
   border: 1px solid color-mix(in srgb, var(--color-border-panel) 80%, transparent);
   border-radius: 18px;
 
-  padding: 30px 28px;
+  padding: 20px 20px;
 
   background:
     linear-gradient(
@@ -132,7 +132,7 @@
   flex-direction: column;
   justify-content: flex-start;
 
-  gap: 18px;
+  gap: 10px;
 
   box-shadow:
     inset 0 0 40px color-mix(in srgb, var(--color-brand-primary) 3%, transparent),
@@ -148,8 +148,8 @@
 }
 
 .passwordIcon {
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
 
   border-radius: 50%;
 
@@ -172,7 +172,7 @@
 .passwordTitle h3 {
   margin: 0;
 
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
 
   color: var(--color-text-primary);
@@ -196,8 +196,8 @@
 }
 
 .passwordButton {
-  width: 50%;
-  height: 54px;
+  width: 46%;
+  height: 48px;
 
   background: transparent !important;
 
@@ -231,7 +231,7 @@
   color: #ef4444;
   font-size: 14px;
   font-weight: 500;
-  margin-top: 8px;
+  margin-top: 4px;
   text-align: center;
 }
 

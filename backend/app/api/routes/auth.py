@@ -161,6 +161,18 @@ def change_password(
 			detail="Senha atual incorreta.",
 		)
 
+	if verify_password(payload.new_password, str(current_user.password)):
+	raise HTTPException(
+		status_code=status.HTTP_400_BAD_REQUEST,
+		detail="A nova senha não pode ser igual à senha atual.",
+	)
+
+user_repo.update_user_password(
+	db=db,
+	user=current_user,
+	hashed_password=hash_password(payload.new_password),
+)	
+
 	user_repo.update_user_password(
 		db=db,
 		user=current_user,
