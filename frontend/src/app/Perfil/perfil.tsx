@@ -7,7 +7,7 @@ import {
   User,
 } from 'lucide-react'
 
-import { useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 
 import PageContainer from '../../components/PageContainer/PageContainer'
 import PageHeader from '../../components/PageHeader/PageHeader'
@@ -50,7 +50,7 @@ function Perfil() {
   const [definindoSenha, setDefinindoSenha] = useState(false)
   const [senhaAtual, setSenhaAtual] = useState('')
   const [novaSenha, setNovaSenha] = useState('')
-  const [confirmarSenha, setConfirmarSenha] = useState('')
+
   const [mensagemSenha, setMensagemSenha] = useState('')
   const [erroSenha, setErroSenha] = useState('')
   const [salvandoSenha, setSalvandoSenha] = useState(false)
@@ -106,8 +106,7 @@ function Perfil() {
     }))
   }
 
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) { 
   event.preventDefault()
 
   localStorage.setItem('perfilUsuario', JSON.stringify(perfil))
@@ -135,7 +134,7 @@ async function handleChangePassword() {
   setMensagemSenha('')
   setErroSenha('')
 
-  if (authProvider === 'credentials' && !senhaAtual.trim()) {
+  if (!senhaAtual.trim()) {
     setErroSenha('Informe a senha atual.')
     return
   }
@@ -145,19 +144,13 @@ async function handleChangePassword() {
     return
   }
 
-  if (authProvider === 'google' && novaSenha !== confirmarSenha) {
-    setErroSenha('As senhas não conferem.')
-    return
-  }
-
   try {
     setSalvandoSenha(true)
 
     const response = await apiPost<{ message: string }>(
       '/auth/change-password',
       {
-        current_password:
-          authProvider === 'credentials' ? senhaAtual : undefined,
+        current_password: senhaAtual,
         new_password: novaSenha,
       }
     )
@@ -165,7 +158,6 @@ async function handleChangePassword() {
     setMensagemSenha(response.message)
     setSenhaAtual('')
     setNovaSenha('')
-    setConfirmarSenha('')
     setDefinindoSenha(false)
   } catch (error) {
     setErroSenha(
@@ -186,6 +178,7 @@ async function handleChangePassword() {
             title="Perfil do usuário"
             description="Configure seu perfil técnico para receber recomendações personalizadas de estudo."
           />
+git commit -m "ajusta autenticacao e alteracao de senha no perfil"
 
           <TabSwitcher
             tabs={profileTabs}
@@ -307,20 +300,22 @@ async function handleChangePassword() {
 
 
                               <p className={styles.authMessage}>
-                                {authProvider === 'google'
-                                  ? 'Esta conta utiliza autenticação via Google. Você também pode definir uma senha para acessar a plataforma com e-mail e senha.'
-                                  : 'Esta conta utiliza login com e-mail e senha. Você pode alterar sua senha de acesso.'}
+                                {authProvider !== 'google' &&
+                                  'Esta conta utiliza login com e-mail e senha. Você pode alterar sua senha de acesso.'}
                               </p>
 
+                            {authProvider === 'credentials' && (
                               <PrimaryButton
-                                type="button"
-                                className={styles.passwordButton}
-                                onClick={() => setDefinindoSenha(true)}
-                              >
-                                {authProvider === 'google' ? 'Definir senha' : 'Alterar senha'}
+                                 type="button"
+                                  className={styles.passwordButton}
+                                  onClick={() => setDefinindoSenha(true)}
+                                >
+                                  Alterar senha
                               </PrimaryButton>
-                            </>
-                          ) : (
+                            )}
+                          </>
+                            
+                        ) : authProvider === 'credentials' ? (
                             <>
                               <div className={styles.passwordTitle}>
                                 <div className={styles.passwordIcon}>
@@ -328,31 +323,17 @@ async function handleChangePassword() {
                                 </div>
 
                   
-                                <h3>{authProvider === 'google'
-                                  ? 'Definir senha'
-                                  : 'Alterar senha'} </h3>
+                                <h3>Alterar senha </h3>
                                 
                               </div>
 
                               <Input
-                                label={
-                                  authProvider === 'google'
-                                    ? 'Nova Senha'
-                                    : 'Senha Atual'
-                                }
+                                label="Senha Atual"
                                 type={mostrarSenhaAtual ? 'text' : 'password'}
-                                placeholder={
-                                  authProvider === 'google'
-                                    ? 'Digite a nova senha:'
-                                    : 'Digite a senha atual:'
-                                }
+                                placeholder="Digite a senha atual:"
+                                value={senhaAtual}
+                                onChange={(event) => setSenhaAtual(event.target.value)}
 
-                                value={authProvider === 'google' ? novaSenha : senhaAtual}
-                                  onChange={(event) =>
-                                    authProvider === 'google'
-                                      ? setNovaSenha(event.target.value)
-                                      : setSenhaAtual(event.target.value)
-                                  }
                                 endIcon={
 
                                   <button
@@ -372,26 +353,14 @@ async function handleChangePassword() {
                               />
 
                               <Input
-                                  label={
-                                    authProvider === 'google'
-                                      ? 'Confirmar Senha'
-                                      : 'Senha Nova'
-                                  }
-                                  type={mostrarNovaSenha ? 'text' : 'password'}
-                                  placeholder={
-                                    authProvider === 'google'
-                                      ? 'Confirme a senha:'
-                                      : 'Digite a senha nova:'
-                                      
-                                  }
+                                label="Senha Nova"
+                                type={mostrarNovaSenha ? 'text' : 'password'}
+                                placeholder="Digite a senha nova:"
+                                value={novaSenha}
+                                onChange={(event) => setNovaSenha(event.target.value)}
 
 
-                                value={authProvider === 'google' ? confirmarSenha : novaSenha}
-                                onChange={(event) =>
-                                  authProvider === 'google'
-                                    ? setConfirmarSenha(event.target.value)
-                                    : setNovaSenha(event.target.value)
-                                }  
+                                
                                 endIcon={
                                   
                                   <button
@@ -415,29 +384,25 @@ async function handleChangePassword() {
                                 className={styles.passwordButton}
                                 onClick={handleChangePassword}
                               >
-                                {salvandoSenha
-                                ? 'Salvando...'
-                                : authProvider === 'google'
-                                  ? 'Salvar senha'
-                                  : 'Alterar'}
+                                {salvandoSenha ? 'Salvando...' : 'Alterar'}
                               </PrimaryButton>
 
                               <button
                                 type="button"
-                                className={styles.cancFelPasswordButton}
+                                className={styles.cancelPasswordButton}
                                 onClick={() => {
-                                setDefinindoSenha(false)
-                                setSenhaAtual('')
-                                setNovaSenha('')
-                                setConfirmarSenha('')
-                                setErroSenha('')
-                                setMensagemSenha('')
-                              }}
+                                  setDefinindoSenha(false)
+                                  setSenhaAtual('')
+                                  setNovaSenha('')
+                                  setErroSenha('')
+                                  setMensagemSenha('')
+                                }}
+                              
                               >
                                 Cancelar
                               </button> 
                             </>
-                          )}
+                          ) : null}
 
                           {erroSenha && (
                             <p className={styles.passwordError}>{erroSenha}</p>
@@ -450,7 +415,7 @@ async function handleChangePassword() {
 
                           {authProvider === 'google' && (
                             <>
-                              <div className={styles.authDivider} />
+                              
 
                               <div className={styles.googleConnected}>
                                 <img
