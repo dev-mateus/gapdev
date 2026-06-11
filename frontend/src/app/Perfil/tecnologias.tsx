@@ -41,6 +41,35 @@ type UserSkillItem = {
   learned_from_module?: boolean
 }
 
+function seenModuleSkillsKey(): string {
+  try {
+    const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || '{}')
+    return `gnose:seenModuleSkills:${usuarioLogado.email ?? 'anon'}`
+  } catch {
+    return 'gnose:seenModuleSkills:anon'
+  }
+}
+
+function loadSeenModuleSkills(): Set<string> {
+  try {
+    const raw = localStorage.getItem(seenModuleSkillsKey())
+    if (raw) {
+      return new Set(JSON.parse(raw) as string[])
+    }
+  } catch {
+    // ignore corrupted storage
+  }
+  return new Set()
+}
+
+function persistSeenModuleSkills(ids: Set<string>) {
+  try {
+    localStorage.setItem(seenModuleSkillsKey(), JSON.stringify([...ids]))
+  } catch {
+    // ignore quota/storage errors
+  }
+}
+
 
 const categoryIcons = {
   Linguagens: Braces,
@@ -113,11 +142,19 @@ function Tecnologias() {
             .map((item) => item.skill_id),
         )
 
+        // Only highlight module skills that the user hasn't seen as "new" yet.
+        // After this visit they're marked as seen so the badge won't show again.
+        const jaVistas = loadSeenModuleSkills()
+        const novasParaDestacar = new Set(
+          [...idsAprendidasEmModulo].filter((id) => !jaVistas.has(id)),
+        )
+        persistSeenModuleSkills(new Set([...jaVistas, ...idsAprendidasEmModulo]))
+
         const preSelecionadas = tecnologias.filter((item) => idsUsuario.has(item.id))
 
         setTecnologiasCatalogo(tecnologias)
         setSelecionadas(preSelecionadas)
-        setIdsModulo(idsAprendidasEmModulo)
+        setIdsModulo(novasParaDestacar)
       } catch (error) {
         if (!ativo) return
 
