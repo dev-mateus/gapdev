@@ -13,6 +13,13 @@
   );
   border: 1px solid color-mix(in srgb, var(--color-ring-focus) 42%, transparent);
   flex: 1;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+  border-color: color-mix(in srgb, var(--color-ring-focus) 60%, transparent);
 }
 
 .left {

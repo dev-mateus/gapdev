@@ -3,6 +3,7 @@
   max-width: var(--page-container-max-width);
   margin-inline: auto;
   padding: 1.5rem;
+  animation: fadeInUp 0.35s ease-out both;
 }
 
 /* Celulares: reduzir padding horizontal para eliminar “vazio” e maximizar área útil */
