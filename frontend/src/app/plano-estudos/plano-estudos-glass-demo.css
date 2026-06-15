@@ -1,0 +1,9 @@
+.cardGridGlass {
+  background: var(--color-bg-shell);
+  border: 1px solid color-mix(in srgb, var(--color-ring-focus) 12%, transparent);
+  box-shadow: var(--shadow-feature);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-shell, 1rem);
+  padding: 1.25rem;
+}
+

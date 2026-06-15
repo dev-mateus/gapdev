@@ -1,5 +1,5 @@
 import { ArrowLeft, BookOpen, Briefcase, Calendar, CheckCircle, Pencil, ShieldCheck, Trash2 } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useStudyPlan, type StudyPlan, type StudyTask } from '../../contexts/StudyPlanContext'
 
@@ -30,157 +30,27 @@ function planStats(plan: StudyPlan) {
   return { totalModules, completedModules, progress }
 }
 
-export default function PlanoEstudosPage() {
-  const { plans, isLoading, error, reloadPlans, toggleTask, renamePlan, deletePlan } = useStudyPlan()
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
-  const [openModuleId, setOpenModuleId] = useState<string | undefined>(undefined)
-  const [searchParams, setSearchParams] = useSearchParams()
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void reloadPlans()
-    }, 0)
-
-    return () => window.clearTimeout(timer)
-  }, [reloadPlans])
-
-  // Auto-open the plan that matches the ?jobId coming from "Gerar plano".
-  useEffect(() => {
-    const jobId = searchParams.get('jobId')
-    if (!jobId || plans.length === 0) return
-    const match = plans.find((p) => p.jobId === jobId)
-    if (match) {
-      setSelectedPlanId(match.id)
-      searchParams.delete('jobId')
-      setSearchParams(searchParams, { replace: true })
-    }
-  }, [plans, searchParams, setSearchParams])
-
-  const selectedPlan = useMemo(
-    () => plans.find((plan) => plan.id === selectedPlanId) ?? null,
-    [plans, selectedPlanId],
-  )
-
-  if (selectedPlan) {
-    return (
-      <PlanDetailView
-        plan={selectedPlan}
-        openModuleId={openModuleId}
-        onOpenModule={setOpenModuleId}
-        onBack={() => {
-          setSelectedPlanId(null)
-          setOpenModuleId(undefined)
-        }}
-        onToggleTask={toggleTask}
-      />
-    )
-  }
-
-  const totalPlans = plans.length
-  const completedPlans = plans.filter((plan) => {
-    const { totalModules, completedModules } = planStats(plan)
-    return totalModules > 0 && completedModules === totalModules
-  }).length
-
-  return (
-    <div className={styles.content}>
-      <PageContainer className={styles.expandedContainer}>
-        <div className={styles.pageStack}>
-          <PageHeader
-            title="Plano de Estudos"
-            description="Cada vaga analisada gera um plano separado. Selecione um para ver os módulos."
-          />
-
-          {isLoading ? <LoadingState message="Carregando planos de estudo" /> : null}
-          {error ? <div className={styles.pageError}>{error}</div> : null}
-
-          <section className={styles.summaryCards} aria-label="Resumo">
-            <div className={`${styles.summaryCard} ${styles.cardGlass}`}>
-              <div className={styles.summaryIconBox} aria-hidden="true">
-                <BookOpen size={20} />
-              </div>
-              <div className={styles.summaryMeta}>
-                <div className={styles.summaryBig}>{totalPlans}</div>
-                <div className={styles.summarySmall}>Planos gerados</div>
-              </div>
-            </div>
-
-            <div className={`${styles.summaryCard} ${styles.cardGlass}`}>
-              <div className={styles.summaryIconBox} aria-hidden="true">
-                <ShieldCheck size={20} />
-              </div>
-              <div className={styles.summaryMeta}>
-                <div className={styles.summaryBig}>{completedPlans}/{totalPlans}</div>
-                <div className={styles.summarySmall}>Planos concluídos</div>
-              </div>
-            </div>
-          </section>
-
-          {!isLoading && plans.length === 0 ? (
-            <section className={styles.emptyState} aria-label="Plano vazio">
-              Nenhum plano de estudos gerado ainda. Analise uma vaga para gerar o primeiro.
-            </section>
-          ) : null}
-
-          {plans.length > 0 ? (
-            <section className={styles.planGrid} aria-label="Planos de estudo">
-              {plans.map((plan) => (
-                <PlanCard
-                  key={plan.id}
-                  plan={plan}
-                  onOpen={() => setSelectedPlanId(plan.id)}
-                  onRename={async (title) => {
-                    await renamePlan(plan.id, title)
-                  }}
-                  onDelete={async () => {
-                    await deletePlan(plan.id)
-                  }}
-                />
-              ))}
-            </section>
-          ) : null}
-        </div>
-      </PageContainer>
-    </div>
-  )
-}
-
 type PlanCardProps = {
   plan: StudyPlan
   onOpen: () => void
-  onRename: (title: string) => Promise<void>
-  onDelete: () => Promise<void>
+  onOpenRename: () => void
+  onOpenDeleteConfirm: () => void
+  isBusy?: boolean
 }
 
-function PlanCard({ plan, onOpen, onRename, onDelete }: PlanCardProps) {
+const PlanCard = memo(function PlanCard({
+  plan,
+  onOpen,
+  onOpenRename,
+  onOpenDeleteConfirm,
+  isBusy = false,
+}: PlanCardProps) {
   const { totalModules, completedModules, progress } = planStats(plan)
-  const [isBusy, setIsBusy] = useState(false)
 
-  const jobLabel = [plan.jobTitle, plan.companyName].filter(Boolean).join(' · ')
-
-  const handleRename = async (event: React.MouseEvent) => {
-    event.stopPropagation()
-    const next = window.prompt('Novo nome do plano:', plan.title)
-    if (!next || next.trim() === plan.title) return
-    setIsBusy(true)
-    try {
-      await onRename(next.trim())
-    } finally {
-      setIsBusy(false)
-    }
-  }
-
-  const handleDelete = async (event: React.MouseEvent) => {
-    event.stopPropagation()
-    const ok = window.confirm(`Excluir o plano "${plan.title}"? Esta ação não pode ser desfeita.`)
-    if (!ok) return
-    setIsBusy(true)
-    try {
-      await onDelete()
-    } finally {
-      setIsBusy(false)
-    }
-  }
+  const jobLabel = useMemo(() => [plan.jobTitle, plan.companyName].filter(Boolean).join(' · '), [
+    plan.companyName,
+    plan.jobTitle,
+  ])
 
   return (
     <article
@@ -194,28 +64,36 @@ function PlanCard({ plan, onOpen, onRename, onDelete }: PlanCardProps) {
           onOpen()
         }
       }}
-      aria-busy={isBusy}
     >
       <header className={styles.planCardHeader}>
-        <h3 className={styles.planCardTitle}>{plan.title}</h3>
+        <div className={styles.planCardTitleBlock}>
+          <h3 className={styles.planCardTitle}>{plan.title}</h3>
+        </div>
+
         <div className={styles.planCardActions}>
           <button
             type="button"
             className={styles.iconButton}
-            onClick={handleRename}
+            disabled={isBusy}
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpenRename()
+            }}
             aria-label="Renomear plano"
             title="Renomear"
-            disabled={isBusy}
           >
             <Pencil size={16} />
           </button>
           <button
             type="button"
             className={`${styles.iconButton} ${styles.iconButtonDanger}`}
-            onClick={handleDelete}
+            disabled={isBusy}
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpenDeleteConfirm()
+            }}
             aria-label="Excluir plano"
             title="Excluir"
-            disabled={isBusy}
           >
             <Trash2 size={16} />
           </button>
@@ -247,7 +125,7 @@ function PlanCard({ plan, onOpen, onRename, onDelete }: PlanCardProps) {
       </div>
     </article>
   )
-}
+})
 
 type PlanDetailViewProps = {
   plan: StudyPlan
@@ -255,15 +133,21 @@ type PlanDetailViewProps = {
   onOpenModule: (id: string | undefined) => void
   onBack: () => void
   onToggleTask: (planId: string, moduleId: string, taskId: string) => void
+  isBusy: boolean
 }
 
-function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask }: PlanDetailViewProps) {
+function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask, isBusy }: PlanDetailViewProps) {
   const totalModules = plan.modules.length
   const completedModules = plan.modules.filter(
     (mod) => mod.tasks.length > 0 && mod.tasks.every((task) => task.done),
   ).length
+
+  const jobLabel = useMemo(() => [plan.jobTitle, plan.companyName].filter(Boolean).join(' · '), [
+    plan.companyName,
+    plan.jobTitle,
+  ])
+
   const selectedOpenModuleId = openModuleId === undefined ? plan.modules[0]?.id ?? '' : openModuleId
-  const jobLabel = [plan.jobTitle, plan.companyName].filter(Boolean).join(' · ')
 
   const [confirmTarget, setConfirmTarget] = useState<{
     moduleId: string
@@ -273,7 +157,6 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
   } | null>(null)
 
   const [toast, setToast] = useState<string | null>(null)
-
   const dismissToast = useCallback(() => setToast(null), [])
 
   useEffect(() => {
@@ -282,44 +165,48 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
     return () => window.clearTimeout(timer)
   }, [toast, dismissToast])
 
-  const handleTaskClick = (moduleId: string, task: StudyTask, moduleName: string, allTasks: StudyTask[]) => {
-    if (task.done) return
+  const handleTaskClick = useCallback(
+    (moduleId: string, task: StudyTask, moduleName: string, allTasks: StudyTask[]) => {
+      if (task.done) return
+      if (isBusy) return
 
-    const pendingCount = allTasks.filter((t) => !t.done).length
-    const isLastTask = pendingCount === 1
+      const pendingCount = allTasks.filter((t) => !t.done).length
+      const isLastTask = pendingCount === 1
 
-    setConfirmTarget({ moduleId, task, isLastTask, moduleName })
-  }
+      setConfirmTarget({ moduleId, task, isLastTask, moduleName })
+    },
+    [isBusy],
+  )
 
-  const handleConfirm = () => {
+  const [isConfirmBusy, setIsConfirmBusy] = useState(false)
+
+  const handleConfirm = useCallback(() => {
     if (!confirmTarget) return
+    if (isConfirmBusy) return
 
-    onToggleTask(plan.id, confirmTarget.moduleId, confirmTarget.task.id)
-
-    if (confirmTarget.isLastTask) {
-      setToast('Habilidade adicionada ao seu perfil')
-    }
-
+    const { moduleId, task, isLastTask } = confirmTarget
     setConfirmTarget(null)
-  }
+    setIsConfirmBusy(true)
 
-  const handleCancel = () => {
+    onToggleTask(plan.id, moduleId, task.id)
+
+    if (isLastTask) setToast('Habilidade adicionada ao seu perfil')
+  }, [confirmTarget, isConfirmBusy, onToggleTask, plan.id])
+
+  const handleCancel = useCallback(() => {
     setConfirmTarget(null)
-  }
+  }, [])
 
   return (
     <div className={styles.content}>
       <PageContainer className={styles.expandedContainer}>
         <div className={styles.pageStack}>
-          <button type="button" className={styles.backButton} onClick={onBack}>
+          <button type="button" className={styles.backButton} onClick={onBack} disabled={isBusy}>
             <ArrowLeft size={16} />
             Voltar aos planos
           </button>
 
-          <PageHeader
-            title={plan.title}
-            description={jobLabel || 'Plano personalizado de estudos'}
-          />
+          <PageHeader title={plan.title} description={jobLabel || 'Plano personalizado de estudos'} />
 
           <section className={styles.summaryCards} aria-label="Resumo">
             <div className={`${styles.summaryCard} ${styles.cardGlass}`}>
@@ -327,7 +214,9 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
                 <ShieldCheck size={20} />
               </div>
               <div className={styles.summaryMeta}>
-                <div className={styles.summaryBig}>{completedModules}/{totalModules}</div>
+                <div className={styles.summaryBig}>
+                  {completedModules}/{totalModules}
+                </div>
                 <div className={styles.summarySmall}>Módulos concluídos</div>
               </div>
             </div>
@@ -356,6 +245,7 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
                   const progressPercentage = moduleEntry.tasks.length
                     ? Math.round((completedTasks / moduleEntry.tasks.length) * 100)
                     : 0
+
                   const priorityClass =
                     moduleEntry.priority === 'media'
                       ? styles.priorityMedia
@@ -367,6 +257,7 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
                         type="button"
                         className={styles.skillPlanHeader}
                         onClick={() => onOpenModule(isOpen ? '' : moduleEntry.id)}
+                        disabled={isBusy}
                       >
                         <div>
                           <span className={`${styles.skillBadge} ${priorityClass}`}>
@@ -376,16 +267,15 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
                         </div>
 
                         <div className={styles.skillPlanMeta}>
-                          <span>{completedTasks}/{moduleEntry.tasks.length} concluído</span>
+                          <span>
+                            {completedTasks}/{moduleEntry.tasks.length} concluído
+                          </span>
                           <span className={styles.expandIcon}>{isOpen ? '-' : '+'}</span>
                         </div>
                       </button>
 
                       <div className={styles.progressTrack} aria-hidden="true">
-                        <div
-                          className={styles.progressFill}
-                          style={{ width: `${progressPercentage}%` }}
-                        />
+                        <div className={styles.progressFill} style={{ width: `${progressPercentage}%` }} />
                       </div>
 
                       {isOpen && moduleEntry.tasks.length > 0 ? (
@@ -395,8 +285,10 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
                               key={task.id}
                               type="button"
                               className={`${styles.skillTaskItem} ${task.done ? styles.taskDone : ''}`}
-                              onClick={() => handleTaskClick(moduleEntry.id, task, moduleEntry.name, moduleEntry.tasks)}
-                              disabled={task.done}
+                              onClick={() =>
+                                handleTaskClick(moduleEntry.id, task, moduleEntry.name, moduleEntry.tasks)
+                              }
+                              disabled={task.done || isBusy}
                             >
                               {task.done ? <CheckCircle size={16} className={styles.taskDoneIcon} /> : null}
                               {task.title}
@@ -433,8 +325,13 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
               <button type="button" className={styles.confirmButtonCancel} onClick={handleCancel}>
                 Cancelar
               </button>
-              <button type="button" className={styles.confirmButtonConfirm} onClick={handleConfirm}>
-                Confirmar
+              <button
+                type="button"
+                className={styles.confirmButtonConfirm}
+                onClick={handleConfirm}
+                disabled={isConfirmBusy || isBusy}
+              >
+                {isConfirmBusy ? 'Confirmando...' : 'Confirmar'}
               </button>
             </div>
           </div>
@@ -450,3 +347,279 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
     </div>
   )
 }
+
+export default function PlanoEstudosPage() {
+  const { plans, isLoading, error, reloadPlans, toggleTask, renamePlan, deletePlan } = useStudyPlan()
+
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
+  const [openModuleId, setOpenModuleId] = useState<string | undefined>(undefined)
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null)
+  const [editingPlanTitle, setEditingPlanTitle] = useState('')
+  const [deletingPlanId, setDeletingPlanId] = useState<string | null>(null)
+  const [actionBusy, setActionBusy] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
+  const [renameError, setRenameError] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const selectedPlan = useMemo(
+    () => plans.find((plan) => plan.id === selectedPlanId) ?? null,
+    [plans, selectedPlanId],
+  )
+
+  const { totalPlans, completedPlans } = useMemo(() => {
+    const total = plans.length
+    let completed = 0
+    for (const p of plans) {
+      const s = planStats(p)
+      if (s.totalModules > 0 && s.completedModules === s.totalModules) completed += 1
+    }
+    return { totalPlans: total, completedPlans: completed }
+  }, [plans])
+
+  const loadingMessage = useMemo(() => {
+    return 'Carregando planos de estudo...'
+  }, [])
+
+  const didInitialReload = useRef(false)
+  useEffect(() => {
+    if (didInitialReload.current) return
+    didInitialReload.current = true
+    void reloadPlans()
+  }, [reloadPlans])
+
+  useEffect(() => {
+    const jobId = searchParams.get('jobId')
+    if (!jobId) return
+
+    const match = plans.find((p) => p.jobId === jobId)
+    if (!match) return
+
+    setSelectedPlanId((prev) => (prev === match.id ? prev : match.id))
+
+    const next = new URLSearchParams(searchParams)
+    next.delete('jobId')
+    setSearchParams(next, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plans, searchParams, setSearchParams])
+
+  const isPageBusy = isLoading
+  const currentEditingPlan = editingPlanId ? plans.find((plan) => plan.id === editingPlanId) : null
+  const currentDeletingPlan = deletingPlanId ? plans.find((plan) => plan.id === deletingPlanId) : null
+
+  const dismissToast = useCallback(() => setToast(null), [])
+
+  useEffect(() => {
+    if (!toast) return
+    const timer = window.setTimeout(dismissToast, 4000)
+    return () => window.clearTimeout(timer)
+  }, [toast, dismissToast])
+
+  if (isLoading) {
+    return (
+      <div className={styles.content}>
+        <LoadingState message={loadingMessage} />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className={styles.content}>
+        <section className={styles.pageError} aria-label="Erro ao carregar">
+          {error}
+        </section>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.content}>
+      {selectedPlan ? (
+        <PlanDetailView
+          plan={selectedPlan}
+          openModuleId={openModuleId}
+          onOpenModule={(id) => setOpenModuleId(id ? id : undefined)}
+          onBack={() => {
+            setSelectedPlanId(null)
+            setOpenModuleId(undefined)
+          }}
+          onToggleTask={(planId, moduleId, taskId) => toggleTask(planId, moduleId, taskId)}
+          isBusy={isPageBusy}
+        />
+      ) : (
+        <PageContainer className={styles.expandedContainer}>
+          <div className={styles.pageStack}>
+            <PageHeader
+              title="Planos de estudo"
+              description={
+                totalPlans > 0
+                  ? `${completedPlans}/${totalPlans} planos concluídos`
+                  : 'Crie e gerencie seus planos de estudo'
+              }
+            />
+
+            {/* Bloco superior: cards glass de resumo */}
+            <section className={styles.summaryCards} aria-label="Resumo do progresso">
+              <div className={`${styles.summaryCard} ${styles.cardGlass}`}>
+                <div className={styles.summaryIconBox} aria-hidden="true">
+                  <ShieldCheck size={20} />
+                </div>
+                <div className={styles.summaryMeta}>
+                  <div className={styles.summaryBig}>{completedPlans}</div>
+                  <div className={styles.summarySmall}>Planos concluídos</div>
+                </div>
+              </div>
+
+              <div className={`${styles.summaryCard} ${styles.cardGlass}`}>
+                <div className={styles.summaryIconBox} aria-hidden="true">
+                  <BookOpen size={20} />
+                </div>
+                <div className={styles.summaryMeta}>
+                  <div className={styles.summaryBig}>{totalPlans - completedPlans}</div>
+                  <div className={styles.summarySmall}>Planos em desenvolvimento</div>
+                </div>
+              </div>
+            </section>
+
+            {/* Bloco inferior: grid de PlanCard */}
+            <section className={styles.planGrid} aria-label="Lista de planos">
+              {plans.length === 0 ? (
+                <section className={styles.emptyState} aria-label="Nenhum plano">
+                  Você ainda não possui planos de estudo.
+                </section>
+              ) : (
+                plans.map((plan) => (
+                  <PlanCard
+                    key={plan.id}
+                    plan={plan}
+                    isBusy={isPageBusy || actionBusy}
+                    onOpen={() => {
+                      setSelectedPlanId(plan.id)
+                      setOpenModuleId(undefined)
+                    }}
+                    onOpenRename={() => {
+                      setEditingPlanId(plan.id)
+                      setEditingPlanTitle(plan.title)
+                      setRenameError(null)
+                    }}
+                    onOpenDeleteConfirm={() => {
+                      setDeletingPlanId(plan.id)
+                    }}
+                  />
+                ))
+              )}
+            </section>
+          </div>
+        </PageContainer>
+      )}
+
+
+      {editingPlanId && currentEditingPlan ? (
+        <div className={styles.confirmOverlay} onClick={() => !actionBusy && setEditingPlanId(null)}>
+          <div className={styles.confirmCard} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <h3 className={styles.confirmTitle}>Renomear plano</h3>
+            <p className={styles.confirmDescription}>Atualize o nome do plano de estudo.</p>
+            <input
+              value={editingPlanTitle}
+              onChange={(event) => {
+                setEditingPlanTitle(event.target.value)
+                setRenameError(null)
+              }}
+              className={styles.renameInput}
+              aria-label="Título do plano"
+              disabled={actionBusy}
+            />
+            {renameError ? <div className={styles.renameError}>{renameError}</div> : null}
+            <div className={styles.confirmActions}>
+              <button
+                type="button"
+                className={styles.confirmButtonCancel}
+                onClick={() => setEditingPlanId(null)}
+                disabled={actionBusy}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className={styles.confirmButtonConfirm}
+                onClick={async () => {
+                  if (!editingPlanTitle.trim()) {
+                    setRenameError('O título não pode ficar vazio.')
+                    return
+                  }
+
+                  if (!editingPlanId) return
+                  setActionBusy(true)
+                  try {
+                    await renamePlan(editingPlanId, editingPlanTitle.trim())
+                    setToast('Plano renomeado com sucesso')
+                    setEditingPlanId(null)
+                  } catch {
+                    setRenameError('Falha ao renomear o plano. Tente novamente.')
+                  } finally {
+                    setActionBusy(false)
+                  }
+                }}
+                disabled={actionBusy}
+              >
+                {actionBusy ? 'Salvando...' : 'Salvar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {deletingPlanId && currentDeletingPlan ? (
+        <div className={styles.confirmOverlay} onClick={() => !actionBusy && setDeletingPlanId(null)}>
+          <div className={styles.confirmCard} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <div className={styles.confirmIcon}>
+              <Trash2 size={32} />
+            </div>
+            <h3 className={styles.confirmTitle}>Excluir plano</h3>
+            <p className={styles.confirmDescription}>
+              Tem certeza que deseja remover o plano "{currentDeletingPlan.title}"? Esta ação não pode ser desfeita.
+            </p>
+            <div className={styles.confirmActions}>
+              <button
+                type="button"
+                className={styles.confirmButtonCancel}
+                onClick={() => setDeletingPlanId(null)}
+                disabled={actionBusy}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className={styles.confirmButtonConfirm}
+                onClick={async () => {
+                  if (!deletingPlanId) return
+                  setActionBusy(true)
+                  try {
+                    await deletePlan(deletingPlanId)
+                    setToast('Plano excluído com sucesso')
+                    setDeletingPlanId(null)
+                  } catch {
+                    setToast('Falha ao excluir o plano. Tente novamente.')
+                  } finally {
+                    setActionBusy(false)
+                  }
+                }}
+                disabled={actionBusy}
+              >
+                {actionBusy ? 'Excluindo...' : 'Excluir'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {toast ? (
+        <div className={styles.toast} onClick={dismissToast}>
+          <CheckCircle size={18} />
+          <span>{toast}</span>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
