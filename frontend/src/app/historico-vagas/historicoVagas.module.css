@@ -13,6 +13,93 @@
   max-width: min(100%, 78rem);
 }
 
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.searchField {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 18rem;
+  min-width: 12rem;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--color-text-icon-placeholder);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.7rem 0.95rem 0.7rem 2.6rem;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-panel);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-icon-placeholder);
+}
+
+.searchInput:hover {
+  border-color: var(--color-border-input-hover);
+}
+
+.searchInput:focus-visible {
+  outline: none;
+  border-color: var(--color-border-input-focus);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
+}
+
+.sortField {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-panel);
+  color: var(--color-text-muted);
+}
+
+.sortField:hover {
+  border-color: var(--color-border-input-hover);
+}
+
+.sortLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sortSelect {
+  padding: 0.7rem 0.25rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sortSelect:focus-visible {
+  outline: none;
+}
+
+.sortSelect option {
+  background: var(--color-surface-panel);
+  color: var(--color-text-primary);
+}
+
 .list {
   display: grid;
   gap: 1.45rem;
@@ -117,6 +204,15 @@
 }
 
 @media (max-width: 900px) {
+  .searchField {
+    flex-basis: 100%;
+  }
+
+  .sortField {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+
   .card {
     flex-direction: column;
     align-items: flex-start;
