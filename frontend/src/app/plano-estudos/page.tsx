@@ -1,5 +1,5 @@
 import { ArrowLeft, BookOpen, Briefcase, Calendar, CheckCircle, Pencil, ShieldCheck, Trash2 } from 'lucide-react'
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useStudyPlan, type StudyPlan, type StudyTask } from '../../contexts/StudyPlanContext'
 
