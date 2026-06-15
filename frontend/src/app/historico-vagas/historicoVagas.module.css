@@ -64,15 +64,23 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex: 1 1 18rem;
+  min-width: 12rem;
   padding: 0 0.85rem;
   border: 1px solid var(--color-border-input);
   border-radius: var(--radius-control);
   background: var(--color-surface-panel);
   color: var(--color-text-muted);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .sortField:hover {
   border-color: var(--color-border-input-hover);
+}
+
+.sortField:focus-within {
+  border-color: var(--color-border-input-focus);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
 }
 
 .sortLabel {
@@ -82,13 +90,19 @@
 }
 
 .sortSelect {
-  padding: 0.7rem 0.25rem;
+  flex: 1;
+  padding: 0.7rem 1.75rem 0.7rem 0.25rem;
   border: none;
-  background: transparent;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2358e0ff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.25rem center;
   color: var(--color-text-primary);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .sortSelect:focus-visible {
@@ -96,7 +110,15 @@
 }
 
 .sortSelect option {
+  padding: 0.5rem 0.75rem;
   background: var(--color-surface-panel);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.sortSelect option:checked,
+.sortSelect option:hover {
+  background: var(--color-brand-primary);
   color: var(--color-text-primary);
 }
 
