@@ -1,13 +1,9 @@
+import { useState } from 'react'
+
 import { useStudyPlan } from '../../contexts/StudyPlanContext'
 import PageHeader from '../../components/PageHeader/PageHeader'
 import PageContainer from '../../components/PageContainer/PageContainer'
 import styles from './progresso.module.css'
-
-type WeeklyData = {
-  label: string
-  completed: number
-  total: number
-}
 
 type SkillProgress = {
   name: string
@@ -17,13 +13,6 @@ type SkillProgress = {
 
 function formatPercentBR(value: number) {
   return `${value.toFixed(2).replace('.', ',')}%`
-}
-
-function startOfDay(date: Date) {
-  const result = new Date(date)
-  result.setHours(0, 0, 0, 0)
-  result.setMilliseconds(0)
-  return result
 }
 
 export default function ProgressoPage() {
@@ -54,54 +43,37 @@ export default function ProgressoPage() {
   ).length
   const dominatedPercent = totalSkills > 0 ? Math.round((dominatedSkills / totalSkills) * 100) : 0
 
-  const skillProgress: SkillProgress[] = allModules.map((moduleEntry) => {
-    const completedModuleTasks = moduleEntry.tasks.filter((task) => task.done).length
-    const percent = moduleEntry.tasks.length
-      ? Math.round((completedModuleTasks / moduleEntry.tasks.length) * 100)
-      : 0
-    const status = percent >= 100 ? 'concluído' : percent >= 40 ? 'em andamento' : 'iniciando'
+  const skillProgress: SkillProgress[] = allModules
+    .map((moduleEntry): SkillProgress => {
+      const completedModuleTasks = moduleEntry.tasks.filter((task) => task.done).length
+      const percent = moduleEntry.tasks.length
+        ? Math.round((completedModuleTasks / moduleEntry.tasks.length) * 100)
+        : 0
+      const status = percent >= 100 ? 'concluído' : percent >= 40 ? 'em andamento' : 'iniciando'
 
-    return {
-      name: `${moduleEntry.name} · ${moduleEntry.planTitle}`,
-      percent,
-      status,
-    }
-  })
+      return {
+        name: `${moduleEntry.name} · ${moduleEntry.planTitle}`,
+        percent,
+        status,
+      }
+    })
+    // Skills não concluídas ficam no topo; as concluídas vão para o final.
+    // Entre as não concluídas, as mais avançadas aparecem primeiro.
+    .sort((a, b) => {
+      const aDone = a.percent >= 100
+      const bDone = b.percent >= 100
+      if (aDone !== bDone) {
+        return aDone ? 1 : -1
+      }
+      return b.percent - a.percent
+    })
 
-  const weeksCount = 4
-  const weeklyTarget = 7
-  const today = startOfDay(new Date())
-
-  const startDate = new Date(today)
-  startDate.setDate(startDate.getDate() - 7 * (weeksCount - 1))
-
-  const daysPassed = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-  const currentWeekNumber = Math.floor(daysPassed / 7) + 1
-  const dayInCurrentWeek = (daysPassed % 7) + 1
-
-  const currentWeekIndex = currentWeekNumber - 1
-  const weeklyData: WeeklyData[] = Array.from({ length: weeksCount }, (_, index) => {
-    const isPast = index < currentWeekIndex
-    const isCurrent = index === currentWeekIndex
-
-    const total = weeklyTarget
-    const completed = isPast ? total : isCurrent ? Math.min(dayInCurrentWeek, total) : 0
-
-    return {
-      label: `Semana ${index + 1}`,
-      completed,
-      total: weeklyTarget,
-    }
-  })
-
-  let currentStreak = 0
-  for (let index = weeklyData.length - 1; index >= 0; index -= 1) {
-    if (weeklyData[index].completed > 0) {
-      currentStreak += 1
-    } else {
-      break
-    }
-  }
+  const SKILLS_VISIVEIS = 6
+  const [skillsExpandidas, setSkillsExpandidas] = useState(false)
+  const temMaisSkills = skillProgress.length > SKILLS_VISIVEIS
+  const skillsVisiveis = skillsExpandidas
+    ? skillProgress
+    : skillProgress.slice(0, SKILLS_VISIVEIS)
 
   return (
     <div className={styles.content}>
@@ -134,14 +106,14 @@ export default function ProgressoPage() {
                   <div className={styles.ring}>
                     <div
                       className={styles.ringFill}
-                      style={{ ['--ring-progress' as any]: `${dominatedPercent}%` }}
+                      style={{ ['--ring-progress' as any]: dominatedPercent }}
                     />
                   </div>
                   <div className={styles.ringCenter}>
                     <div className={styles.ringNumber}>
                       {dominatedSkills}/{totalSkills}
                     </div>
-                    <div className={styles.ringSub}>{formatPercentBR(dominatedPercent)} completo</div>
+                    <div className={styles.ringSub}>{formatPercentBR(dominatedPercent)} </div>
                   </div>
                 </div>
 
@@ -150,94 +122,62 @@ export default function ProgressoPage() {
                 </div>
               </div>
             </div>
-
-            <div className={`${styles.card} ${styles.cardGlass}`}>
-              <div className={styles.cardTop}>
-                <div className={styles.cardIcon} aria-hidden="true">
-                  ▣
-                </div>
-                <div className={styles.cardMeta}>
-                  <h3 className={styles.cardTitle}>Sequência atual</h3>
-                  <div className={styles.cardValueRow}>
-                    <span className={styles.cardValue}>{currentStreak}</span>
-                    <span className={styles.badgeRecord}>Semanas com progresso recente</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </section>
 
-          <div className={styles.grid}>
-            <section className={`${styles.panel} ${styles.panelGlass}`}>
-              <div className={styles.panelHeader}>
-                <h2 className={styles.panelTitle}>Progresso semanal</h2>
-                <p className={styles.panelSubtitle}>Semanas calculadas a partir das tarefas do plano de estudos</p>
-              </div>
+          <section className={`${styles.panel} ${styles.panelGlass}`}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>Progresso por skill</h2>
+              <p className={styles.panelSubtitle}>Dados extraídos diretamente do plano de estudos</p>
+            </div>
 
-              <div className={styles.bars} role="img" aria-label="Gráfico de barras semanal">
-                {weeklyData.map((week) => {
-                  const heightPercent = week.total > 0 ? (week.completed / week.total) * 100 : 0
+            <div className={styles.skillList}>
+              {skillsVisiveis.map((skill) => {
+                const isDone = skill.percent >= 100
 
-                  return (
-                    <div key={week.label} className={styles.barCol}>
-                      <div className={styles.barWrap}>
-                        <div
-                          className={styles.bar}
-                          style={{ height: `${heightPercent}%`, ['--bar-value' as any]: week.completed }}
-                        />
-                        <div className={styles.barValue}>{week.completed}/{week.total}</div>
+                return (
+                  <div key={skill.name} className={styles.skillRow}>
+                    <div className={styles.skillTop}>
+                      <div className={styles.skillName}>
+                        {skill.name}
+                        {isDone ? <span className={styles.check} aria-label="Concluído">✓</span> : null}
                       </div>
-                      <div className={styles.barLabel}>{week.label}</div>
+                      <div className={styles.skillPercent}>{skill.percent}%</div>
                     </div>
-                  )
-                })}
-              </div>
-            </section>
 
-            <section className={`${styles.panel} ${styles.panelGlass}`}>
-              <div className={styles.panelHeader}>
-                <h2 className={styles.panelTitle}>Progresso por skill</h2>
-                <p className={styles.panelSubtitle}>Dados extraídos diretamente do plano de estudos</p>
-              </div>
-
-              <div className={styles.skillList}>
-                {skillProgress.map((skill) => {
-                  const isDone = skill.percent >= 100
-
-                  return (
-                    <div key={skill.name} className={styles.skillRow}>
-                      <div className={styles.skillTop}>
-                        <div className={styles.skillName}>
-                          {skill.name}
-                          {isDone ? <span className={styles.check} aria-label="Concluído">✓</span> : null}
-                        </div>
-                        <div className={styles.skillPercent}>{skill.percent}%</div>
-                      </div>
-
-                      <div className={styles.progressTrack} aria-hidden="true">
-                        <div
-                          className={styles.progressFill}
-                          style={{ width: `${skill.percent}%` }}
-                          data-done={isDone ? 'true' : 'false'}
-                        />
-                      </div>
-
-                      <div className={styles.skillStatus}>
-                        {skill.status === 'concluído'
-                          ? 'Concluído'
-                          : skill.status === 'iniciando'
-                            ? 'Iniciando'
-                            : 'Em andamento'}
-                      </div>
+                    <div className={styles.progressTrack} aria-hidden="true">
+                      <div
+                        className={styles.progressFill}
+                        style={{ width: `${skill.percent}%` }}
+                        data-done={isDone ? 'true' : 'false'}
+                      />
                     </div>
-                  )
-                })}
-              </div>
-            </section>
-          </div>
+
+                    <div className={styles.skillStatus}>
+                      {skill.status === 'concluído'
+                        ? 'Concluído'
+                        : skill.status === 'iniciando'
+                          ? 'Iniciando'
+                          : 'Em andamento'}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {temMaisSkills ? (
+              <button
+                type="button"
+                className={styles.verMaisButton}
+                onClick={() => setSkillsExpandidas((atual) => !atual)}
+              >
+                {skillsExpandidas
+                  ? 'Ver menos'
+                  : `Ver mais (${skillProgress.length - SKILLS_VISIVEIS})`}
+              </button>
+            ) : null}
+          </section>
         </div>
       </PageContainer>
     </div>
   )
 }
-
