@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FaCalendar } from 'react-icons/fa6'
+import { ArrowUpDown, Search } from 'lucide-react'
 
 import PageContainer from '../../components/PageContainer/PageContainer'
 import PageHeader from '../../components/PageHeader/PageHeader'
@@ -13,6 +14,15 @@ import styles from './historicoVagas.module.css'
 const tabs: TabSwitcherItem[] = [
   { id: 'analisar-vaga', label: 'Analisar vaga', href: '/vagas' },
   { id: 'minhas-vagas', label: 'Minhas vagas', href: '/historico-vagas' },
+]
+
+type SortOption = 'recent' | 'oldest' | 'compatibility' | 'company'
+
+const sortOptions: { value: SortOption; label: string }[] = [
+  { value: 'recent', label: 'Mais recentes' },
+  { value: 'oldest', label: 'Mais antigas' },
+  { value: 'compatibility', label: 'Maior compatibilidade' },
+  { value: 'company', label: 'Empresa (A-Z)' },
 ]
 
 function navigateTo(path: string) {
@@ -35,6 +45,8 @@ function HistoricoPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [isEmptyHistory, setIsEmptyHistory] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortBy, setSortBy] = useState<SortOption>('recent')
 
   useEffect(() => {
     let isMounted = true
@@ -73,6 +85,45 @@ function HistoricoPage() {
       isMounted = false
     }
   }, [])
+
+  const visibleJobs = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+
+    const filtered = term
+      ? jobs.filter((job) => {
+          const haystack = [
+            job.job_title,
+            job.company_name,
+            ...(job.tecnologias ?? []),
+          ]
+            .join(' ')
+            .toLowerCase()
+
+          return haystack.includes(term)
+        })
+      : jobs
+
+    const sorted = [...filtered]
+
+    sorted.sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        case 'compatibility':
+          return (getJobCompatibility(b) ?? -1) - (getJobCompatibility(a) ?? -1)
+        case 'company':
+          return a.company_name.localeCompare(b.company_name, 'pt-BR')
+        case 'recent':
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      }
+    })
+
+    return sorted
+  }, [jobs, searchTerm, sortBy])
+
+  const hasNoResults =
+    !isLoading && !errorMessage && !isEmptyHistory && visibleJobs.length === 0
 
   function handleTabChange(tab: TabSwitcherItem) {
     if (!tab.href) return
@@ -117,8 +168,47 @@ function HistoricoPage() {
             <p className={styles.emptyState}>Nenhuma vaga salva ainda.</p>
           ) : null}
 
+          {!isLoading && !errorMessage && !isEmptyHistory ? (
+            <div className={styles.toolbar}>
+              <div className={styles.searchField}>
+                <Search size={18} className={styles.searchIcon} aria-hidden="true" />
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder="Buscar por cargo, empresa ou tecnologia"
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  aria-label="Buscar vagas"
+                />
+              </div>
+
+              <label className={styles.sortField}>
+                <ArrowUpDown size={16} aria-hidden="true" />
+                <span className={styles.sortLabel}>Ordenar por</span>
+                <select
+                  className={styles.sortSelect}
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value as SortOption)}
+                  aria-label="Ordenar vagas"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          ) : null}
+
+          {hasNoResults ? (
+            <p className={styles.emptyState}>
+              Nenhuma vaga encontrada para “{searchTerm.trim()}”.
+            </p>
+          ) : null}
+
           <div className={styles.list}>
-            {jobs.map((job) => (
+            {visibleJobs.map((job) => (
               <article
                 key={job.id}
                 className={styles.card}
