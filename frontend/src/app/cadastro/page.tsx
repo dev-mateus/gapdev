@@ -229,6 +229,18 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
         }
       )
 
+      const loginData = await apiPost<LoginResponse>(
+        '/auth/login',
+        {
+          email: trimmedEmail,
+          password,
+        }
+      )
+
+      localStorage.setItem(
+        'access_token',
+        loginData.access_token
+      )
 
       localStorage.setItem(
         `usuario_${trimmedEmail}`,
@@ -238,14 +250,28 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
         })
       )
 
+      localStorage.setItem(
+        'usuarioLogado',
+        JSON.stringify({
+          nome: trimmedName,
+          email: trimmedEmail,
+        })
+      )
+
+      localStorage.removeItem('usuarioEmail')
+
+      window.dispatchEvent(
+        new Event('auth-changed')
+      )
+
       setFormMessageType('success')
 
       setFormMessage(
-        'Conta criada com sucesso. Redirecionando para o login...'
+        'Conta criada com sucesso. Redirecionando...'
       )
 
       window.setTimeout(() => {
-        window.location.href = '/login'
+        navigate('/perfil')
       }, 1200)
 
     } catch (error) {
