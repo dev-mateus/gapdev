@@ -303,6 +303,113 @@
 }
 
 /* ==========================
+   TERMS LINKS
+========================== */
+.termsLink {
+  all: unset;
+  color: var(--color-brand-accent);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.termsLink:hover {
+  color: var(--color-text-link-hover);
+}
+
+/* ==========================
+   MODAL
+========================== */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 42rem;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-shell);
+  background: var(--color-bg-shell);
+  border: 1px solid var(--color-border-shell);
+  box-shadow: var(--shadow-shell);
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border-shell);
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--color-text-primary);
+}
+
+.modalClose {
+  all: unset;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.modalClose:hover {
+  color: var(--color-text-primary);
+}
+
+.modalBody {
+  padding: 1.5rem;
+  overflow-y: auto;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.modalBody h3 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+}
+
+.modalBody h3:first-child {
+  margin-top: 0;
+}
+
+.modalBody p {
+  margin: 0 0 0.75rem;
+}
+
+.modalBody ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.modalBody li {
+  margin-bottom: 0.35rem;
+}
+
+/* ==========================
    RESPONSIVE
 ========================== */
 @media (min-width: 768px) {

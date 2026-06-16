@@ -1,9 +1,9 @@
 import { useId } from 'react'
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import styles from './Checkbox.module.css'
 
 type CheckboxProps = {
-  label: string
+  label: ReactNode
   checked?: boolean
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
 }

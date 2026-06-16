@@ -39,35 +39,7 @@ type SkillCatalogItem = {
 type UserSkillItem = {
   skill_id: string
   learned_from_module?: boolean
-}
-
-function seenModuleSkillsKey(): string {
-  try {
-    const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || '{}')
-    return `gnose:seenModuleSkills:${usuarioLogado.email ?? 'anon'}`
-  } catch {
-    return 'gnose:seenModuleSkills:anon'
-  }
-}
-
-function loadSeenModuleSkills(): Set<string> {
-  try {
-    const raw = localStorage.getItem(seenModuleSkillsKey())
-    if (raw) {
-      return new Set(JSON.parse(raw) as string[])
-    }
-  } catch {
-    // ignore corrupted storage
-  }
-  return new Set()
-}
-
-function persistSeenModuleSkills(ids: Set<string>) {
-  try {
-    localStorage.setItem(seenModuleSkillsKey(), JSON.stringify([...ids]))
-  } catch {
-    // ignore quota/storage errors
-  }
+  module_badge_seen?: boolean
 }
 
 
@@ -136,19 +108,17 @@ function Tecnologias() {
             .filter((value): value is string => Boolean(value)),
         )
 
-        const idsAprendidasEmModulo = new Set(
+        const novasParaDestacar = new Set(
           (userSkills ?? [])
-            .filter((item) => item.learned_from_module && item.skill_id)
+            .filter((item) => item.learned_from_module && item.skill_id && !item.module_badge_seen)
             .map((item) => item.skill_id),
         )
 
-        // Only highlight module skills that the user hasn't seen as "new" yet.
-        // After this visit they're marked as seen so the badge won't show again.
-        const jaVistas = loadSeenModuleSkills()
-        const novasParaDestacar = new Set(
-          [...idsAprendidasEmModulo].filter((id) => !jaVistas.has(id)),
-        )
-        persistSeenModuleSkills(new Set([...jaVistas, ...idsAprendidasEmModulo]))
+        if (novasParaDestacar.size > 0) {
+          apiPost('/skills/acknowledge-new', {
+            skill_ids: [...novasParaDestacar],
+          }).catch(() => {})
+        }
 
         const preSelecionadas = tecnologias.filter((item) => idsUsuario.has(item.id))
 

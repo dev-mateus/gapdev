@@ -1,6 +1,6 @@
 """User Skill repository."""
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.job_skill import JobSkill
@@ -119,3 +119,21 @@ def delete_user_skill(db: Session, skill_id: str) -> bool:
 	db.delete(user_skill)
 	db.commit()
 	return True
+
+
+def acknowledge_module_badges(db: Session, user_id: str, skill_ids: list[str]) -> None:
+	"""Mark module skill badges as seen for the given user."""
+
+	if not skill_ids:
+		return
+
+	statement = (
+		update(UserSkill)
+		.where(
+			UserSkill.user_id == user_id,
+			UserSkill.skill_id.in_(skill_ids),
+		)
+		.values(module_badge_seen=True)
+	)
+	db.execute(statement)
+	db.commit()
