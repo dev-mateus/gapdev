@@ -161,6 +161,18 @@ export function StudyPlanProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  const silentReloadPlans = useCallback(async () => {
+    const token = localStorage.getItem('access_token')?.trim()
+    if (!token) return
+
+    try {
+      const data = await apiGet<StudyPlanResponse[]>('/study-plans')
+      setPlans(mapApiPlans(data))
+    } catch {
+      // Keep current optimistic state on error
+    }
+  }, [])
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       void reloadPlans()
@@ -225,14 +237,12 @@ export function StudyPlanProvider({ children }: { children: React.ReactNode }) {
       status: nextDone ? 'completed' : 'pending',
     })
       .then(() => {
-        // Completing a module marks the skill as known across every plan, so
-        // refresh to surface the propagated state coming from the backend.
-        void reloadPlans()
+        void silentReloadPlans()
       })
       .catch(() => {
-        void reloadPlans()
+        void silentReloadPlans()
       })
-  }, [plans, reloadPlans])
+  }, [plans, silentReloadPlans])
 
   const renamePlan = useCallback(async (planId: string, title: string) => {
     await apiPatch(`/study-plans/${planId}`, { title })
