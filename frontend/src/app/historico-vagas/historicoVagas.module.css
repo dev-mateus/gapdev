@@ -24,9 +24,11 @@
   position: relative;
   display: flex;
   align-items: center;
-  flex: 1 1 18rem;
-  min-width: 45rem;
+
+  flex: 2 1 0;
+  min-width: 16rem;
 }
+
 
 .searchIcon {
   position: absolute;
@@ -61,18 +63,26 @@
 }
 
 .sortField {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 1 1 18rem;
-  min-width: 12rem;
+
+  width: 16rem;
+  height: 2.65rem;
+  flex: 0 0 16rem;
+
   padding: 0 0.85rem;
   border: 1px solid var(--color-border-input);
   border-radius: var(--radius-control);
   background: var(--color-surface-panel);
   color: var(--color-text-muted);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  white-space: nowrap;
 }
+
+
 
 .sortField:hover {
   border-color: var(--color-border-input-hover);
@@ -89,25 +99,65 @@
   white-space: nowrap;
 }
 
-.sortSelect {
+.sortValue {
   flex: 1;
-  padding: 0.7rem 1.75rem 0.7rem 0.25rem;
-  border: none;
-  background-color: transparent;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2358e0ff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.25rem center;
-  color: var(--color-text-primary);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-align: left;
+}
+
+.sortDropdown {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+
+  margin: 0;
+  padding: 0.35rem;
+
+  list-style: none;
+
+  background: var(--color-surface-panel);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-control);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+
+  max-height: 18rem;
+  overflow: auto;
+}
+
+.sortOption {
+  padding: 0.55rem 0.75rem;
+  border-radius: calc(var(--radius-control) - 4px);
+
+  color: var(--color-text-primary);
+  font-weight: 650;
+  font-size: 0.85rem;
+
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sortOption:hover {
+  background: var(--color-brand-primary);
+  color: var(--color-text-primary);
+}
+
+.sortOption[aria-selected='true'] {
+  background: color-mix(in srgb, var(--color-brand-primary) 18%, var(--color-surface-panel));
+}
+
+
+.sortField {
+  position: relative;
 }
 
 .sortSelect:focus-visible {
   outline: none;
 }
+
 
 .sortSelect option {
   padding: 0.5rem 0.75rem;
@@ -121,6 +171,9 @@
   background: var(--color-brand-primary);
   color: var(--color-text-primary);
 }
+
+/* (mantido por compatibilidade; não usado mais pelo dropdown customizado) */
+
 
 .list {
   display: grid;
@@ -227,13 +280,17 @@
 
 @media (max-width: 900px) {
   .searchField {
-    flex-basis: 100%;
+    flex: 1 1 100%;
+    min-width: 0;
   }
 
   .sortField {
     flex: 1 1 100%;
+    width: auto;
+    min-width: 0;
     justify-content: space-between;
   }
+
 
   .card {
     flex-direction: column;

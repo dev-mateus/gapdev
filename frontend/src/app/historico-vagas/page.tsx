@@ -1,15 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { FaCalendar } from 'react-icons/fa6'
 import { ArrowUpDown, Search } from 'lucide-react'
 
 import PageContainer from '../../components/PageContainer/PageContainer'
 import PageHeader from '../../components/PageHeader/PageHeader'
+
 import TabSwitcher, { type TabSwitcherItem } from '../../components/TabSwitcher/TabSwitcher'
 import { fetchJobs, type JobItem } from './services/jobsService'
 
 import LoadingState from '../../components/LoadingState/LoadingState'
 import { jobLevelLabel } from '../../utils/jobLevel'
 import styles from './historicoVagas.module.css'
+
 
 const tabs: TabSwitcherItem[] = [
   { id: 'analisar-vaga', label: 'Analisar vaga', href: '/vagas' },
@@ -47,6 +49,9 @@ function HistoricoPage() {
   const [isEmptyHistory, setIsEmptyHistory] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('recent')
+  const [isOpenSortDropdown, setIsOpenSortDropdown] = useState(false)
+  const sortDropdownRef = useRef<HTMLLabelElement | null>(null)
+
 
   useEffect(() => {
     let isMounted = true
@@ -85,6 +90,39 @@ function HistoricoPage() {
       isMounted = false
     }
   }, [])
+
+  useEffect(() => {
+    if (!isOpenSortDropdown) return
+
+    function handlePointerDown(event: MouseEvent | TouchEvent) {
+      const el = sortDropdownRef.current
+      if (!el) return
+
+      const target = event.target as Node | null
+      if (!target) return
+
+      if (!el.contains(target)) {
+        setIsOpenSortDropdown(false)
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsOpenSortDropdown(false)
+      }
+    }
+
+    window.addEventListener('mousedown', handlePointerDown)
+    window.addEventListener('touchstart', handlePointerDown, { passive: true })
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('mousedown', handlePointerDown)
+      window.removeEventListener('touchstart', handlePointerDown)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpenSortDropdown])
+
 
   const visibleJobs = useMemo(() => {
     const term = searchTerm.trim().toLowerCase()
@@ -182,22 +220,60 @@ function HistoricoPage() {
                 />
               </div>
 
-              <label className={styles.sortField}>
+              <label
+                ref={sortDropdownRef}
+                className={styles.sortField}
+                role="button"
+                tabIndex={0}
+                aria-label="Ordenar vagas"
+                aria-expanded={isOpenSortDropdown}
+                onClick={() => setIsOpenSortDropdown((prev) => !prev)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    setIsOpenSortDropdown((prev) => !prev)
+                  }
+                }}
+              >
                 <ArrowUpDown size={16} aria-hidden="true" />
                 <span className={styles.sortLabel}>Ordenar por</span>
-                <select
-                  className={styles.sortSelect}
-                  value={sortBy}
-                  onChange={(event) => setSortBy(event.target.value as SortOption)}
-                  aria-label="Ordenar vagas"
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+
+                <span className={styles.sortValue}>
+                  {sortOptions.find((o) => o.value === sortBy)?.label ?? ''}
+                </span>
+
+                {isOpenSortDropdown ? (
+                  <ul className={styles.sortDropdown} role="listbox" aria-label="Opções de ordenação">
+                    {sortOptions.map((option) => {
+                      const isSelected = option.value === sortBy
+                      return (
+                        <li
+                          key={option.value}
+                          className={styles.sortOption}
+                          role="option"
+                          aria-selected={isSelected}
+                          tabIndex={0}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setSortBy(option.value)
+                            setIsOpenSortDropdown(false)
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              setSortBy(option.value)
+                              setIsOpenSortDropdown(false)
+                            }
+                          }}
+                        >
+                          {option.label}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                ) : null}
               </label>
+
             </div>
           ) : null}
 
@@ -261,3 +337,4 @@ function HistoricoPage() {
 }
 
 export default HistoricoPage
+
