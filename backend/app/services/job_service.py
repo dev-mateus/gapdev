@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.enums import SkillPriority
 from app.repositories.job_repository import create_job as create_job_record
+from app.repositories.job_repository import delete_job as delete_job_record
 from app.repositories.job_repository import get_job_by_id, update_job_compatibility
 from app.repositories.job_repository import list_jobs_by_user
 from app.repositories.user_repo import get_user_by_email
@@ -138,3 +139,22 @@ def set_job_compatibility(db: Session, user_email: str, job_id: str, compatibili
 		)
 
 	return _job_to_read(updated_job)
+
+
+def delete_job(db: Session, user_email: str, job_id: str) -> None:
+	"""Delete a job owned by the authenticated user."""
+
+	user_id = _resolve_user_id(db, user_email)
+	job = get_job_by_id(db, job_id)
+	if not job or str(getattr(job, "user_id")) != user_id:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Vaga nao encontrada.",
+		)
+
+	deleted = delete_job_record(db, job_id)
+	if not deleted:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Vaga nao encontrada.",
+		)
