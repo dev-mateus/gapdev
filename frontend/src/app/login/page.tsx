@@ -242,9 +242,9 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
               />
 
               <div className={styles.formRow}>
-                <a className={styles.inlineLink} href="#forgot-password">
+                <Link className={styles.inlineLink} to="/esqueci-senha">
                   Esqueci minha senha
-                </a>
+                </Link>
               </div>
 
               {formMessage ? (

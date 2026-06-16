@@ -1,0 +1,116 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, #0f2f44 0%, #061c2d 60%);
+  padding: 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 620px;
+  background: #061c2d;
+  border: 1px solid rgba(31, 163, 198, 0.25);
+  border-radius: 24px;
+  padding: 48px;
+  box-shadow:
+    0 0 0 1px rgba(31, 163, 198, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border: 2px solid rgba(31, 163, 198, 0.08);
+  border-radius: 50%;
+  top: -120px;
+  right: -120px;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border: 2px solid rgba(31, 163, 198, 0.08);
+  border-radius: 50%;
+  top: -50px;
+  right: -50px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.brandMark {
+  color: #1fa3c6;
+  font-size: 1.4rem;
+}
+
+.brandName {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f5f7fa;
+}
+
+.brandAccent {
+  color: #2bb3d6;
+}
+
+.title {
+  font-size: clamp(1.75rem, 2.8vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: #f5f7fa;
+  margin-bottom: 16px;
+}
+
+.description {
+  color: #b9c7d3;
+  font-size: 1rem;
+  margin-bottom: 40px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.submitButton {
+  margin-top: 8px;
+}
+
+.backLink {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.backLink a {
+  color: #2bb3d6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.backLink a:hover {
+  text-decoration: underline;
+}
+
+.successMessage {
+  color: #43d17c;
+  font-size: 0.95rem;
+}
+
+.errorMessage {
+  color: #ff6b6b;
+  font-size: 0.95rem;
+}

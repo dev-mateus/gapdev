@@ -24,3 +24,9 @@ class User(Base):
 	jobs = relationship("Job", back_populates="user", cascade="all, delete-orphan")
 	skills = relationship("UserSkill", back_populates="user", cascade="all, delete-orphan")
 	study_plans = relationship("StudyPlan", back_populates="user", cascade="all, delete-orphan")
+
+	password_reset_tokens = relationship(
+		"PasswordResetToken",
+		back_populates="user",
+		cascade="all, delete-orphan",
+	)
