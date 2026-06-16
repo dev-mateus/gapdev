@@ -21,8 +21,15 @@ class UserSkillRead(UserSkillCreate):
     skill_id: str
     skill_name: str
     learned_from_module: bool = False
+    module_badge_seen: bool = False
 
     model_config = {"from_attributes": True}
+
+
+class AcknowledgeNewSkillsRequest(BaseModel):
+    """Payload to mark module skills badges as seen."""
+
+    skill_ids: list[str]
 
 
 class SkillCatalogRead(BaseModel):

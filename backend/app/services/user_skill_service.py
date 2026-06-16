@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.repositories.user_skill_repository import (
+	acknowledge_module_badges,
 	create_user_skill as create_user_skill_record,
 	delete_user_skill,
 	get_user_skill_by_id,
@@ -44,6 +45,7 @@ def _skill_to_read(skill: object, learned_from_module: bool = False) -> UserSkil
 		skill_name=str(skill_name),
 		level=level_str,
 		learned_from_module=learned_from_module,
+		module_badge_seen=bool(getattr(skill, "module_badge_seen", False)),
 	)
 
 
@@ -156,3 +158,11 @@ def delete_skill(db: Session, user_email: str, skill_id: str) -> bool:
 		)
 
 	return delete_user_skill(db, skill_id)
+
+
+def acknowledge_new_skills(db: Session, user_email: str, skill_ids: list[str]) -> dict[str, str]:
+	"""Mark module skill badges as seen so they don't show 'nova' again."""
+
+	user_id = _resolve_user_id(db, user_email)
+	acknowledge_module_badges(db, user_id, skill_ids)
+	return {"message": "ok"}
