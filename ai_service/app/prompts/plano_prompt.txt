@@ -17,9 +17,10 @@ Rules:
 - One module per skill_id, no duplicates.
 - target_level must be at least the job required_level for that skill.
 - priority must mirror the priority in the Job skills payload.
-- subskills MUST contain between 3 and 5 specific learning topics needed to
+- subskills MUST contain between 5 and 7 specific learning topics needed to
   master the module skill. Topics must be concrete and actionable
-  (e.g. "Hooks no React", "Decorators em Python", "Promises e async/await").
+  (e.g. "Hooks no React", "Decorators em Python", "Promises e async/await",
+  "Testes unitarios com Jest", "Gerenciamento de estado com Redux").
 - subskills[].name MUST NOT repeat the module skill name verbatim.
 - Do NOT invent skill_id values for subskills, only names.
 - Every text field (reason, subskills[].reason) must be concise, practical and

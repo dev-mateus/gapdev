@@ -191,6 +191,8 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
     onToggleTask(plan.id, moduleId, task.id)
 
     if (isLastTask) setToast('Habilidade adicionada ao seu perfil')
+
+    setIsConfirmBusy(false)
   }, [confirmTarget, isConfirmBusy, onToggleTask, plan.id])
 
   const handleCancel = useCallback(() => {

@@ -1,15 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { FaCalendar } from 'react-icons/fa6'
 import { ArrowUpDown, Search, Trash } from 'lucide-react'
 
 import PageContainer from '../../components/PageContainer/PageContainer'
 import PageHeader from '../../components/PageHeader/PageHeader'
+
 import TabSwitcher, { type TabSwitcherItem } from '../../components/TabSwitcher/TabSwitcher'
 import { fetchJobs, deleteJob, type JobItem } from './services/jobsService'
 
 import LoadingState from '../../components/LoadingState/LoadingState'
 import { jobLevelLabel } from '../../utils/jobLevel'
 import styles from './historicoVagas.module.css'
+
 
 const tabs: TabSwitcherItem[] = [
   { id: 'analisar-vaga', label: 'Analisar vaga', href: '/vagas' },
@@ -49,6 +51,11 @@ function HistoricoPage() {
   const [sortBy, setSortBy] = useState<SortOption>('recent')
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [removingIds, setRemovingIds] = useState<string[]>([])
+  const [isOpenSortDropdown, setIsOpenSortDropdown] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 6
+  const sortDropdownRef = useRef<HTMLLabelElement | null>(null)
+
 
   useEffect(() => {
     let isMounted = true
@@ -88,6 +95,39 @@ function HistoricoPage() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!isOpenSortDropdown) return
+
+    function handlePointerDown(event: MouseEvent | TouchEvent) {
+      const el = sortDropdownRef.current
+      if (!el) return
+
+      const target = event.target as Node | null
+      if (!target) return
+
+      if (!el.contains(target)) {
+        setIsOpenSortDropdown(false)
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsOpenSortDropdown(false)
+      }
+    }
+
+    window.addEventListener('mousedown', handlePointerDown)
+    window.addEventListener('touchstart', handlePointerDown, { passive: true })
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('mousedown', handlePointerDown)
+      window.removeEventListener('touchstart', handlePointerDown)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpenSortDropdown])
+
+
   const visibleJobs = useMemo(() => {
     const term = searchTerm.trim().toLowerCase()
 
@@ -123,6 +163,22 @@ function HistoricoPage() {
 
     return sorted
   }, [jobs, searchTerm, sortBy])
+
+  // Volta para a primeira página sempre que a busca ou a ordenação mudam,
+  // evitando ficar numa página que deixou de existir após filtrar.
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, sortBy])
+
+  const totalPages = Math.max(1, Math.ceil(visibleJobs.length / ITEMS_PER_PAGE))
+
+  // Protege contra a página atual ficar fora do intervalo (ex.: após excluir).
+  const safePage = Math.min(currentPage, totalPages)
+
+  const paginatedJobs = useMemo(() => {
+    const start = (safePage - 1) * ITEMS_PER_PAGE
+    return visibleJobs.slice(start, start + ITEMS_PER_PAGE)
+  }, [visibleJobs, safePage])
 
   const hasNoResults =
     !isLoading && !errorMessage && !isEmptyHistory && visibleJobs.length === 0
@@ -184,22 +240,60 @@ function HistoricoPage() {
                 />
               </div>
 
-              <label className={styles.sortField}>
+              <label
+                ref={sortDropdownRef}
+                className={styles.sortField}
+                role="button"
+                tabIndex={0}
+                aria-label="Ordenar vagas"
+                aria-expanded={isOpenSortDropdown}
+                onClick={() => setIsOpenSortDropdown((prev) => !prev)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    setIsOpenSortDropdown((prev) => !prev)
+                  }
+                }}
+              >
                 <ArrowUpDown size={16} aria-hidden="true" />
                 <span className={styles.sortLabel}>Ordenar por</span>
-                <select
-                  className={styles.sortSelect}
-                  value={sortBy}
-                  onChange={(event) => setSortBy(event.target.value as SortOption)}
-                  aria-label="Ordenar vagas"
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+
+                <span className={styles.sortValue}>
+                  {sortOptions.find((o) => o.value === sortBy)?.label ?? ''}
+                </span>
+
+                {isOpenSortDropdown ? (
+                  <ul className={styles.sortDropdown} role="listbox" aria-label="Opções de ordenação">
+                    {sortOptions.map((option) => {
+                      const isSelected = option.value === sortBy
+                      return (
+                        <li
+                          key={option.value}
+                          className={styles.sortOption}
+                          role="option"
+                          aria-selected={isSelected}
+                          tabIndex={0}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setSortBy(option.value)
+                            setIsOpenSortDropdown(false)
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              setSortBy(option.value)
+                              setIsOpenSortDropdown(false)
+                            }
+                          }}
+                        >
+                          {option.label}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                ) : null}
               </label>
+
             </div>
           ) : null}
 
@@ -210,7 +304,7 @@ function HistoricoPage() {
           ) : null}
 
           <div className={styles.list}>
-            {visibleJobs.map((job) => {
+            {paginatedJobs.map((job) => {
               const isRemoving = removingIds.includes(job.id)
 
               if (confirmDeleteId === job.id) {
@@ -242,7 +336,7 @@ function HistoricoPage() {
                               setTimeout(() => {
                                 setJobs((prev) => prev.filter((j) => j.id !== job.id))
                                 setRemovingIds((prev) => prev.filter((id) => id !== job.id))
-                                setIsEmptyHistory((prev) => {
+                                setIsEmptyHistory(() => {
                                   const remaining = visibleJobs.filter((j) => j.id !== job.id)
                                   return remaining.length === 0
                                 })
@@ -321,6 +415,32 @@ function HistoricoPage() {
               )
             })}
           </div>
+
+          {totalPages > 1 ? (
+            <nav className={styles.pagination} aria-label="Paginação do histórico">
+              <button
+                type="button"
+                className={styles.pageButton}
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={safePage <= 1}
+              >
+                Anterior
+              </button>
+
+              <span className={styles.pageInfo}>
+                Página {safePage} de {totalPages}
+              </span>
+
+              <button
+                type="button"
+                className={styles.pageButton}
+                onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                disabled={safePage >= totalPages}
+              >
+                Próxima
+              </button>
+            </nav>
+          ) : null}
         </div>
       </PageContainer>
     </div>

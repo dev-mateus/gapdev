@@ -20,6 +20,13 @@ from app.models.user import User
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+from datetime import datetime, timedelta
+import hashlib
+import secrets
+import os
+
+from app.models.password_reset_token import PasswordResetToken
+from app.services.email_service import send_password_reset_email
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 limiter = Limiter(key_func=get_remote_address)
@@ -43,6 +50,19 @@ class ChangePasswordRequest(BaseModel):
 
 	current_password: str | None = None
 	new_password: str
+
+
+class ForgotPasswordRequest(BaseModel):
+	"""Forgot password payload."""
+
+	email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+	"""Reset password payload."""
+
+	token: str
+	new_password: str	
 
 
 @router.post("/login")
@@ -174,3 +194,97 @@ def change_password(
 	)
 
 	return {"message": "Senha alterada com sucesso."}
+
+
+@router.post("/forgot-password")
+def forgot_password(
+	payload: ForgotPasswordRequest,
+	db: Session = Depends(get_database),
+) -> dict[str, str]:
+	"""Generate password reset token."""
+
+	generic_message = "Se o e-mail estiver cadastrado, enviaremos um link de recuperação."
+
+	user = user_repo.get_user_by_email(db, str(payload.email))
+
+	if not user:
+		return {"message": generic_message}
+
+	token = secrets.token_urlsafe(32)
+	token_hash = hashlib.sha256(token.encode()).hexdigest()
+
+	reset_token = PasswordResetToken(
+		user_id=user.id,
+		token_hash=token_hash,
+		expires_at=datetime.utcnow() + timedelta(minutes=30),
+		used=False,
+	)
+
+	db.add(reset_token)
+	db.commit()
+
+	frontend_url = os.getenv("FRONTEND_URL")
+
+	reset_link = f"{frontend_url}/resetar-senha?token={token}"
+
+	send_password_reset_email(
+		to_email=user.email,
+		reset_link=reset_link,
+	)
+
+	return {"message": generic_message}
+
+@router.post("/reset-password")
+def reset_password(
+	payload: ResetPasswordRequest,
+	db: Session = Depends(get_database),
+) -> dict[str, str]:
+	"""Reset user password using recovery token."""
+
+	if not payload.new_password or len(payload.new_password) < 6:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="A nova senha deve ter pelo menos 6 caracteres.",
+		)
+
+	token_hash = hashlib.sha256(payload.token.encode()).hexdigest()
+
+	reset_token = (
+		db.query(PasswordResetToken)
+		.filter(
+			PasswordResetToken.token_hash == token_hash,
+			PasswordResetToken.used == False,
+		)
+		.first()
+	)
+
+	if not reset_token:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="Token inválido ou já utilizado.",
+		)
+
+	if reset_token.expires_at < datetime.utcnow():
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="Token expirado.",
+		)
+
+	user = db.query(User).filter(User.id == reset_token.user_id).first()
+
+	if not user:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="Usuário não encontrado.",
+		)
+
+	user.password = hash_password(payload.new_password)
+	reset_token.used = True
+
+	db.add(user)
+	db.add(reset_token)
+	db.commit()
+	db.refresh(user)
+	db.refresh(reset_token)
+
+	return {"message": "Senha redefinida com sucesso."}	
