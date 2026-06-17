@@ -1,3 +1,5 @@
+/* Corrigido: removido erro de CSS syntax e classes dinâmicas compatíveis com page.tsx */
+
 .content {
   width: 100%;
   min-height: 100vh;
@@ -103,7 +105,7 @@
   border: 1px solid color-mix(in srgb, var(--color-ring-focus) 28%, transparent);
   color: var(--color-text-accent-light);
   margin-bottom: 0.6rem;
-  box-shadow: 0 4px 18px color-mix(in srgb, var(--color-progress-end) 8%, transparent), inset 0 1px 0 rgba(255,255,255,0.02);
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--color-progress-end) 8%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 .summaryMeta {
@@ -256,7 +258,11 @@
 }
 
 .progressFill[data-status='futura'] {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--color-progress-start) 40%, transparent) 0%, color-mix(in srgb, var(--color-progress-end) 40%, transparent) 100%);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-progress-start) 40%, transparent) 0%,
+    color-mix(in srgb, var(--color-progress-end) 40%, transparent) 100%
+  );
   box-shadow: none;
   opacity: 0.5;
 }
@@ -474,7 +480,6 @@
   box-sizing: border-box;
   overflow: hidden;
 
-  /* evita corte em cantos por mismatch de viewport (iOS/scrollbar/resize) */
   transform: translateZ(0);
 
   animation: fadeIn 180ms ease;
@@ -637,3 +642,194 @@
     transform: translateY(0);
   }
 }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0;
+  /* posiciona acima dos cards */
+  margin-top: -0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+
+.searchField {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 16rem;
+}
+
+
+.searchIcon {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.7rem 0.95rem 0.7rem 2.6rem;
+  border-radius: 0.85rem;
+  background: var(--color-surface-panel);
+  border: 1px solid color-mix(in srgb, var(--color-border-input) 70%, transparent);
+  color: var(--color-text-primary);
+  outline: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.75;
+}
+
+.searchInput:hover {
+  border-color: color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
+}
+
+.searchInput:focus {
+  border-color: color-mix(in srgb, var(--color-ring-focus) 55%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ring-focus) 18%, transparent);
+}
+
+.sortField {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 16rem;
+  height: 2.65rem;
+  flex: 0 0 16rem;
+  padding: 0 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--color-border-shell-inner) 70%, transparent);
+  border-radius: 0.85rem;
+  background: var(--color-surface-panel);
+  color: var(--color-text-muted);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.sortField:hover {
+  border-color: color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
+}
+
+.sortField:focus-within {
+  border-color: color-mix(in srgb, var(--color-ring-focus) 55%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ring-focus) 18%, transparent);
+}
+
+.sortLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sortLabelIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+.sortValue {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-align: left;
+  padding-right: 1rem;
+}
+
+.sortSelect {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  appearance: none;
+}
+
+.sortDropdown {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+
+  margin: 0;
+  padding: 0.35rem;
+
+  list-style: none;
+
+  background: var(--color-surface-panel);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-control);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+
+  max-height: 18rem;
+  overflow: auto;
+}
+
+.sortOption {
+  padding: 0.55rem 0.75rem;
+  border-radius: calc(var(--radius-control) - 4px);
+
+  color: var(--color-text-primary);
+  font-weight: 650;
+  font-size: 0.85rem;
+
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sortOption:hover {
+  background: var(--color-brand-primary);
+  color: var(--color-text-primary);
+}
+
+.sortOption[aria-selected='true'] {
+  background: color-mix(in srgb, var(--color-brand-primary) 18%, var(--color-surface-panel));
+}
+
+.sortField::after {
+  content: '';
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--color-text-muted);
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .searchField {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .sortField {
+    flex: 1 1 100%;
+    width: auto;
+    min-width: 0;
+    justify-content: space-between;
+  }
+}
+
