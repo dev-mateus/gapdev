@@ -183,7 +183,9 @@ def _fallback_subskill_names(module_name: str) -> list[dict]:
 
 	return [
 		{"name": f"Fundamentos de {module_name}", "reason": f"Dominar os conceitos basicos de {module_name}."},
+		{"name": f"Conceitos intermediarios de {module_name}", "reason": f"Aprofundar o conhecimento em {module_name} alem do basico."},
 		{"name": f"Pratica guiada de {module_name}", "reason": f"Aplicar {module_name} em exercicios praticos."},
+		{"name": f"Boas praticas em {module_name}", "reason": f"Conhecer padroes e boas praticas adotados pelo mercado em {module_name}."},
 		{"name": f"Projeto com {module_name}", "reason": f"Consolidar o aprendizado de {module_name} em um projeto."},
 	]
 
@@ -215,7 +217,7 @@ def _resolve_subskills(db: Session, subskills: object, module_skill_id: str, mod
 		candidates = _fallback_subskill_names(module_name)
 
 	resolved: list[dict] = []
-	for candidate in candidates[:5]:
+	for candidate in candidates[:7]:
 		catalog_skill = resolve_or_create_subtopic_skill(db, candidate["name"], module_name)
 		if not catalog_skill:
 			continue
