@@ -14,6 +14,7 @@ from app.repositories.study_plan_repository import (
 	get_study_plan_by_id_for_user,
 	get_study_plan_by_user_and_job,
 	get_study_plan_item_for_user,
+	list_active_plan_skills_with_plan_info,
 	list_study_plans_by_user,
 	list_user_items_for_skill,
 	mark_item_completed,
@@ -234,30 +235,53 @@ def _resolve_subskills(db: Session, subskills: object, module_skill_id: str, mod
 	return resolved
 
 
-def _filter_missing_job_skills(job_skills: list[object], user_skills: list[object]) -> list[object]:
-	"""Keep only job skills the user has NOT added to their profile.
+def _filter_missing_job_skills(
+	job_skills: list[object],
+	user_skills: list[object],
+	existing_plan_skills: dict[str, str] | None = None,
+) -> tuple[list[object], list[dict]]:
+	"""Keep only job skills the user has NOT added to their profile
+	and that are NOT already being studied in another plan.
 
-	The study plan must contain exclusively the skills the user does not know
-	yet (i.e. never selected). Any job skill already present in the user's
-	profile, regardless of level, is ignored.
+	Returns a tuple of (missing_skills, skipped_skills) where skipped_skills
+	contains info about skills excluded because they exist in other plans.
 	"""
 
 	known_skill_ids = {str(getattr(us, "skill_id")) for us in user_skills}
+	existing_plan_skills = existing_plan_skills or {}
 
 	missing: list[object] = []
+	skipped: list[dict] = []
 	for job_skill in job_skills:
 		skill_key = str(getattr(job_skill, "skill_id"))
 		if skill_key in known_skill_ids:
 			continue
+
+		if skill_key in existing_plan_skills:
+			skill_relation = getattr(job_skill, "skill", None)
+			skill_name = str(getattr(skill_relation, "canonical_name", getattr(job_skill, "raw_name", "")))
+			skipped.append({
+				"skill_name": skill_name,
+				"plan_title": existing_plan_skills[skill_key],
+			})
+			continue
+
 		missing.append(job_skill)
-	return missing
+	return missing, skipped
 
 
-def _normalize_generated_items(db: Session, generated_items: list[dict], job_skills: list[object], user_skills: list[object]) -> list[dict]:
+def _normalize_generated_items(
+	db: Session,
+	generated_items: list[dict],
+	job_skills: list[object],
+	user_skills: list[object],
+	existing_plan_skills: dict[str, str] | None = None,
+) -> list[dict]:
 	"""Keep generated items valid for the selected job and current user levels."""
 
 	job_skill_by_id = {str(getattr(skill, "skill_id")): skill for skill in job_skills}
 	known_skill_ids = {str(getattr(us, "skill_id")) for us in user_skills}
+	existing_plan_skills = existing_plan_skills or {}
 
 	normalized: list[dict] = []
 	seen: set[str] = set()
@@ -274,8 +298,10 @@ def _normalize_generated_items(db: Session, generated_items: list[dict], job_ski
 		if not job_skill or skill_key in seen:
 			continue
 
-		# Hard gate: only skills the user does NOT know belong in the plan.
 		if skill_key in known_skill_ids:
+			continue
+
+		if skill_key in existing_plan_skills:
 			continue
 
 		current_level = None
@@ -360,11 +386,16 @@ def generate_plan_for_job(
 
 	user_skills = list_skills_by_user(db, user_id)
 
-	# Only ask the AI about the actual gap so it can't waste tokens on
-	# skills the user already meets at or above the required level.
-	missing_job_skills = _filter_missing_job_skills(job_skills, user_skills)
+	existing_plan_skills = list_active_plan_skills_with_plan_info(db, user_id, exclude_job_id=job_id)
+
+	missing_job_skills, skipped_skills = _filter_missing_job_skills(
+		job_skills, user_skills, existing_plan_skills,
+	)
 	if not missing_job_skills:
-		plan = create_or_replace_study_plan(db, user_id, job_id, [], "completed", title=plan_title)
+		plan = create_or_replace_study_plan(
+			db, user_id, job_id, [], "completed",
+			title=plan_title, skipped_skills=skipped_skills or None,
+		)
 		return _plan_to_read(plan)
 
 	ai_payload = generate_study_plan(
@@ -379,15 +410,16 @@ def generate_plan_for_job(
 	)
 
 	generated_items = ai_payload.get("items", []) if isinstance(ai_payload, dict) else []
-	items = _normalize_generated_items(db, generated_items, missing_job_skills, user_skills)
+	items = _normalize_generated_items(db, generated_items, missing_job_skills, user_skills, existing_plan_skills)
 
-	# Backstop: if the model returned nothing usable, build the plan
-	# directly from the gap so the user is never left without modules.
 	if not items:
 		items = _items_from_missing_skills(db, missing_job_skills)
 
 	plan_status = "active" if items else "completed"
-	plan = create_or_replace_study_plan(db, user_id, job_id, items, plan_status, title=plan_title)
+	plan = create_or_replace_study_plan(
+		db, user_id, job_id, items, plan_status,
+		title=plan_title, skipped_skills=skipped_skills or None,
+	)
 	return _plan_to_read(plan)
 
 
