@@ -12,7 +12,8 @@ import BottomNav from './components/BottomNav/BottomNav'
 import HistoricoPage from './app/historico-vagas/page'
 import ProgressoPage from './app/progresso/page'
 import { StudyPlanProvider } from './contexts/StudyPlanContext'
-
+import EsqueciSenhaPage from './app/esqueci-senha/page'
+import ResetarSenhaPage from './app/resetar-senha/page'
 
 import './App.css'
 
@@ -81,6 +82,16 @@ function App(): ReactElement {
           <Route
             path="/login"
             element={<LoginPage isBackendConnected={isBackendConnected} />}
+          />
+
+          <Route
+            path="/esqueci-senha"
+            element={<EsqueciSenhaPage isBackendConnected={isBackendConnected} />}
+          />
+
+          <Route
+            path="/resetar-senha"
+            element={<ResetarSenhaPage />}
           />
 
           <Route
