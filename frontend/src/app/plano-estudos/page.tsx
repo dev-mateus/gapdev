@@ -1,7 +1,7 @@
-import { ArrowLeft, ArrowUpDown, BookOpen, Briefcase, Calendar, CheckCircle, Pencil, Search, ShieldCheck, Trash2 } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowUpDown, BookOpen, Briefcase, Calendar, CheckCircle, Pencil, Search, ShieldCheck, Trash2 } from 'lucide-react'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useStudyPlan, type StudyPlan, type StudyTask } from '../../contexts/StudyPlanContext'
+import { useStudyPlan, type SkippedSkill, type StudyPlan, type StudyTask } from '../../contexts/StudyPlanContext'
 
 import PageContainer from '../../components/PageContainer/PageContainer'
 import PageHeader from '../../components/PageHeader/PageHeader'
@@ -134,6 +134,38 @@ const PlanCard = memo(function PlanCard({
   )
 })
 
+function SkippedSkillsNotice({ skippedSkills }: { skippedSkills: SkippedSkill[] }) {
+  const grouped = useMemo(() => {
+    const map = new Map<string, string[]>()
+    for (const s of skippedSkills) {
+      const existing = map.get(s.planTitle) ?? []
+      existing.push(s.skillName)
+      map.set(s.planTitle, existing)
+    }
+    return map
+  }, [skippedSkills])
+
+  return (
+    <section className={styles.skippedNotice} aria-label="Skills já presentes em outros planos">
+      <div className={styles.skippedNoticeHeader}>
+        <AlertCircle size={18} />
+        <strong>Algumas skills da vaga já estão em outros planos</strong>
+      </div>
+      <p className={styles.skippedNoticeText}>
+        Para evitar duplicação, as skills abaixo não foram incluídas neste plano porque já fazem parte de outro plano de estudos. Ao concluí-las no plano original, elas serão automaticamente marcadas como concluídas aqui também.
+      </p>
+      <ul className={styles.skippedList}>
+        {Array.from(grouped.entries()).map(([planTitle, skills]) => (
+          <li key={planTitle}>
+            <strong>{skills.join(', ')}</strong>
+            <span className={styles.skippedPlanRef}> — já em "{planTitle}"</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 type PlanDetailViewProps = {
   plan: StudyPlan
   openModuleId: string | undefined
@@ -240,6 +272,10 @@ function PlanDetailView({ plan, openModuleId, onOpenModule, onBack, onToggleTask
               </div>
             </div>
           </section>
+
+          {plan.skippedSkills.length > 0 ? (
+            <SkippedSkillsNotice skippedSkills={plan.skippedSkills} />
+          ) : null}
 
           {plan.modules.length === 0 ? (
             <section className={styles.emptyState} aria-label="Plano vazio">

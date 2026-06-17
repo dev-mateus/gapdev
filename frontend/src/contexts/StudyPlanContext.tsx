@@ -18,6 +18,11 @@ export type SkillModule = {
   tasks: StudyTask[]
 }
 
+export type SkippedSkill = {
+  skillName: string
+  planTitle: string
+}
+
 export type StudyPlan = {
   id: string
   title: string
@@ -28,6 +33,7 @@ export type StudyPlan = {
   updatedAt: string
   status: string
   modules: SkillModule[]
+  skippedSkills: SkippedSkill[]
 }
 
 type StudyPlanItemSkillResponse = {
@@ -48,6 +54,11 @@ type StudyPlanItemResponse = {
   subskills?: StudyPlanItemSkillResponse[]
 }
 
+type SkippedSkillResponse = {
+  skill_name: string
+  plan_title: string
+}
+
 type StudyPlanResponse = {
   id: string
   job_id: string
@@ -58,6 +69,7 @@ type StudyPlanResponse = {
   created_at: string
   updated_at: string
   items: StudyPlanItemResponse[]
+  skipped_skills?: SkippedSkillResponse[]
 }
 
 interface StudyPlanContextValue {
@@ -129,6 +141,10 @@ function mapApiPlans(apiPlans: StudyPlanResponse[]): StudyPlan[] {
       name: item.skill_name,
       priority: mapPriority(item.priority),
       tasks: mapItemTasks(item),
+    })),
+    skippedSkills: (plan.skipped_skills ?? []).map((s) => ({
+      skillName: s.skill_name,
+      planTitle: s.plan_title,
     })),
   }))
 }
