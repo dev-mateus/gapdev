@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { FaArrowLeft, FaArrowTrendUp, FaEnvelope } from 'react-icons/fa6'
+import { FaArrowTrendUp, FaEnvelope } from 'react-icons/fa6'
 import { Link } from 'react-router-dom'
 
 import Button from '../../components/Button/Button'
@@ -85,15 +85,15 @@ function EsqueciSenhaPage({ isBackendConnected }: EsqueciSenhaPageProps) {
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <Input
-          label="E-mail"
-          type="email"
-          placeholder="seu@gmail.com"
-          startIcon={<FaEnvelope />}
-          autoComplete="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          required
-        />
+            label="E-mail"
+            type="text"
+            placeholder="seu@gmail.com"
+            startIcon={<FaEnvelope />}
+            autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
 
         {formMessage ? (
           <p
