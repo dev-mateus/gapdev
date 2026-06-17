@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, Briefcase, Calendar, CheckCircle, Pencil, ShieldCheck, Trash2 } from 'lucide-react'
+import { ArrowLeft, ArrowUpDown, BookOpen, Briefcase, Calendar, CheckCircle, Pencil, Search, ShieldCheck, Trash2 } from 'lucide-react'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useStudyPlan, type StudyPlan, type StudyTask } from '../../contexts/StudyPlanContext'
@@ -29,6 +29,13 @@ function planStats(plan: StudyPlan) {
   const progress = totalModules ? Math.round((completedModules / totalModules) * 100) : 0
   return { totalModules, completedModules, progress }
 }
+
+const sortOptions: { value: 'recentes' | 'antigos' | 'titulo' | 'progresso'; label: string }[] = [
+  { value: 'recentes', label: 'Mais recentes' },
+  { value: 'antigos', label: 'Mais antigos' },
+  { value: 'titulo', label: 'Título (A-Z)' },
+  { value: 'progresso', label: 'Progresso' },
+]
 
 type PlanCardProps = {
   plan: StudyPlan
@@ -363,10 +370,60 @@ export default function PlanoEstudosPage() {
   const [renameError, setRenameError] = useState<string | null>(null)
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const selectedPlan = useMemo(
-    () => plans.find((plan) => plan.id === selectedPlanId) ?? null,
-    [plans, selectedPlanId],
-  )
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortBy, setSortBy] = useState<'recentes' | 'antigos' | 'titulo' | 'progresso'>('recentes')
+  const [isOpenSortDropdown, setIsOpenSortDropdown] = useState(false)
+  const sortDropdownRef = useRef<HTMLLabelElement | null>(null)
+
+  useEffect(() => {
+    if (!isOpenSortDropdown) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const element = sortDropdownRef.current
+      if (!element || element.contains(event.target as Node)) return
+      setIsOpenSortDropdown(false)
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isOpenSortDropdown])
+
+  const filteredPlans = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+
+    const filtered = !term
+      ? plans
+      : plans.filter((plan) => {
+          const haystack = [plan.title, plan.jobTitle, plan.companyName]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase()
+          return haystack.includes(term)
+        })
+
+    const getDateValue = (value: string) => {
+      const time = new Date(value).getTime()
+      return Number.isFinite(time) ? time : 0
+    }
+
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortBy === 'recentes') return getDateValue(b.createdAt) - getDateValue(a.createdAt)
+      if (sortBy === 'antigos') return getDateValue(a.createdAt) - getDateValue(b.createdAt)
+      if (sortBy === 'titulo')
+        return a.title.localeCompare(b.title, 'pt-BR', { sensitivity: 'base' })
+
+      // progresso (maior para menor)
+      return planStats(b).progress - planStats(a).progress
+    })
+
+    return sorted
+  }, [plans, searchTerm, sortBy])
+
+
+  const selectedPlan = useMemo(() => {
+    return plans.find((plan) => plan.id === selectedPlanId) ?? null
+  }, [plans, selectedPlanId])
+
 
   const { totalPlans, completedPlans } = useMemo(() => {
     const total = plans.length
@@ -378,9 +435,11 @@ export default function PlanoEstudosPage() {
     return { totalPlans: total, completedPlans: completed }
   }, [plans])
 
+
   const loadingMessage = useMemo(() => {
     return 'Carregando planos de estudo...'
   }, [])
+
 
   const didInitialReload = useRef(false)
   useEffect(() => {
@@ -460,7 +519,78 @@ export default function PlanoEstudosPage() {
               }
             />
 
-            {/* Bloco superior: cards glass de resumo */}
+            {/* Bloco de filtros */}
+
+            <div className={styles.toolbar} aria-label="Buscar e ordenar planos">
+              <div className={styles.searchField}>
+                <span className={styles.searchIcon} aria-hidden="true">
+                  <Search size={18} />
+                </span>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={styles.searchInput}
+                  placeholder="Buscar por título, cargo ou empresa..."
+                  aria-label="Buscar planos"
+                />
+              </div>
+
+              <label
+              ref={sortDropdownRef}
+              className={styles.sortField}
+              role="button"
+              tabIndex={0}
+              aria-label="Ordenar planos"
+              aria-expanded={isOpenSortDropdown}
+              onClick={() => setIsOpenSortDropdown((prev) => !prev)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  setIsOpenSortDropdown((prev) => !prev)
+                }
+              }}
+            >
+              <ArrowUpDown size={16} aria-hidden="true" />
+              <span className={styles.sortLabel}>Ordenar por</span>
+              <span className={styles.sortValue}>
+                {sortOptions.find((option) => option.value === sortBy)?.label ?? ''}
+              </span>
+
+              {isOpenSortDropdown ? (
+                <ul className={styles.sortDropdown} role="listbox" aria-label="Opções de ordenação">
+                  {sortOptions.map((option) => {
+                    const isSelected = option.value === sortBy
+                    return (
+                      <li
+                        key={option.value}
+                        className={styles.sortOption}
+                        role="option"
+                        aria-selected={isSelected}
+                        tabIndex={0}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          setSortBy(option.value)
+                          setIsOpenSortDropdown(false)
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault()
+                            setSortBy(option.value)
+                            setIsOpenSortDropdown(false)
+                          }
+                        }}
+                      >
+                        {option.label}
+                      </li>
+                    )
+                  })}
+                </ul>
+              ) : null}
+            </label>
+            </div>
+
+            {/* Bloco de cards glass de contagem */}
             <section className={styles.summaryCards} aria-label="Resumo do progresso">
               <div className={`${styles.summaryCard} ${styles.cardGlass}`}>
                 <div className={styles.summaryIconBox} aria-hidden="true">
@@ -485,15 +615,19 @@ export default function PlanoEstudosPage() {
 
             {/* Bloco inferior: grid de PlanCard */}
             <section className={styles.planGrid} aria-label="Lista de planos">
-              {plans.length === 0 ? (
+              {/* (A lista já está filtrada/ordenada via filteredPlans) */}
+
+              {filteredPlans.length === 0 ? (
+
                 <section className={styles.emptyState} aria-label="Nenhum plano">
                   Você ainda não possui planos de estudo.
                 </section>
               ) : (
-                plans.map((plan) => (
+                filteredPlans.map((plan) => (
                   <PlanCard
                     key={plan.id}
                     plan={plan}
+
                     isBusy={isPageBusy || actionBusy}
                     onOpen={() => {
                       setSelectedPlanId(plan.id)
