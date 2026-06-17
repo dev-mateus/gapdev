@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { FaCalendar } from 'react-icons/fa6'
-import { ArrowUpDown, Search } from 'lucide-react'
+import { ArrowUpDown, Search, Trash } from 'lucide-react'
 
 import PageContainer from '../../components/PageContainer/PageContainer'
 import PageHeader from '../../components/PageHeader/PageHeader'
 
 import TabSwitcher, { type TabSwitcherItem } from '../../components/TabSwitcher/TabSwitcher'
-import { fetchJobs, type JobItem } from './services/jobsService'
+import { fetchJobs, deleteJob, type JobItem } from './services/jobsService'
 
 import LoadingState from '../../components/LoadingState/LoadingState'
 import { jobLevelLabel } from '../../utils/jobLevel'
@@ -49,6 +49,8 @@ function HistoricoPage() {
   const [isEmptyHistory, setIsEmptyHistory] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('recent')
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [removingIds, setRemovingIds] = useState<string[]>([])
   const [isOpenSortDropdown, setIsOpenSortDropdown] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const ITEMS_PER_PAGE = 6
@@ -302,51 +304,116 @@ function HistoricoPage() {
           ) : null}
 
           <div className={styles.list}>
-            {paginatedJobs.map((job) => (
-              <article
-                key={job.id}
-                className={styles.card}
-                role="button"
-                tabIndex={0}
-                onClick={() => handleJobClick(job)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    handleJobClick(job)
-                  }
-                }}
-              >
-                <div className={styles.left}>
-                  <h2 className={styles.jobTitle}>{job.job_title}</h2>
-                  <p className={styles.companyName}>{job.company_name}</p>
+            {paginatedJobs.map((job) => {
+              const isRemoving = removingIds.includes(job.id)
 
-                  <div className={styles.meta}>
-                    <FaCalendar />
-                    <span>Analisado em {new Intl.DateTimeFormat('pt-BR').format(new Date(job.created_at))}</span>
-                  </div>
-
-                  <div className={styles.tags}>
-                    {job.tecnologias?.slice(0, 5).map((tech) => (
-                      <span key={tech} className={styles.tag}>{tech}</span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className={styles.right}>
-                  <div className={styles.levelBadge}>
-                    Nível: {jobLevelLabel(job.level)}
-                  </div>
-                  <div className={styles.match}>
-                    <div className={styles.matchValue}>
-                      {getJobCompatibility(job) !== undefined ? `${getJobCompatibility(job)}%` : '-'}
+              if (confirmDeleteId === job.id) {
+                return (
+                  <div key={job.id} className={`${styles.card} ${styles.confirmBanner}`}>
+                    <div className={styles.left}>
+                      <h2 className={styles.jobTitle}>Excluir {job.job_title}?</h2>
+                      <p className={styles.companyName}>Esta ação não pode ser desfeita.</p>
                     </div>
-                    <div className={styles.matchLabel}>
-                      Compatibilidade
+
+                    <div className={styles.right}>
+                      <div className={styles.confirmButtons}>
+                        <button
+                          type="button"
+                          className={styles.confirmCancel}
+                          onClick={() => setConfirmDeleteId(null)}
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.confirmDelete}
+                          onClick={async () => {
+                            try {
+                              await deleteJob(job.id)
+                              setRemovingIds((prev) => [...prev, job.id])
+                              setConfirmDeleteId(null)
+
+                              setTimeout(() => {
+                                setJobs((prev) => prev.filter((j) => j.id !== job.id))
+                                setRemovingIds((prev) => prev.filter((id) => id !== job.id))
+                                setIsEmptyHistory(() => {
+                                  const remaining = visibleJobs.filter((j) => j.id !== job.id)
+                                  return remaining.length === 0
+                                })
+                              }, 260)
+                            } catch (err) {
+                              // ignore for now; could show toast
+                              setConfirmDeleteId(null)
+                            }
+                          }}
+                        >
+                          Sim, excluir
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                )
+              }
+
+              return (
+                <article
+                  key={job.id}
+                  className={`${styles.card} ${isRemoving ? styles.removing : ''}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleJobClick(job)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      handleJobClick(job)
+                    }
+                  }}
+                >
+                  <div className={styles.left}>
+                    <h2 className={styles.jobTitle}>{job.job_title}</h2>
+                    <p className={styles.companyName}>{job.company_name}</p>
+
+                    <div className={styles.meta}>
+                      <FaCalendar />
+                      <span>Analisado em {new Intl.DateTimeFormat('pt-BR').format(new Date(job.created_at))}</span>
+                    </div>
+
+                    <div className={styles.tags}>
+                      {job.tecnologias?.slice(0, 5).map((tech) => (
+                        <span key={tech} className={styles.tag}>{tech}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className={styles.right}>
+                    <div className={styles.levelBadge}>
+                      Nível: {jobLevelLabel(job.level)}
+                    </div>
+                    <div className={styles.match}>
+                      <div className={styles.matchValue}>
+                        {getJobCompatibility(job) !== undefined ? `${getJobCompatibility(job)}%` : '-'}
+                      </div>
+                      <div className={styles.matchLabel}>
+                        Compatibilidade
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className={styles.trashButton}
+                      aria-label={`Excluir ${job.job_title}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setConfirmDeleteId(job.id)
+                      }}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      <Trash size={16} className={styles.trashIcon} />
+                    </button>
+                  </div>
+                </article>
+              )
+            })}
           </div>
 
           {totalPages > 1 ? (

@@ -1,4 +1,4 @@
-import { apiGet } from '../../../services/api'
+import { apiGet, apiDelete } from '../../../services/api'
 
 export type JobItem = {
   id: string
@@ -15,4 +15,8 @@ export type JobItem = {
 
 export async function fetchJobs(): Promise<JobItem[]> {
   return apiGet<JobItem[]>('/jobs')
+}
+
+export async function deleteJob(id: string): Promise<void> {
+  return apiDelete(`/jobs/${id}`)
 }
