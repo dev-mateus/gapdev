@@ -50,6 +50,8 @@ function HistoricoPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('recent')
   const [isOpenSortDropdown, setIsOpenSortDropdown] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 6
   const sortDropdownRef = useRef<HTMLLabelElement | null>(null)
 
 
@@ -159,6 +161,22 @@ function HistoricoPage() {
 
     return sorted
   }, [jobs, searchTerm, sortBy])
+
+  // Volta para a primeira página sempre que a busca ou a ordenação mudam,
+  // evitando ficar numa página que deixou de existir após filtrar.
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, sortBy])
+
+  const totalPages = Math.max(1, Math.ceil(visibleJobs.length / ITEMS_PER_PAGE))
+
+  // Protege contra a página atual ficar fora do intervalo (ex.: após excluir).
+  const safePage = Math.min(currentPage, totalPages)
+
+  const paginatedJobs = useMemo(() => {
+    const start = (safePage - 1) * ITEMS_PER_PAGE
+    return visibleJobs.slice(start, start + ITEMS_PER_PAGE)
+  }, [visibleJobs, safePage])
 
   const hasNoResults =
     !isLoading && !errorMessage && !isEmptyHistory && visibleJobs.length === 0
@@ -284,7 +302,7 @@ function HistoricoPage() {
           ) : null}
 
           <div className={styles.list}>
-            {visibleJobs.map((job) => (
+            {paginatedJobs.map((job) => (
               <article
                 key={job.id}
                 className={styles.card}
@@ -330,6 +348,32 @@ function HistoricoPage() {
               </article>
             ))}
           </div>
+
+          {totalPages > 1 ? (
+            <nav className={styles.pagination} aria-label="Paginação do histórico">
+              <button
+                type="button"
+                className={styles.pageButton}
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={safePage <= 1}
+              >
+                Anterior
+              </button>
+
+              <span className={styles.pageInfo}>
+                Página {safePage} de {totalPages}
+              </span>
+
+              <button
+                type="button"
+                className={styles.pageButton}
+                onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                disabled={safePage >= totalPages}
+              >
+                Próxima
+              </button>
+            </nav>
+          ) : null}
         </div>
       </PageContainer>
     </div>
@@ -337,4 +381,3 @@ function HistoricoPage() {
 }
 
 export default HistoricoPage
-
