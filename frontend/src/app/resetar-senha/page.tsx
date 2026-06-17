@@ -6,6 +6,7 @@ import Button from '../../components/Button/Button'
 import Input from '../../components/Input/Input'
 import { apiPost } from '../../services/api'
 import { validatePassword } from '../../utils/validators'
+import { FaChartLine } from 'react-icons/fa6'
 
 import styles from '../esqueci-senha/esqueci-senha.module.css'
 
@@ -93,7 +94,7 @@ function ResetarSenhaPage() {
       <header className={styles.header}>
         <div className={styles.brand}>
           <span className={styles.brandMark} aria-hidden="true">
-            <FaLock />
+            <FaChartLine  />
           </span>
 
           <span className={styles.brandName}>

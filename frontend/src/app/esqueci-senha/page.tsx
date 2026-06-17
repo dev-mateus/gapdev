@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { FaArrowTrendUp, FaEnvelope } from 'react-icons/fa6'
+import { FaChartLine, FaEnvelope } from 'react-icons/fa6'
 import { Link } from 'react-router-dom'
 
 import Button from '../../components/Button/Button'
@@ -65,7 +65,7 @@ function EsqueciSenhaPage({ isBackendConnected }: EsqueciSenhaPageProps) {
       <header className={styles.header}>
         <div className={styles.brand}>
           <span className={styles.brandMark} aria-hidden="true">
-            <FaArrowTrendUp />
+            <FaChartLine  />
           </span>
 
           <span className={styles.brandName}>
