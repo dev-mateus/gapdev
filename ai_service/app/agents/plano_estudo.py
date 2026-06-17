@@ -97,7 +97,7 @@ def _normalize_subskills(raw_subskills: Any, skill_name: str, target_level: str)
 	if not topics:
 		topics = _fallback_subskills(skill_name, target_level)
 
-	return topics[:5]
+	return topics[:7]
 
 
 def _fallback_subskills(skill_name: str, target_level: str) -> list[dict]:
@@ -109,8 +109,16 @@ def _fallback_subskills(skill_name: str, target_level: str) -> list[dict]:
 			"reason": f"Dominar os conceitos basicos de {skill_name}.",
 		},
 		{
+			"name": f"Conceitos intermediarios de {skill_name}",
+			"reason": f"Aprofundar o conhecimento em {skill_name} alem do basico.",
+		},
+		{
 			"name": f"Pratica de {skill_name}",
 			"reason": f"Praticar {skill_name} ate o nivel {target_level} com exercicios reais.",
+		},
+		{
+			"name": f"Boas praticas em {skill_name}",
+			"reason": f"Conhecer padroes e boas praticas adotados pelo mercado em {skill_name}.",
 		},
 		{
 			"name": f"Projeto com {skill_name}",
@@ -237,7 +245,7 @@ def generate_study_plan(
 		return {"items": []}
 
 	try:
-		response = ask_hf(prompt, max_tokens=2400)
+		response = ask_hf(prompt, max_tokens=3200)
 		parsed = _parse_model_response(response)
 		items = _normalize_ai_items(parsed, job_skills, user_skills)
 	except Exception:
