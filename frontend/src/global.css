@@ -1,35 +1,65 @@
 @import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&family=Inter:wght@700;800&display=swap');
 @import 'tailwindcss';
 
+/* ============================================================================
+   GAPDEV · DESIGN SYSTEM
+   ----------------------------------------------------------------------------
+   Fonte única de verdade para os design tokens da aplicação.
+   Todos os componentes consomem estas variáveis via var(--token).
+
+   Organização:
+     A. Cores      -> A1 Marca | A2 Fundos/superfícies | A3 Texto | A4 Bordas/focus
+     B. Semântica  -> B1 Status form | B2 Feedback | B3 Prioridade | B4 Progresso
+     C. Componentes-> C1 Sidebar | C2 Modal | C3 Botão destrutivo
+     D. Tipografia
+     E. Raios
+     F. Sombras
+     G. Espaçamento e layout
+     H. Motion
+
+   Convenção de nomes: --color-*, --font-*, --radius-*, --shadow-*,
+   --transition-*, --page-*. Não alterar valores sem alinhar com o time,
+   pois afetam toda a aplicação.
+============================================================================ */
+
 @theme {
-  /* ==========================================
-     1. CORES DE MARCA
-  ========================================== */
+  /* ==========================================================================
+     A1. CORES · MARCA
+  ========================================================================== */
   --color-brand-accent: #3ec1e0;
   --color-brand-primary: #1b7895;
   --color-brand-primary-hover: #1e6981;
 
-  /* ==========================================
-     2. FUNDOS E SUPERFÍCIES
-  ========================================== */
+  /* ==========================================================================
+     A2. CORES · FUNDOS E SUPERFÍCIES
+  ========================================================================== */
+  /* Fundo da página (gradiente) */
   --color-bg-page-start: #000000;
   --color-bg-page-end: #012e49;
+
+  /* Shells e painéis estruturais */
   --color-bg-app-shell: #061c2d;
   --color-bg-shell: #02111b;
   --color-bg-info-pane: #06324d;
   --color-bg-form-pane: #001827;
   --color-bg-feature-icon: #2b5f96;
+
+  /* Inputs e controles */
   --color-bg-input: #051522;
   --color-bg-input-hover: #072131;
   --color-bg-checkbox: #051522;
   --color-bg-secondary-hover: #02253b;
+
+  /* Superfícies translúcidas (glass) */
   --color-surface-panel: rgba(1, 30, 47, 0.82);
   --color-surface-panel-hover: rgba(1, 30, 47, 0.9);
   --color-surface-switcher: rgba(1, 25, 39, 0.82);
+  --color-bg-surface-dark: rgba(2, 17, 27, 0.52);
+  --color-bg-card-dark: rgba(0, 11, 20, 0.65);
 
-  /* ==========================================
-     3. TEXTO
-  ========================================== */
+  /* ==========================================================================
+     A3. CORES · TEXTO
+  ========================================================================== */
   --color-text-primary: #f8fbff;
   --color-text-heading-hero: #f5fbff;
   --color-text-brand: #dff7ff;
@@ -39,25 +69,91 @@
   --color-text-link-hover: #9aeaff;
   --color-text-icon: #b4d7e7;
   --color-text-icon-placeholder: #b4d7e7;
+  --color-text-accent: #63d6ff;
+  --color-text-accent-light: #baf3ff;
 
-  /* ==========================================
-     4. BORDAS E FOCUS
-  ========================================== */
+  /* ==========================================================================
+     A4. CORES · BORDAS E FOCUS
+  ========================================================================== */
   --color-border-shell: rgba(255, 255, 255, 0.18);
   --color-border-shell-inner: rgba(255, 255, 255, 0.08);
   --color-border-input: rgba(255, 255, 255, 0.22);
   --color-border-input-hover: #58e0ff;
   --color-border-input-focus: #58e0ff;
-  --color-ring-focus: #58e0ff;
-  --color-ring-focus-soft: #3ac0f0;
   --color-border-secondary: rgba(255, 255, 255, 0.24);
   --color-border-secondary-hover: #58e0ff;
   --color-border-checkbox: rgba(255, 255, 255, 0.4);
   --color-border-checkbox-checked: #67deff;
+  --color-border-panel: #1c3c50;
+  --color-ring-focus: #58e0ff;
+  --color-ring-focus-soft: #3ac0f0;
 
-  /* ==========================================
-     5. TIPOGRAFIA
-  ========================================== */
+  /* ==========================================================================
+     B1. SEMÂNTICA · STATUS DE FORMULÁRIO
+  ========================================================================== */
+  --color-status-error-border: #8f3e4c;
+  --color-status-error-bg: rgba(117, 31, 45, 0.35);
+  --color-status-error-text: #ffd7de;
+  --color-status-success-border: #2f7f72;
+  --color-status-success-bg: rgba(10, 82, 71, 0.35);
+  --color-status-success-text: #d9fff7;
+
+  /* ==========================================================================
+     B2. SEMÂNTICA · FEEDBACK (compatibilidade)
+  ========================================================================== */
+  --color-semantic-success: #00d37f;
+  --color-semantic-success-on: #002a1a;
+  --color-semantic-success-check: #b6f7c9;
+  --color-semantic-warning: #ffcc24;
+  --color-semantic-warning-on: #082031;
+  --color-semantic-error: #ff4d4d;
+  --color-semantic-error-on: #fff7f7;
+  --color-semantic-error-muted: #ff7b7b;
+
+  /* ==========================================================================
+     B3. SEMÂNTICA · PRIORIDADE (badges plano de estudos)
+  ========================================================================== */
+  --color-priority-high: #ef4444;
+  --color-priority-high-text: #ffd7d7;
+  --color-priority-medium: #fbbf24;
+  --color-priority-medium-text: #fff0c2;
+  --color-priority-low: #38bdf8;
+  --color-priority-low-text: #c7f5ff;
+
+  /* ==========================================================================
+     B4. SEMÂNTICA · BARRA DE PROGRESSO
+  ========================================================================== */
+  --color-progress-start: #4bc5ff;
+  --color-progress-end: #1d8cff;
+  --color-progress-done-start: #22c55e;
+  --color-progress-done-end: #15803d;
+
+  /* ==========================================================================
+     C1. COMPONENTES · SIDEBAR
+  ========================================================================== */
+  --color-bg-sidebar: #0a2538;
+  --color-bg-sidebar-hover: #12394d;
+  --color-bg-sidebar-active: #1fa3c6;
+  --color-text-sidebar-muted: #c7d3dd;
+  --color-bg-danger-hover: #b83434;
+
+  /* ==========================================================================
+     C2. COMPONENTES · MODAL / DIÁLOGO
+  ========================================================================== */
+  --color-bg-modal: #0a1628;
+  --color-border-modal: #1e3a52;
+  --color-text-modal-title: #e6f1f7;
+  --color-text-modal-body: #b0c4d4;
+
+  /* ==========================================================================
+     C3. COMPONENTES · BOTÃO DESTRUTIVO (perigo)
+  ========================================================================== */
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+
+  /* ==========================================================================
+     D. TIPOGRAFIA
+  ========================================================================== */
   --font-body:
     'Arimo',
     ui-sans-serif,
@@ -76,122 +172,41 @@
     'Segoe UI',
     sans-serif;
 
-  /* ==========================================
-     6. RAIOS
-  ========================================== */
+  /* ==========================================================================
+     E. RAIOS
+  ========================================================================== */
   --radius-shell: 1.7rem;
   --radius-control: 1rem;
   --radius-checkbox: 0.35rem;
 
-  /* ==========================================
-     7. SOMBRAS
-  ========================================== */
+  /* ==========================================================================
+     F. SOMBRAS
+  ========================================================================== */
   --shadow-shell:
     0 34px 80px rgba(0, 0, 0, 1),
     inset 0 0 0 1px var(--color-border-shell-inner);
+  --shadow-feature: 0 12px 30px rgba(3, 18, 32, 1);
+  --shadow-focus: 0 0 0 4px rgba(58, 192, 240, 0.22);
 
-  --shadow-feature:
-    0 12px 30px rgba(3, 18, 32, 1);
-
-  --shadow-focus:
-    0 0 0 4px rgba(58, 192, 240, 0.22);
-
-  /* ==========================================
-     8. MOTION
-  ========================================== */
-  --transition-default: 160ms ease;
-
-  /* ==========================================
-     9. ESPAÇAMENTO
-  ========================================== */
+  /* ==========================================================================
+     G. ESPAÇAMENTO E LAYOUT
+  ========================================================================== */
   --page-pad-block: 1.7rem;
-
   --page-pad-inline: 1.7rem;
   --page-container-max-width: 64rem;
   --page-container-max-width-expanded: 84rem;
   --page-header-title-size: clamp(1.9rem, 3.5vw, 2.4rem);
   --page-header-description-width: 42rem;
 
-  /* ==========================================
-     10. STATUS DE FORMULÁRIO
-  ========================================== */
-  --color-status-error-border: #8f3e4c;
-  --color-status-error-bg: rgba(117, 31, 45, 0.35);
-  --color-status-error-text: #ffd7de;
-  --color-status-success-border: #2f7f72;
-  --color-status-success-bg: rgba(10, 82, 71, 0.35);
-  --color-status-success-text: #d9fff7;
-
-  /* ==========================================
-     11. FEEDBACK SEMÂNTICO (compatibilidade)
-  ========================================== */
-  --color-semantic-success: #00d37f;
-  --color-semantic-success-on: #002a1a;
-  --color-semantic-warning: #ffcc24;
-  --color-semantic-warning-on: #082031;
-  --color-semantic-error: #ff4d4d;
-  --color-semantic-error-on: #fff7f7;
-  --color-semantic-error-muted: #ff7b7b;
-  --color-semantic-success-check: #b6f7c9;
-
-  /* ==========================================
-     12. PRIORIDADE (badges plano de estudos)
-  ========================================== */
-  --color-priority-high: #ef4444;
-  --color-priority-high-text: #ffd7d7;
-  --color-priority-medium: #fbbf24;
-  --color-priority-medium-text: #fff0c2;
-  --color-priority-low: #38bdf8;
-  --color-priority-low-text: #c7f5ff;
-
-  /* ==========================================
-     13. SIDEBAR
-  ========================================== */
-  --color-bg-sidebar: #0a2538;
-  --color-bg-sidebar-hover: #12394d;
-  --color-bg-sidebar-active: #1fa3c6;
-  --color-text-sidebar-muted: #c7d3dd;
-  --color-bg-danger-hover: #b83434;
-
-  /* ==========================================
-     14. MODAL / DIÁLOGO
-  ========================================== */
-  --color-bg-modal: #0a1628;
-  --color-border-modal: #1e3a52;
-  --color-text-modal-title: #e6f1f7;
-  --color-text-modal-body: #b0c4d4;
-
-  /* ==========================================
-     15. PERIGO (botão destruitivo)
-  ========================================== */
-  --color-danger: #dc2626;
-  --color-danger-hover: #b91c1c;
-
-  /* ==========================================
-     16. BARRA DE PROGRESSO
-  ========================================== */
-  --color-progress-start: #4bc5ff;
-  --color-progress-end: #1d8cff;
-  --color-progress-done-start: #22c55e;
-  --color-progress-done-end: #15803d;
-
-  /* ==========================================
-     17. TEXTO ADICIONAL
-  ========================================== */
-  --color-text-accent: #63d6ff;
-  --color-text-accent-light: #baf3ff;
-
-  /* ==========================================
-     18. SUPERFÍCIES ADICIONAIS
-  ========================================== */
-  --color-bg-surface-dark: rgba(2, 17, 27, 0.52);
-  --color-bg-card-dark: rgba(0, 11, 20, 0.65);
-  --color-border-panel: #1c3c50;
+  /* ==========================================================================
+     H. MOTION
+  ========================================================================== */
+  --transition-default: 160ms ease;
 }
 
-/* ==========================================
+/* ============================================================================
    RESET GLOBAL
-========================================== */
+============================================================================ */
 *,
 *::before,
 *::after {
@@ -204,18 +219,18 @@ html,
 body {
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-x: hidden;
 }
 
 body {
   color-scheme: dark;
   font-family: var(--font-body);
   color: var(--color-text-primary);
-  background:
-    radial-gradient(
-      circle at center,
-      var(--color-bg-page-start) 0 12%,
-      var(--color-bg-page-end) 68% 100%
-    );
+  background: radial-gradient(
+    circle at center,
+    var(--color-bg-page-start) 0 12%,
+    var(--color-bg-page-end) 68% 100%
+  );
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -224,11 +239,12 @@ body {
 #root {
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-x: hidden;
 }
 
-/* ==========================================
+/* ============================================================================
    TIPOGRAFIA GLOBAL
-========================================== */
+============================================================================ */
 h1,
 h2,
 h3,
@@ -242,9 +258,9 @@ p {
   line-height: 1.6;
 }
 
-/* ==========================================
+/* ============================================================================
    LINKS
-========================================== */
+============================================================================ */
 a {
   color: var(--color-text-link);
   text-decoration: none;
@@ -255,9 +271,9 @@ a:hover {
   color: var(--color-text-link-hover);
 }
 
-/* ==========================================
+/* ============================================================================
    FORM ELEMENTS
-========================================== */
+============================================================================ */
 button,
 input,
 textarea,
@@ -278,18 +294,9 @@ select {
   }
 }
 
-/* Segurança contra estouro de layout (sem afetar o responsivo) */
-html,
-body {
-  overflow-x: hidden;
-}
-#root {
-  overflow-x: hidden;
-}
-
-/* ==========================================
+/* ============================================================================
    GLASS SYSTEM
-========================================== */
+============================================================================ */
 .glass {
   background: var(--color-bg-shell);
   border: 1px solid var(--color-border-shell);
@@ -298,9 +305,9 @@ body {
   backdrop-filter: blur(18px);
 }
 
-/* ==========================================
+/* ============================================================================
    SCROLLBAR
-========================================== */
+============================================================================ */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -326,25 +333,25 @@ body {
   }
 }
 
-/* ==========================================
+/* ============================================================================
    SELECTION
-========================================== */
+============================================================================ */
 ::selection {
   background: rgba(62, 193, 224, 0.3);
   color: #fff;
 }
 
-/* ==========================================
+/* ============================================================================
    FOCUS ACCESSIBILITY
-========================================== */
+============================================================================ */
 :focus-visible {
   outline: 2px solid var(--color-ring-focus);
   outline-offset: 3px;
 }
 
-/* ==========================================
+/* ============================================================================
    PAGE TRANSITION
-========================================== */
+============================================================================ */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -356,9 +363,9 @@ body {
   }
 }
 
-/* ==========================================
-   RESPONSIVIDADE
-========================================== */
+/* ============================================================================
+   RESPONSIVIDADE · escala de padding por breakpoint
+============================================================================ */
 @media (min-width: 768px) {
   :root {
     --page-pad-block: 2.2rem;
