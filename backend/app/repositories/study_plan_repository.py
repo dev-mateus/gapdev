@@ -143,13 +143,19 @@ def create_or_replace_study_plan(
 	items: list[dict],
 	status: str = "active",
 	title: str | None = None,
+	skipped_skills: list[dict] | None = None,
 ) -> StudyPlan:
 	"""Create a plan or replace the items of the existing user/job plan."""
+
+	import json
+
+	skipped_json = json.dumps(skipped_skills, ensure_ascii=False) if skipped_skills else None
 
 	plan = get_study_plan_by_user_and_job(db, user_id, job_id)
 	if plan:
 		plan.items.clear()
 		plan.status = _map_plan_status(status)
+		plan.skipped_skills = skipped_json
 		if title is not None:
 			plan.title = title
 	else:
@@ -157,6 +163,7 @@ def create_or_replace_study_plan(
 			user_id=user_id,
 			job_id=job_id,
 			title=title,
+			skipped_skills=skipped_json,
 			status=_map_plan_status(status),
 		)
 		db.add(plan)

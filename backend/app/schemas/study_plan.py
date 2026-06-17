@@ -60,6 +60,13 @@ class StudyPlanItemRead(BaseModel):
 	model_config = {"from_attributes": True}
 
 
+class SkippedSkillRead(BaseModel):
+	"""Skill omitted from the plan because it already exists in another plan."""
+
+	skill_name: str
+	plan_title: str
+
+
 class StudyPlanRead(BaseModel):
 	"""Study plan response."""
 
@@ -73,5 +80,6 @@ class StudyPlanRead(BaseModel):
 	created_at: datetime
 	updated_at: datetime
 	items: list[StudyPlanItemRead] = []
+	skipped_skills: list[SkippedSkillRead] = []
 
 	model_config = {"from_attributes": True}

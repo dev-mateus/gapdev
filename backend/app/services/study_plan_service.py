@@ -24,7 +24,7 @@ from app.repositories.study_plan_repository import (
 )
 from app.repositories.user_repo import get_user_by_email
 from app.repositories.user_skill_repository import create_user_skill as create_user_skill_record, list_skills_by_user
-from app.schemas.study_plan import StudyPlanItemRead, StudyPlanItemSkillRead, StudyPlanRead
+from app.schemas.study_plan import SkippedSkillRead, StudyPlanItemRead, StudyPlanItemSkillRead, StudyPlanRead
 from app.schemas.user_skill import UserSkillCreate
 
 
@@ -117,6 +117,20 @@ def _default_plan_title(job: object) -> str:
 	return "Plano de estudos"
 
 
+def _parse_skipped_skills(raw: object) -> list[SkippedSkillRead]:
+	"""Parse the persisted JSON skipped_skills into response objects."""
+
+	import json
+
+	if not raw:
+		return []
+	try:
+		data = json.loads(str(raw)) if isinstance(raw, str) else raw
+		return [SkippedSkillRead(**entry) for entry in data if isinstance(entry, dict)]
+	except (json.JSONDecodeError, TypeError, ValueError):
+		return []
+
+
 def _plan_to_read(plan: object) -> StudyPlanRead:
 	"""Convert a study plan into the public response schema."""
 
@@ -142,6 +156,7 @@ def _plan_to_read(plan: object) -> StudyPlanRead:
 		created_at=getattr(plan, "created_at"),
 		updated_at=getattr(plan, "updated_at"),
 		items=[_item_to_read(item) for item in items],
+		skipped_skills=_parse_skipped_skills(getattr(plan, "skipped_skills", None)),
 	)
 
 
