@@ -21,6 +21,7 @@ class StudyPlan(Base):
 	user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 	job_id = Column(String(36), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
 	title = Column(String(200), nullable=True)
+	skipped_skills = Column(Text, nullable=True)
 	status = Column(SQLEnum(StudyPlanStatus), nullable=False, default=StudyPlanStatus.draft)
 	created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 	updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())

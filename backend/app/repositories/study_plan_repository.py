@@ -108,6 +108,34 @@ def list_completed_module_skill_ids(db: Session, user_id: str) -> set[str]:
 	return {str(skill_id) for skill_id in db.scalars(statement).all() if skill_id}
 
 
+def list_active_plan_skills_with_plan_info(
+	db: Session, user_id: str, exclude_job_id: str | None = None,
+) -> dict[str, str]:
+	"""Return a map of skill_id → plan title for skills in other active plans.
+
+	Only considers non-completed items so that skills already finished
+	(and added to the user profile) are not flagged as duplicates.
+	"""
+
+	statement = (
+		select(StudyPlanItem.skill_id, StudyPlan.title, StudyPlan.job_id)
+		.join(StudyPlan, StudyPlan.id == StudyPlanItem.study_plan_id)
+		.where(
+			StudyPlan.user_id == user_id,
+			StudyPlanItem.status != StudyPlanItemStatus.completed,
+		)
+	)
+	if exclude_job_id:
+		statement = statement.where(StudyPlan.job_id != exclude_job_id)
+
+	result: dict[str, str] = {}
+	for skill_id, plan_title, _ in db.execute(statement).all():
+		sid = str(skill_id)
+		if sid not in result:
+			result[sid] = plan_title or "Outro plano de estudos"
+	return result
+
+
 def create_or_replace_study_plan(
 	db: Session,
 	user_id: str,
@@ -115,13 +143,19 @@ def create_or_replace_study_plan(
 	items: list[dict],
 	status: str = "active",
 	title: str | None = None,
+	skipped_skills: list[dict] | None = None,
 ) -> StudyPlan:
 	"""Create a plan or replace the items of the existing user/job plan."""
+
+	import json
+
+	skipped_json = json.dumps(skipped_skills, ensure_ascii=False) if skipped_skills else None
 
 	plan = get_study_plan_by_user_and_job(db, user_id, job_id)
 	if plan:
 		plan.items.clear()
 		plan.status = _map_plan_status(status)
+		plan.skipped_skills = skipped_json
 		if title is not None:
 			plan.title = title
 	else:
@@ -129,6 +163,7 @@ def create_or_replace_study_plan(
 			user_id=user_id,
 			job_id=job_id,
 			title=title,
+			skipped_skills=skipped_json,
 			status=_map_plan_status(status),
 		)
 		db.add(plan)
