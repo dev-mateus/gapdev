@@ -13,11 +13,11 @@ from app.models.job import JobLevel  # ← adicionar
 class JobCreate(BaseModel):
     """Payload to create a job."""
 
-    company_name: str
-    job_title: str
-    description: str
-    level: Optional[JobLevel] = JobLevel.Junior  # ← era Optional[str]
-    compatibility: Optional[int] = 0
+    company_name: str = Field(..., min_length=1, max_length=200)
+    job_title: str = Field(..., min_length=1, max_length=200)
+    description: str = Field(..., min_length=10, max_length=15000)
+    level: Optional[JobLevel] = JobLevel.Junior
+    compatibility: Optional[int] = Field(0, ge=0, le=100)
 
 
 class JobRead(JobCreate):

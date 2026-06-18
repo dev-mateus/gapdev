@@ -1,6 +1,8 @@
 """Study plan routes."""
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Request, Response, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_database
@@ -24,10 +26,13 @@ from app.services.study_plan_service import (
 )
 
 router = APIRouter(prefix="/study-plans", tags=["study-plans"])
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/generate", response_model=StudyPlanRead, status_code=status.HTTP_201_CREATED)
+@limiter.limit("10/minute")
 def generate_study_plan_route(
+	request: Request,
 	payload: StudyPlanGenerateRequest,
 	db: Session = Depends(get_database),
 	current_user: User = Depends(get_current_user),

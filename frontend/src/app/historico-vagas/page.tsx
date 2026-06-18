@@ -189,8 +189,6 @@ function HistoricoPage() {
   }
 
   function handleJobClick(job: JobItem) {
-    // Rebuild the analysis context so the compatibility page can re-run the
-    // analysis for this job against the user's current skills.
     const analysisContext = JSON.stringify({
       title: job.job_title,
       company: job.company_name,

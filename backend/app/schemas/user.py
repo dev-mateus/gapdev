@@ -1,14 +1,14 @@
 """User schemas."""
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserCreate(BaseModel):
 	"""Payload for user creation."""
 
-	name: str
+	name: str = Field(..., min_length=2, max_length=100)
 	email: EmailStr
-	password: str
+	password: str = Field(..., min_length=6, max_length=32)
 
 
 class UserRead(BaseModel):
@@ -25,5 +25,5 @@ class UserRead(BaseModel):
 class UserUpdate(BaseModel):
 	"""Payload for user profile update."""
 
-	name: str | None = None
+	name: str | None = Field(None, min_length=2, max_length=100)
 	seniority_level: str | None = None

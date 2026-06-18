@@ -5,7 +5,7 @@ from uuid import uuid4
 import httpx
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.orm import Session
 from app.schemas.user import UserCreate
 
@@ -36,7 +36,7 @@ class LoginRequest(BaseModel):
 	"""Login payload."""
 
 	email: EmailStr
-	password: str
+	password: str = Field(..., min_length=1, max_length=32)
 
 
 class GoogleLoginRequest(BaseModel):
@@ -49,7 +49,7 @@ class ChangePasswordRequest(BaseModel):
 	"""Change password payload."""
 
 	current_password: str | None = None
-	new_password: str
+	new_password: str = Field(..., min_length=6, max_length=32)
 
 
 class ForgotPasswordRequest(BaseModel):
@@ -62,7 +62,7 @@ class ResetPasswordRequest(BaseModel):
 	"""Reset password payload."""
 
 	token: str
-	new_password: str	
+	new_password: str = Field(..., min_length=6, max_length=32)
 
 
 @router.post("/login")
@@ -163,12 +163,6 @@ def change_password(
 ) -> dict[str, str]:
 	"""Change authenticated user password."""
 
-	if not payload.new_password or len(payload.new_password) < 6:
-		raise HTTPException(
-			status_code=status.HTTP_400_BAD_REQUEST,
-			detail="A nova senha deve ter pelo menos 6 caracteres.",
-		)
-
 	if not payload.current_password:
 		raise HTTPException(
 			status_code=status.HTTP_400_BAD_REQUEST,
@@ -197,7 +191,9 @@ def change_password(
 
 
 @router.post("/forgot-password")
+@limiter.limit("3/minute")
 def forgot_password(
+	request: Request,
 	payload: ForgotPasswordRequest,
 	db: Session = Depends(get_database),
 ) -> dict[str, str]:
@@ -240,12 +236,6 @@ def reset_password(
 	db: Session = Depends(get_database),
 ) -> dict[str, str]:
 	"""Reset user password using recovery token."""
-
-	if not payload.new_password or len(payload.new_password) < 6:
-		raise HTTPException(
-			status_code=status.HTTP_400_BAD_REQUEST,
-			detail="A nova senha deve ter pelo menos 6 caracteres.",
-		)
 
 	token_hash = hashlib.sha256(payload.token.encode()).hexdigest()
 
