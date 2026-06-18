@@ -25,8 +25,9 @@
   display: flex;
   align-items: center;
 
-  flex: 2 1 0;
+  flex: 2 1 16rem;
   min-width: 16rem;
+  max-width: 32rem;
 }
 
 
@@ -40,12 +41,12 @@
 .searchInput {
   width: 100%;
   padding: 0.7rem 0.95rem 0.7rem 2.6rem;
-  border: 1px solid var(--color-border-input);
+  border: 1px solid color-mix(in srgb, var(--color-border-input) 65%, transparent);
   border-radius: var(--radius-control);
-  background: var(--color-surface-panel);
+  background: color-mix(in srgb, var(--color-surface-panel) 85%, transparent);
   color: var(--color-text-primary);
   font-size: 0.9rem;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .searchInput::placeholder {
@@ -53,12 +54,14 @@
 }
 
 .searchInput:hover {
-  border-color: var(--color-border-input-hover);
+  border-color: color-mix(in srgb, var(--color-border-input-hover) 75%, transparent);
+  background-color: color-mix(in srgb, var(--color-surface-panel) 92%, transparent);
 }
 
 .searchInput:focus-visible {
   outline: none;
   border-color: var(--color-border-input-focus);
+  background-color: color-mix(in srgb, var(--color-surface-panel) 95%, transparent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
 }
 
@@ -68,28 +71,27 @@
   align-items: center;
   gap: 0.5rem;
 
-  width: 16rem;
+  min-width: 14rem;
+  max-width: 22rem;
   height: 2.65rem;
-  flex: 0 0 16rem;
+  flex: 0 1 auto;
 
   padding: 0 0.85rem;
-  border: 1px solid var(--color-border-input);
+  border: 1px solid color-mix(in srgb, var(--color-border-input) 65%, transparent);
   border-radius: var(--radius-control);
-  background: var(--color-surface-panel);
+  background: color-mix(in srgb, var(--color-surface-panel) 85%, transparent);
   color: var(--color-text-muted);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  white-space: nowrap;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-
-
 .sortField:hover {
-  border-color: var(--color-border-input-hover);
+  border-color: color-mix(in srgb, var(--color-border-input-hover) 75%, transparent);
+  background-color: color-mix(in srgb, var(--color-surface-panel) 92%, transparent);
 }
 
 .sortField:focus-within {
   border-color: var(--color-border-input-focus);
+  background-color: color-mix(in srgb, var(--color-surface-panel) 95%, transparent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
 }
 
@@ -105,6 +107,10 @@
   font-weight: 700;
   color: var(--color-text-primary);
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 0.5rem;
 }
 
 .sortDropdown {
@@ -147,11 +153,6 @@
 
 .sortOption[aria-selected='true'] {
   background: color-mix(in srgb, var(--color-brand-primary) 18%, var(--color-surface-panel));
-}
-
-
-.sortField {
-  position: relative;
 }
 
 .sortSelect:focus-visible {
