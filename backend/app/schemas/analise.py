@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 class AnaliseRequest(BaseModel):
     """Request payload for job analysis."""
 
-    description: str
+    description: str = Field(..., min_length=20, max_length=15000)
     job_id: Optional[str] = None
 
 

@@ -1,7 +1,13 @@
 """Analise routes for job descriptions."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
 
 from app.api.deps import get_current_user, get_database
 from app.models.user import User
@@ -16,6 +22,7 @@ from app.repositories.job_repository import get_job_by_id
 from ai_service.app.agents.analise_vaga import analyze_vaga
 
 router = APIRouter(prefix="/analise", tags=["analise"])
+limiter = Limiter(key_func=get_remote_address)
 
 
 def _map_skill_level(required_level: str | None) -> str:
@@ -179,7 +186,9 @@ def _collect_catalog_skill_names(db: Session) -> list[str]:
 
 
 @router.post("", response_model=AnaliseResponse)
+@limiter.limit("10/minute")
 def analisar_vaga_route(
+    request: Request,
     payload: AnaliseRequest,
     db: Session = Depends(get_database),
     current_user: User = Depends(get_current_user),
@@ -244,8 +253,7 @@ def analisar_vaga_route(
                 create_job_skill(db, user_email, skill_create)
                 normalized_job_skills.append(skill)
             except Exception as e:
-                # Log error but continue saving other skills
-                print(f"Error saving skill: {e}")
+                logger.warning("Failed to save skill %s: %s", skill.get("skill_id"), e)
 
         if normalized_job_skills:
             parsed = dict(parsed)
