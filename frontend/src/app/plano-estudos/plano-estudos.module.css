@@ -647,7 +647,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.5rem;
   width: 100%;
   max-width: 980px;
   margin: 0 auto;
@@ -662,7 +662,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  flex: 1 1 auto;
+  flex: 1 1 16rem;
   min-width: 16rem;
 }
 
@@ -708,16 +708,16 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  width: 16rem;
+  min-width: 14rem;
+  max-width: 22rem;
   height: 2.65rem;
-  flex: 0 0 16rem;
+  flex: 0 1 auto;
   padding: 0 0.85rem;
   border: 1px solid color-mix(in srgb, var(--color-border-shell-inner) 70%, transparent);
   border-radius: 0.85rem;
   background: var(--color-surface-panel);
   color: var(--color-text-muted);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  white-space: nowrap;
   user-select: none;
 }
 
@@ -737,13 +737,12 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sortLabelIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.85;
+  display: none;
 }
 
 .sortValue {
@@ -752,7 +751,10 @@
   font-weight: 700;
   color: var(--color-text-primary);
   text-align: left;
-  padding-right: 1rem;
+  padding-right: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sortSelect {
@@ -808,15 +810,7 @@
 }
 
 .sortField::after {
-  content: '';
-  position: absolute;
-  right: 0.85rem;
-  top: 50%;
-  transform: translateY(-50%);
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 5px solid var(--color-text-muted);
-  pointer-events: none;
+  display: none;
 }
 
 @media (max-width: 900px) {
