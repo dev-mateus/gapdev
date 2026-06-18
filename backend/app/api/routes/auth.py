@@ -36,7 +36,7 @@ class LoginRequest(BaseModel):
 	"""Login payload."""
 
 	email: EmailStr
-	password: str = Field(..., min_length=1, max_length=128)
+	password: str = Field(..., min_length=1, max_length=32)
 
 
 class GoogleLoginRequest(BaseModel):
@@ -49,7 +49,7 @@ class ChangePasswordRequest(BaseModel):
 	"""Change password payload."""
 
 	current_password: str | None = None
-	new_password: str = Field(..., min_length=6, max_length=128)
+	new_password: str = Field(..., min_length=6, max_length=32)
 
 
 class ForgotPasswordRequest(BaseModel):
@@ -62,7 +62,7 @@ class ResetPasswordRequest(BaseModel):
 	"""Reset password payload."""
 
 	token: str
-	new_password: str = Field(..., min_length=6, max_length=128)
+	new_password: str = Field(..., min_length=6, max_length=32)
 
 
 @router.post("/login")
