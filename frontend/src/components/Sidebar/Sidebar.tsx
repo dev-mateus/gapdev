@@ -45,8 +45,7 @@ function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           </div>
 
           <div className={styles.sidebarLogoText}>
-            <span>Skill</span>
-            <span>Progress</span>
+            <span>GapDev</span>
           </div>
         </div>
       )}
