@@ -10,7 +10,8 @@ import {
   FaLock,
 } from 'react-icons/fa6'
 
-import { useGoogleLogin } from '@react-oauth/google'
+import { GoogleLogin } from '@react-oauth/google'
+
 import { Link, useNavigate } from 'react-router-dom'
 
 import Button from '../../components/Button/Button'
@@ -58,52 +59,45 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
 
   const navigate = useNavigate()
 
-  const loginWithGoogle = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        const googleAccessToken = tokenResponse.access_token
+  async function handleGoogleSuccess(credentialResponse: { credential?: string }) {
+  try {
+    const googleCredential = credentialResponse.credential
 
-        if (!googleAccessToken) {
-          throw new Error('Nao foi possivel recuperar o token do Google.')
-        }
+    if (!googleCredential) {
+      throw new Error('Nao foi possivel recuperar o token do Google.')
+    }
 
-        const data = await apiPost<LoginResponse>('/auth/google', {
-          google_token: googleAccessToken,
-        })
+    const data = await apiPost<LoginResponse>('/auth/google', {
+      google_token: googleCredential,
+    })
 
-        localStorage.setItem('access_token', data.access_token)
+    localStorage.setItem('access_token', data.access_token)
 
-        localStorage.setItem(
-          'usuarioLogado',
-          JSON.stringify({
-            email: '',
-            nome: '',
-            authProvider: 'google',
-          })
-        )
+    localStorage.setItem(
+      'usuarioLogado',
+      JSON.stringify({
+        email: '',
+        nome: '',
+        authProvider: 'google',
+      })
+    )
 
-        localStorage.removeItem('usuarioEmail')
-        window.dispatchEvent(new Event('auth-changed'))
+    localStorage.removeItem('usuarioEmail')
+    window.dispatchEvent(new Event('auth-changed'))
 
-        setFormMessageType('success')
-        setFormMessage('Login realizado com sucesso.')
+    setFormMessageType('success')
+    setFormMessage('Login realizado com sucesso.')
 
-        navigate('/perfil')
-      } catch (error) {
-        setFormMessageType('error')
-        setFormMessage(
-          error instanceof Error
-            ? error.message
-            : 'Erro ao fazer login com Google.'
-        )
-      }
-    },
-
-    onError: () => {
-      setFormMessageType('error')
-      setFormMessage('Erro ao autenticar com Google.')
-    },
-  })
+    navigate('/perfil')
+  } catch (error) {
+    setFormMessageType('error')
+    setFormMessage(
+      error instanceof Error
+        ? error.message
+        : 'Erro ao fazer login com Google.'
+    )
+  }
+}
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -278,17 +272,25 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
                 <span />
               </div>
 
-              {/* ↓ MUDANÇA: disabled enquanto backend não conectou */}
-              <Button
-                type="button"
-                variant="secondary"
-                icon={<FaGoogle />}
-                className={styles.googleButton}
-                onClick={() => loginWithGoogle()}
-                disabled={!isBackendConnected}
-              >
-                {!isBackendConnected ? 'Aguarde...' : 'Entrar com Google'}
-              </Button>
+              {isBackendConnected ? (
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => {
+                    setFormMessageType('error')
+                    setFormMessage('Erro ao autenticar com Google.')
+                  }}
+                />
+              ) : (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  icon={<FaGoogle />}
+                  className={styles.googleButton}
+                  disabled
+                >
+                  Aguarde...
+                </Button>
+              )}
 
               <p className={styles.footerText}>
                 Ainda não tem uma conta? <Link to="/cadastro">Cadastre-se</Link>
