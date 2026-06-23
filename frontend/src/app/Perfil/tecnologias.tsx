@@ -18,12 +18,13 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
-import { apiGet, apiPost } from '../../services/api'
+import { apiGet, apiPost, apiDelete } from '../../services/api'
 
 import styles from './tecnologias.module.css'
 
 type Tecnologia = {
   id: string
+  userSkillId?: string
   nome: string
   descricao: string
   categoria: string
@@ -37,6 +38,7 @@ type SkillCatalogItem = {
 }
 
 type UserSkillItem = {
+  id: string
   skill_id: string
   learned_from_module?: boolean
   module_badge_seen?: boolean
@@ -120,7 +122,16 @@ function Tecnologias() {
           }).catch(() => {})
         }
 
-        const preSelecionadas = tecnologias.filter((item) => idsUsuario.has(item.id))
+        const userSkillPorSkillId = new Map(
+          (userSkills ?? []).map((item) => [item.skill_id, item.id]),
+        )
+
+        const preSelecionadas = tecnologias
+          .filter((item) => idsUsuario.has(item.id))
+          .map((item) => ({
+            ...item,
+            userSkillId: userSkillPorSkillId.get(item.id),
+          }))
 
         setTecnologiasCatalogo(tecnologias)
         setSelecionadas(preSelecionadas)
@@ -194,34 +205,50 @@ function Tecnologias() {
     setSelecionadas((prev) => [...prev, tecnologia])
   }
 
-  function removerTecnologia(id: string) {
-    setErroSalvar(null)
-    setMensagemSucesso(null)
+  async function removerTecnologia(tecnologia: Tecnologia) {
+  setErroSalvar(null)
+  setMensagemSucesso(null)
 
-    setSelecionadas((prev) =>
-      prev.filter((tech) => tech.id !== id),
-    )
-  }
-
-  async function salvarTecnologias() {
-    if (selecionadas.length === 0 || salvando) {
-      return
+  try {
+    if (tecnologia.userSkillId) {
+      await apiDelete(`/skills/${tecnologia.userSkillId}`)
     }
 
-    setSalvando(true)
-    setErroSalvar(null)
-    setMensagemSucesso(null)
-
-    const resultados = await Promise.allSettled(
-      selecionadas.map((tech) =>
-        apiPost<{ id: string; skill_id: string }>('/skills', {
-          skill_id: tech.id,
-          level: 'Basic',
-        }),
-      ),
+    setSelecionadas((prev) =>
+      prev.filter((tech) => tech.id !== tecnologia.id),
     )
 
-    const sucesso = resultados.filter((item) => item.status === 'fulfilled').length
+    setMensagemSucesso('Tecnologia removida com sucesso.')
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Erro ao remover tecnologia.'
+
+    setErroSalvar(message)
+  }
+}
+
+
+async function salvarTecnologias() {
+  if (selecionadas.length === 0 || salvando) {
+    return
+  }
+
+  setSalvando(true)
+  setErroSalvar(null)
+  setMensagemSucesso(null)
+
+  const resultados = await Promise.allSettled(
+    selecionadas.map((tech) =>
+      apiPost<{ id: string; skill_id: string }>('/skills', {
+        skill_id: tech.id,
+        level: 'Basic',
+      }),
+    ),
+  )
+
+  const sucesso = resultados.filter((item) => item.status === 'fulfilled').length
 
     if (sucesso === 0) {
       setErroSalvar('Não foi possível salvar suas tecnologias. Tente novamente.')
@@ -256,6 +283,10 @@ function Tecnologias() {
         document.removeEventListener('mousedown', handleClickOutside)
       }
     }, [])
+
+
+
+
 
   return (
     <section className={styles.container}>
@@ -382,7 +413,7 @@ function Tecnologias() {
                             <button
                               type="button"
                               onClick={() =>
-                                removerTecnologia(tech.id)
+                                removerTecnologia(tech)
                               }
                             >
                               <X size={18} />
