@@ -28,6 +28,10 @@ import os
 from app.models.password_reset_token import PasswordResetToken
 from app.services.email_service import send_password_reset_email
 
+
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+
 router = APIRouter(prefix="/auth", tags=["auth"])
 limiter = Limiter(key_func=get_remote_address)
 
@@ -87,72 +91,58 @@ def login(
 		"token_type": "bearer",
 	}
 
-
 @router.post("/google")
 def google_login(
 	payload: GoogleLoginRequest,
-	db: Session = Depends(get_database),
-) -> dict[str, str]:
-	"""Authenticate user with Google OAuth token."""
+		db: Session = Depends(get_database),
+	) -> dict[str, str]:
+		"""Authenticate user with Google ID token."""
 
-	try:
-		response = httpx.get(
-			"https://www.googleapis.com/oauth2/v2/userinfo",
-			headers={
-				"Authorization": f"Bearer {payload.google_token}",
-			},
-			timeout=10.0,
-		)
-	except httpx.TimeoutException:
-		raise HTTPException(
-			status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-			detail="Timeout ao comunicar com o Google. Tente novamente.",
-		)
-	except httpx.RequestError as exc:
-		raise HTTPException(
-			status_code=status.HTTP_502_BAD_GATEWAY,
-			detail=f"Erro ao comunicar com o Google: {exc}",
-		)
+		google_client_id = os.getenv("GOOGLE_CLIENT_ID")
 
-	if response.status_code == 401:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Token do Google invalido ou expirado.",
-		)
+		if not google_client_id:
+			raise HTTPException(
+				status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+				detail="GOOGLE_CLIENT_ID não configurado.",
+			)
 
-	if response.status_code != 200:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail=f"Google retornou status {response.status_code}.",
-		)
+		try:
+			user_data = id_token.verify_oauth2_token(
+				payload.google_token,
+				google_requests.Request(),
+				google_client_id,
+			)
+		except ValueError:
+			raise HTTPException(
+				status_code=status.HTTP_401_UNAUTHORIZED,
+				detail="Token do Google inválido.",
+			)
 
-	user_data = response.json()
+		email = user_data.get("email")
+		name = user_data.get("name")
 
-	email = user_data.get("email")
-	name = user_data.get("name")
+		if not email:
+			raise HTTPException(
+				status_code=status.HTTP_400_BAD_REQUEST,
+				detail="Google não retornou email do usuário.",
+			)
 
-	if not email:
-		raise HTTPException(
-			status_code=status.HTTP_400_BAD_REQUEST,
-			detail="Google nao retornou email do usuario",
-		)
+		user = user_repo.get_user_by_email(db, email)
 
-	user = user_repo.get_user_by_email(db, email)
+		if not user:
+			user = user_repo.create_user(
+				db=db,
+				payload=UserCreate(
+					name=name or "Usuário Google",
+					email=email,
+					password=hash_password(str(uuid4())),
+				),
+			)
 
-	if not user:
-		user = user_repo.create_user(
-			db=db,
-			payload=UserCreate(
-				name=name or "Usuario Google",
-				email=email,
-				password=hash_password(str(uuid4())),
-			),
-		)
-
-	return {
-		"access_token": create_access_token({"sub": str(user.id)}),
-		"token_type": "bearer",
-	}
+		return {
+			"access_token": create_access_token({"sub": str(user.id)}),
+			"token_type": "bearer",
+		}
 
 
 @router.post("/change-password")
