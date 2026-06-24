@@ -38,7 +38,7 @@
 .card {
   padding: 1.3rem 1.35rem;
   border-radius: 1.25rem;
-  min-height: 210px;
+  min-height: 160px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -102,7 +102,7 @@
 }
 
 .cardValue {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 900;
   letter-spacing: -0.04em;
   color: var(--color-text-primary);
