@@ -8,7 +8,13 @@
 }
 
 .expandedContainer {
-  max-width: min(100%, 84rem);
+  max-width: min(100%, 78rem);
+}
+
+@media (min-width: 1280px) {
+  .expandedContainer {
+    max-width: min(100%, 84rem);
+  }
 }
 
 .pageStack {
@@ -688,26 +694,23 @@
 
 .toolbar {
   display: flex;
+  gap: 0.85rem;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
   width: 100%;
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 0;
-  /* posiciona acima dos cards */
-  margin-top: -0.75rem;
-  margin-bottom: 0.75rem;
-}
 
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
 
 .searchField {
   position: relative;
   display: flex;
   align-items: center;
-  flex: 1 1 16rem;
-  min-width: 16rem;
+
+  flex: 1;
+  min-width: 0;
 }
+
 
 
 .searchIcon {
@@ -722,25 +725,18 @@
 .searchInput {
   width: 100%;
   padding: 0.7rem 0.95rem 0.7rem 2.6rem;
-  border-radius: 0.85rem;
-  background: var(--color-surface-panel);
-  border: 1px solid color-mix(in srgb, var(--color-border-input) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border-input) 65%, transparent);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--color-surface-panel) 85%, transparent);
   color: var(--color-text-primary);
-  outline: none;
-  font-weight: 700;
-  font-size: 0.95rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .searchInput::placeholder {
   color: var(--color-text-muted);
   opacity: 0.75;
 }
-
-.searchInput:hover {
-  border-color: color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
-}
-
 .searchInput:focus {
   border-color: color-mix(in srgb, var(--color-ring-focus) 55%, transparent);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ring-focus) 18%, transparent);
@@ -767,106 +763,3 @@
 .sortField:hover {
   border-color: color-mix(in srgb, var(--color-ring-focus) 35%, transparent);
 }
-
-.sortField:focus-within {
-  border-color: color-mix(in srgb, var(--color-ring-focus) 55%, transparent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ring-focus) 18%, transparent);
-}
-
-.sortLabel {
-  font-size: 0.85rem;
-  font-weight: 600;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sortLabelIcon {
-  display: none;
-}
-
-.sortValue {
-  flex: 1;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  text-align: left;
-  padding-right: 0.5rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sortSelect {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  appearance: none;
-}
-
-.sortDropdown {
-  position: absolute;
-  z-index: 50;
-  top: calc(100% + 0.35rem);
-  left: 0;
-  right: 0;
-
-  margin: 0;
-  padding: 0.35rem;
-
-  list-style: none;
-
-  background: var(--color-surface-panel);
-  border: 1px solid var(--color-border-input);
-  border-radius: var(--radius-control);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-
-  max-height: 18rem;
-  overflow: auto;
-}
-
-.sortOption {
-  padding: 0.55rem 0.75rem;
-  border-radius: calc(var(--radius-control) - 4px);
-
-  color: var(--color-text-primary);
-  font-weight: 650;
-  font-size: 0.85rem;
-
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.sortOption:hover {
-  background: var(--color-brand-primary);
-  color: var(--color-text-primary);
-}
-
-.sortOption[aria-selected='true'] {
-  background: color-mix(in srgb, var(--color-brand-primary) 18%, var(--color-surface-panel));
-}
-
-.sortField::after {
-  display: none;
-}
-
-@media (max-width: 900px) {
-  .searchField {
-    flex: 1 1 100%;
-    min-width: 0;
-  }
-
-  .sortField {
-    flex: 1 1 100%;
-    width: auto;
-    min-width: 0;
-    justify-content: space-between;
-  }
-}
-

@@ -555,79 +555,9 @@ export default function PlanoEstudosPage() {
               }
             />
 
-            {/* Bloco de filtros */}
-
-            <div className={styles.toolbar} aria-label="Buscar e ordenar planos">
-              <div className={styles.searchField}>
-                <span className={styles.searchIcon} aria-hidden="true">
-                  <Search size={18} />
-                </span>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className={styles.searchInput}
-                  placeholder="Buscar por título, cargo ou empresa..."
-                  aria-label="Buscar planos"
-                />
-              </div>
-
-              <label
-              ref={sortDropdownRef}
-              className={styles.sortField}
-              role="button"
-              tabIndex={0}
-              aria-label="Ordenar planos"
-              aria-expanded={isOpenSortDropdown}
-              onClick={() => setIsOpenSortDropdown((prev) => !prev)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  setIsOpenSortDropdown((prev) => !prev)
-                }
-              }}
-            >
-              <ArrowUpDown size={16} aria-hidden="true" />
-              <span className={styles.sortLabel}>Ordenar por</span>
-              <span className={styles.sortValue}>
-                {sortOptions.find((option) => option.value === sortBy)?.label ?? ''}
-              </span>
-
-              {isOpenSortDropdown ? (
-                <ul className={styles.sortDropdown} role="listbox" aria-label="Opções de ordenação">
-                  {sortOptions.map((option) => {
-                    const isSelected = option.value === sortBy
-                    return (
-                      <li
-                        key={option.value}
-                        className={styles.sortOption}
-                        role="option"
-                        aria-selected={isSelected}
-                        tabIndex={0}
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          setSortBy(option.value)
-                          setIsOpenSortDropdown(false)
-                        }}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter' || event.key === ' ') {
-                            event.preventDefault()
-                            setSortBy(option.value)
-                            setIsOpenSortDropdown(false)
-                          }
-                        }}
-                      >
-                        {option.label}
-                      </li>
-                    )
-                  })}
-                </ul>
-              ) : null}
-            </label>
-            </div>
-
             {/* Bloco de cards glass de contagem */}
             <section className={styles.summaryCards} aria-label="Resumo do progresso">
+
               <div className={`${styles.summaryCard} ${styles.cardGlass}`}>
                 <div className={styles.summaryIconBox} aria-hidden="true">
                   <ShieldCheck size={20} />
@@ -649,10 +579,78 @@ export default function PlanoEstudosPage() {
               </div>
             </section>
 
-            {/* Bloco inferior: grid de PlanCard */}
-            <section className={styles.planGrid} aria-label="Lista de planos">
+            {/* Bloco de filtros */}
+            <div className={styles.toolbar}>
+              <div className={styles.searchField}>
+                <span className={styles.searchIcon} aria-hidden="true">
+                  <Search size={18} />
+                </span>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={styles.searchInput}
+                  placeholder="Buscar por título, cargo ou empresa..."
+                  aria-label="Buscar planos"
+                />
+              </div>
+
+              <label
+                ref={sortDropdownRef}
+                className={styles.sortField}
+                role="button"
+                tabIndex={0}
+                aria-label="Ordenar planos"
+                aria-expanded={isOpenSortDropdown}
+                onClick={() => setIsOpenSortDropdown((prev) => !prev)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    setIsOpenSortDropdown((prev) => !prev)
+                  }
+                }}
+              >
+                <ArrowUpDown size={16} aria-hidden="true" />
+                <span className={styles.sortLabel}>Ordenar por</span>
+                <span className={styles.sortValue}>
+                  {sortOptions.find((option) => option.value === sortBy)?.label ?? ''}
+                </span>
+
+                {isOpenSortDropdown ? (
+                  <ul className={styles.sortDropdown} role="listbox" aria-label="Opções de ordenação">
+                    {sortOptions.map((option) => {
+                      const isSelected = option.value === sortBy
+                      return (
+                        <li
+                          key={option.value}
+                          className={styles.sortOption}
+                          role="option"
+                          aria-selected={isSelected}
+                          tabIndex={0}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setSortBy(option.value)
+                            setIsOpenSortDropdown(false)
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              setSortBy(option.value)
+                              setIsOpenSortDropdown(false)
+                            }
+                          }}
+                        >
+                          {option.label}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                ) : null}
+              </label>
+            </div>
               {/* (A lista já está filtrada/ordenada via filteredPlans) */}
 
+            <section className={styles.planGrid} aria-label="Lista de planos">
               {filteredPlans.length === 0 ? (
 
                 <section className={styles.emptyState} aria-label="Nenhum plano">
