@@ -6,15 +6,13 @@ import {
   FaEnvelope,
   FaEye,
   FaEyeSlash,
-  FaGoogle,
   FaLock,
 } from 'react-icons/fa6'
-
-import { GoogleLogin } from '@react-oauth/google'
 
 import { Link, useNavigate } from 'react-router-dom'
 
 import Button from '../../components/Button/Button'
+import GoogleButton from '../../components/GoogleButton/GoogleButton'
 import Input from '../../components/Input/Input'
 import { apiPost } from '../../services/api'
 import { validateEmail, validatePassword } from '../../utils/validators'
@@ -204,8 +202,6 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
               <h2 className={styles.formTitle}>Bem-vindo de volta!</h2>
               <p className={styles.formSubtitle}>
                 Faça login para continuar sua jornada
-                {' · '}
-                Backend: {isBackendConnected ? 'conectado' : 'conectando...'}
               </p>
             </header>
 
@@ -252,7 +248,6 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
                 </p>
               ) : null}
 
-              {/* ↓ MUDANÇA: disabled enquanto backend não conectou ou está submetendo */}
               <Button
                 type="submit"
                 variant="primary"
@@ -272,25 +267,16 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
                 <span />
               </div>
 
-              {isBackendConnected ? (
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={() => {
-                    setFormMessageType('error')
-                    setFormMessage('Erro ao autenticar com Google.')
-                  }}
-                />
-              ) : (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  icon={<FaGoogle />}
-                  className={styles.googleButton}
-                  disabled
-                >
-                  Aguarde...
-                </Button>
-              )}
+              <GoogleButton
+                onSuccess={handleGoogleSuccess}
+                onError={() => {
+                  setFormMessageType('error')
+                  setFormMessage('Erro ao autenticar com Google.')
+                }}
+                disabled={!isBackendConnected}
+              >
+                {isBackendConnected ? 'Entrar com Google' : 'Aguarde...'}
+              </GoogleButton>
 
               <p className={styles.footerText}>
                 Ainda não tem uma conta? <Link to="/cadastro">Cadastre-se</Link>
