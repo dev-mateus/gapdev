@@ -1,0 +1,30 @@
+/* O wrapper define a área clicável. O botão visível dita o tamanho;
+   o overlay do Google é posicionado por cima dele. */
+.wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.visibleButton {
+  width: 100%;
+}
+
+/* Botão real do Google: sobreposto e invisível.
+   opacity 0 esconde o visual branco, mas o elemento continua clicável. */
+.googleOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Faz o container e o iframe internos do Google preencherem toda a área
+   do botão visível, garantindo que qualquer clique seja capturado. */
+.googleOverlay > div,
+.googleOverlay iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+}
