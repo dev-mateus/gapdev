@@ -57,45 +57,43 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
 
   const navigate = useNavigate()
 
-  async function handleGoogleSuccess(credentialResponse: { credential?: string }) {
-  try {
-    const googleCredential = credentialResponse.credential
+  async function handleGoogleSuccess(googleToken: string) {
+    try {
+      if (!googleToken) {
+        throw new Error('Nao foi possivel recuperar o token do Google.')
+      }
 
-    if (!googleCredential) {
-      throw new Error('Nao foi possivel recuperar o token do Google.')
-    }
-
-    const data = await apiPost<LoginResponse>('/auth/google', {
-      google_token: googleCredential,
-    })
-
-    localStorage.setItem('access_token', data.access_token)
-
-    localStorage.setItem(
-      'usuarioLogado',
-      JSON.stringify({
-        email: '',
-        nome: '',
-        authProvider: 'google',
+      const data = await apiPost<LoginResponse>('/auth/google', {
+        google_token: googleToken,
       })
-    )
 
-    localStorage.removeItem('usuarioEmail')
-    window.dispatchEvent(new Event('auth-changed'))
+      localStorage.setItem('access_token', data.access_token)
 
-    setFormMessageType('success')
-    setFormMessage('Login realizado com sucesso.')
+      localStorage.setItem(
+        'usuarioLogado',
+        JSON.stringify({
+          email: '',
+          nome: '',
+          authProvider: 'google',
+        })
+      )
 
-    navigate('/perfil')
-  } catch (error) {
-    setFormMessageType('error')
-    setFormMessage(
-      error instanceof Error
-        ? error.message
-        : 'Erro ao fazer login com Google.'
-    )
+      localStorage.removeItem('usuarioEmail')
+      window.dispatchEvent(new Event('auth-changed'))
+
+      setFormMessageType('success')
+      setFormMessage('Login realizado com sucesso.')
+
+      navigate('/perfil')
+    } catch (error) {
+      setFormMessageType('error')
+      setFormMessage(
+        error instanceof Error
+          ? error.message
+          : 'Erro ao fazer login com Google.'
+      )
+    }
   }
-}
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -202,6 +200,8 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
               <h2 className={styles.formTitle}>Bem-vindo de volta!</h2>
               <p className={styles.formSubtitle}>
                 Faça login para continuar sua jornada
+                {' · '}
+                Backend: {isBackendConnected ? 'conectado' : 'conectando...'}
               </p>
             </header>
 

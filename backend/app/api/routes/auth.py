@@ -96,7 +96,15 @@ def google_login(
 	payload: GoogleLoginRequest,
 		db: Session = Depends(get_database),
 	) -> dict[str, str]:
-		"""Authenticate user with Google ID token."""
+		"""Authenticate user with Google.
+
+		Aceita dois formatos de token, nesta ordem:
+		1. ID token (JWT) — validado localmente pela assinatura do Google.
+		2. Access token — validado consultando o endpoint userinfo do Google.
+
+		Isso permite tanto o componente <GoogleLogin> (ID token) quanto o
+		botão customizado com useGoogleLogin (access token) no frontend.
+		"""
 
 		google_client_id = os.getenv("GOOGLE_CLIENT_ID")
 
@@ -106,20 +114,42 @@ def google_login(
 				detail="GOOGLE_CLIENT_ID não configurado.",
 			)
 
+		email = None
+		name = None
+
+		# 1) Tenta validar como ID token (JWT assinado pelo Google).
 		try:
 			user_data = id_token.verify_oauth2_token(
 				payload.google_token,
 				google_requests.Request(),
 				google_client_id,
 			)
+			email = user_data.get("email")
+			name = user_data.get("name")
 		except ValueError:
-			raise HTTPException(
-				status_code=status.HTTP_401_UNAUTHORIZED,
-				detail="Token do Google inválido.",
-			)
+			# 2) Não é um ID token válido: trata como access token e consulta
+			#    o endpoint userinfo do Google para obter os dados do usuário.
+			try:
+				response = httpx.get(
+					"https://www.googleapis.com/oauth2/v3/userinfo",
+					headers={"Authorization": f"Bearer {payload.google_token}"},
+					timeout=10,
+				)
+			except httpx.HTTPError:
+				raise HTTPException(
+					status_code=status.HTTP_401_UNAUTHORIZED,
+					detail="Não foi possível validar o token do Google.",
+				)
 
-		email = user_data.get("email")
-		name = user_data.get("name")
+			if response.status_code != 200:
+				raise HTTPException(
+					status_code=status.HTTP_401_UNAUTHORIZED,
+					detail="Token do Google inválido.",
+				)
+
+			user_info = response.json()
+			email = user_info.get("email")
+			name = user_info.get("name")
 
 		if not email:
 			raise HTTPException(
@@ -143,7 +173,6 @@ def google_login(
 			"access_token": create_access_token({"sub": str(user.id)}),
 			"token_type": "bearer",
 		}
-
 
 @router.post("/change-password")
 def change_password(
