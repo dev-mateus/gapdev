@@ -200,8 +200,6 @@ function LoginPage({ isBackendConnected }: LoginPageProps) {
               <h2 className={styles.formTitle}>Bem-vindo de volta!</h2>
               <p className={styles.formSubtitle}>
                 Faça login para continuar sua jornada
-                {' · '}
-                Backend: {isBackendConnected ? 'conectado' : 'conectando...'}
               </p>
             </header>
 

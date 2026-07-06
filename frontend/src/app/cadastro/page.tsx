@@ -389,12 +389,6 @@ function CadastroPage({ isBackendConnected }: CadastroPageProps) {
 
               <p className={styles.formSubtitle}>
                 Comece sua jornada agora
-                {' · '}
-                Backend: {
-                  isBackendConnected
-                    ? 'conectado'
-                    : 'desconectado'
-                }
               </p>
             </header>
 
